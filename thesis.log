@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  13 MAR 2026 00:36
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  13 MAR 2026 00:47
  restricted system commands enabled.
  file:line:error style messages enabled.
 **d:/gitrepo/LaTeX-Thesis-Template/thesis
@@ -1252,36 +1252,72 @@ Chapter 2.
 
 ] [6] [7] [8] [9]) (./chapters/ch3_design_construction.tex [10]
 Chapter 3.
+
+LaTeX Warning: Reference `sec:pretraining' on page 11 undefined on input line 2
+2.
+
+
+LaTeX Warning: Reference `fig:overall_arch' on page 11 undefined on input line 
+64.
+
 [11
 
-] [12]
-<images/sampleimg.png, id=778, 126.4725pt x 134.75343pt>
-File: images/sampleimg.png Graphic file (type png)
-<use images/sampleimg.png>
-Package luatex.def Info: images/sampleimg.png  used on input line 93.
-(luatex.def)             Requested size: 113.8126pt x 113.81306pt.
- [13<./images/sampleimg.png>] [14]) (./chapters/ch4_results.tex
+]
+
+LaTeX Warning: Citation `hu2022lora' on page 12 undefined on input line 135.
+
+[12]
+
+LaTeX Warning: Reference `eq:vlm_input' on page 13 undefined on input line 201.
+
+
+[13] [14]
+
+LaTeX Warning: Reference `eq:ntp_sequence' on page 15 undefined on input line 3
+06.
+
 [15]
+
+LaTeX Warning: Citation `paszke2019pytorch' on page 16 undefined on input line 
+409.
+
+
+LaTeX Warning: Citation `wolf2020transformers' on page 16 undefined on input li
+ne 410.
+
+
+LaTeX Warning: Citation `loshchilov2019adamw' on page 16 undefined on input lin
+e 414.
+
+
+LaTeX Warning: Reference `tab:hyperparams' on page 16 undefined on input line 4
+23.
+
+
+LaTeX Warning: Reference `eq:vlm_input' on page 16 undefined on input line 459.
+
+
+) (./chapters/ch4_results.tex [16] [17]
 Chapter 4.
-[16
+[18
 
-] [17]) (./chapters/ch5_conclusion.tex [18]
+] [19]) (./chapters/ch5_conclusion.tex [20]
 Chapter 5.
-[19
+[21
 
-] [20] [21]
+] [22] [23]
 Overfull \hbox (3.73721pt too wide) in paragraph at lines 143--144
 []\TU/THSarabun.ttf(0)/m/n/12 Or-ga-ni-za-tion Name.//Year BE. Pub-li-ca-tion Ye
 ar.//Book Ti-tle.//Vol-ume (if any).//Edi-tion (if any).//City
  []
 
-[22]
+[24]
 Overfull \hbox (0.97719pt too wide) in paragraph at lines 163--164
 []\TU/THSarabun.ttf(0)/m/n/12 Au-thor of the Ar-ti-cle.//Year BE. Pub-li-ca-tion
  Year.// ”Ar-ti-cle Ti-tle (Con-fer-ence Re-port).”//Page/Page
  []
 
-[23]
+[25]
 Overfull \hbox (48.25485pt too wide) in paragraph at lines 221--222
 []\TU/THSarabun.ttf(0)/m/n/12 Au-thor.//Pub-li-ca-tion Year, Date, Month.//”Ar
 -ti-cle Ti-tle.”//Au-thor of the Ar-ti-cle.//News-pa-per Name.//Page/Page
@@ -1299,7 +1335,7 @@ Overfull \hbox (11.33316pt too wide) in paragraph at lines 251--252
 li-ca-tion Ti-tle.//Edi-tion (if any).//City of Pub-li-ca-tion://Pub-
  []
 
-[24] [25]
+[26] [27]
 Overfull \hbox (81.67719pt too wide) in paragraph at lines 319--320
 []\TU/THSarabun.ttf(0)/m/n/12 Texas In-stru-ments. 1998. Speech syn-the-sis Pro-
 ces-sors. [On-line]. Avail-able: http://www.ti.com/sc/docs/msp/speech/in-
@@ -1317,26 +1353,26 @@ Overfull \hbox (17.10521pt too wide) in paragraph at lines 349--350
 /Vol-ume,/Is-sue Num-ber.//Month Year of Print-ing.//Page/Page
  []
 
-[26])
+[28])
 Overfull \hbox (80.48921pt too wide) in paragraph at lines 409--77
 []\TU/THSarabun.ttf(0)/m/n/12 [3] Texas In-stru-ments. ”Speech Syn-the-sis Pro
 -ces-sors.” [On-line]. Avail-able : http://www.ti.com/sc/does/msp/speech/in-
  []
 
-[27] (./thesis.bbl [28
+[29] (./thesis.bbl [30
 
 
-]) (./chapters/appendix.tex [29] [30
+]) (./chapters/appendix.tex [31] [32
 
-] [31
+] [33
 
-] [32]
-<images/authorbib.png, id=927, 103.13531pt x 130.98938pt>
+] [34]
+<images/authorbib.png, id=981, 103.13531pt x 130.98938pt>
 File: images/authorbib.png Graphic file (type png)
 <use images/authorbib.png>
 Package luatex.def Info: images/authorbib.png  used on input line 51.
 (luatex.def)             Requested size: 113.8127pt x 113.81392pt.
- [33
+ [35
 
 
 <./images/authorbib.png>]) (./thesis.aux)
@@ -1344,28 +1380,61 @@ Package luatex.def Info: images/authorbib.png  used on input line 51.
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
-Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 8E9A9BBA099050A27122072B61D310D4;18187.
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `thesis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `thesis.out':
+(rerunfilecheck)             Before: 8E9A9BBA099050A27122072B61D310D4;18187
+(rerunfilecheck)             After:  FA3E22841A9C8107ADD13C0D97548090;20114.
 )
 
 Here is how much of LuaTeX's memory you used:
- 20184 strings out of 476076
+ 20234 strings out of 476076
  100000,953878 words of node,token memory allocated
- 772 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 23 attribute, 93 glue_spec
-, 23 attribute_list, 2 write, 2 pdf_action nodes
-   avail lists: 2:1209,3:473,4:312,5:260,6:162,7:8321,8:46,9:772,10:26,11:849
- 41993 multiletter control sequences out of 65536+600000
- 76 fonts using 30476759 bytes
- 79i,17n,97p,924b,631s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 856 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 44 attribute, 93 glue_spec
+, 44 attribute_list, 2 write, 2 pdf_action nodes
+   avail lists: 2:1167,3:473,4:312,5:266,6:162,7:8321,8:52,9:772,10:26,11:849
+ 42007 multiletter control sequences out of 65536+600000
+ 80 fonts using 30893415 bytes
+ 79i,13n,97p,758b,631s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+warning  (pdf backend): unreferenced destination with name 'figure.caption.10'
+
+warning  (pdf backend): unreferenced destination with name 'table.caption.9'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.15'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.14'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.13'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.12'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.11'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.10'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.9'
+
+warning  (pdf backend): unreferenced destination with name 'section.3.8'
 <c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
 no12-regular.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./
 fonts/THSarabunItalic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf><C:/
 Users/Windows-11/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfding/uzdr.pfb
 >
-Output written on thesis.pdf (44 pages, 328476 bytes).
+Output written on thesis.pdf (46 pages, 353403 bytes).
 
-PDF statistics: 985 PDF objects out of 1000 (max. 8388607)
- 246 named destinations out of 1000 (max. 1048576)
+PDF statistics: 1040 PDF objects out of 1200 (max. 8388607)
+ 285 named destinations out of 1000 (max. 1048576)
  761 words of extra memory for PDF output out of 10000 (max. 100000000)
 
