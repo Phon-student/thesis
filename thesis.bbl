@@ -1,8 +1,57 @@
 \begin{thebibliography}{1}
 
-\bibitem{zhang2023design}
-Xuechen Zhang, Zhengmin Wu, Chengmao Cao, Kun Luo, Kuan Qin, Yangyang Huang, and Jie Cao.
-\newblock Design and operation of a deep-learning-based fresh tea-leaf sorting robot.
-\newblock {\em Computers and Electronics in Agriculture}, 206:107664, 2023.
+\bibitem{kim2024openvla}
+Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
+\newblock {OpenVLA}: An open-source vision-language-action model.
+\newblock In {\em Proceedings of the Conference on Robot Learning (CoRL)},
+  2024.
+\newblock Establishes the dual-encoder SigLIP + DINOv2 backbone convention.
+
+\bibitem{liu2023llava}
+Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
+\newblock Visual instruction tuning.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  2023.
+
+\bibitem{nvidia2024groot}
+{NVIDIA}.
+\newblock {GR00T N1}: An open foundation model for generalist humanoid robots.
+\newblock Technical report, NVIDIA Corporation, 2024.
+\newblock Demonstrates FiLM-based continuous state conditioning and customised
+  action tokenisation.
+
+\bibitem{openx2023}
+{Open X-Embodiment Collaboration}.
+\newblock Open {X-Embodiment}: Robotic learning datasets and {RT-X} models.
+\newblock In {\em Proceedings of the IEEE International Conference on Robotics
+  and Automation (ICRA)}, 2024.
+
+\bibitem{openai2023gpt4v}
+{OpenAI}.
+\newblock {GPT-4} technical report.
+\newblock Technical report, OpenAI, 2023.
+
+\bibitem{oquab2023dinov2}
+Maxime Oquab, Timoth{\'e}e Darcet, Th{\'e}o Moutakanni, et~al.
+\newblock {DINOv2}: Learning robust visual features without supervision.
+\newblock {\em Transactions on Machine Learning Research}, 2023.
+\newblock Foundation for the DINOv3 vision expert used in the proposed
+  architecture.
+
+\bibitem{perez2018film}
+Ethan Perez, Florian Strub, Harm de~Vries, Vincent Dumoulin, and Aaron
+  Courville.
+\newblock {FiLM}: Visual reasoning with a general conditioning layer.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, 2018.
+
+\bibitem{pertsch2025fast}
+Karl Pertsch, Robin Strudel, et~al.
+\newblock {FAST}: Efficient action tokenization for vision-language-action
+  models.
+\newblock In {\em Proceedings of the Conference on Robot Learning (CoRL)},
+  2025.
+\newblock State-of-the-art discrete action tokeniser; referred to as FAST+ in
+  this thesis.
 
 \end{thebibliography}

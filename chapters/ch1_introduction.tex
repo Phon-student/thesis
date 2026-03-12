@@ -1,91 +1,231 @@
 \chapter{INTRODUCTION}
 
-\section{SIGNIFICANCE OF A THESIS}
+%─────────────────────────────────────────────────────────────────────────────
+\section{Background and Motivation}
+%─────────────────────────────────────────────────────────────────────────────
 
-A thesis is a continuous presentation of a study or research undertaken by
-students or researchers. Research or study at the graduate level differs significantly
-from undergraduate study because it involves in-depth exploration, problem
-identification, and a well-defined problem-solving process. It presents reasoned
-theories, analysis, and logically sound critiques from various perspectives. Therefore, a
-thesis is a written work or literature that must be studied, referenced, or further
-researched by subsequent students or researchers. A good thesis should have the following characteristics:
+The aspiration to endow robotic systems with the capacity for autonomous, general-purpose
+manipulation has been a defining pursuit of artificial intelligence research for several
+decades. Classical approaches to robot control, grounded in handcrafted heuristics,
+explicit geometric planning, and task-specific programming pipelines, have achieved
+considerable success within narrowly constrained environments. However, these paradigms
+exhibit a fundamental brittleness: they demand exhaustive engineering effort for each new
+task, fail to gracefully accommodate distributional shifts in the visual environment, and
+cannot leverage the rich semantic knowledge embedded in natural language instructions.
+Consequently, deploying robotic agents in unstructured, real-world settings---where objects,
+lighting conditions, and task goals vary continuously---remains an open and formidable
+challenge.
+
+The transformative advances in large-scale deep learning over the past decade have opened
+a compelling alternative trajectory. The emergence of Vision-Language Models
+(VLMs)~\cite{openai2023gpt4v, liu2023llava}, trained on internet-scale multimodal corpora,
+has demonstrated that neural networks can acquire remarkably robust visual understanding,
+spatial reasoning, and natural language grounding without task-specific supervision. These
+models encode not merely perceptual features, but higher-order semantic relationships---an
+ability that maps intuitively onto the requirements of instruction-following robotic
+manipulation, where an agent must interpret a command such as
+\textit{``put the banana in the green box''}, locate the relevant objects in the scene,
+and execute a coordinated sequence of physical motions to accomplish the goal.
+
+This convergence of insights from natural language processing and robotic control has
+catalysed the emergence of Vision-Language-Action (VLA) models---a class of architectures
+that unify visual perception, language comprehension, and continuous motor action
+generation within a single, end-to-end trainable framework. VLA models have shown
+early but encouraging results in generalising manipulation policies to novel objects,
+instructions, and scene configurations, suggesting that scaling the paradigms of
+foundation model research to the action domain may represent a productive path toward
+general-purpose robotic intelligence~\cite{openx2023, oquab2023dinov2}.
+
+Nevertheless, the design of effective VLA architectures presents a set of non-trivial
+technical challenges that the existing literature has only partially resolved. Three
+interrelated problems are of particular relevance to this thesis. \textit{First}, the
+choice of action representation---specifically, how continuous robot trajectories are
+encoded into a form that a language backbone can process---critically influences both
+the fidelity and the computational tractability of the resulting policy. Discrete
+tokenisation strategies, such as the FAST+ tokeniser~\cite{pertsch2025fast}, have emerged
+as a strong baseline, yet the design space of customised tokenisation remains
+incompletely explored. \textit{Second}, the architectural coupling between the language
+backbone and the action generation module---whether through discrete token prediction,
+hidden state conditioning, or feature modulation mechanisms such as Feature-wise Linear
+Modulation (FiLM)~\cite{perez2018film}---introduces significant tradeoffs between
+interpretability, latency, and generalisation capacity. \textit{Third}, the training
+methodology, including the formulation of pre-training objectives, the choice of
+auxiliary tasks such as object localisation, and the role of masked autoencoding for
+action token reconstruction, remains an active area of investigation with no established
+consensus on best practice.
+
+These challenges motivate the present work. This thesis proposes and evaluates a novel
+VLA architecture designed to address the aforementioned limitations through a principled
+synthesis of current best practices and targeted architectural innovations.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Problem Identification}
+%─────────────────────────────────────────────────────────────────────────────
+
+The central problem addressed in this thesis concerns the effective integration of a
+frozen Vision-Language Model backbone with a learned action generation module for
+instruction-following robotic manipulation. More specifically, the following
+research gaps have been identified through a systematic review of the relevant literature.
+
+\paragraph{Gap 1: Suboptimal Action Representation in Hybrid Architectures.}
+Existing VLA frameworks predominantly adopt one of two representational strategies:
+purely discrete action tokenisation, wherein trajectory chunks are mapped to a finite
+vocabulary and predicted autoregressively, or purely continuous conditioning, wherein
+the action model is conditioned on dense hidden states extracted from the language
+backbone. Each strategy entails distinct limitations. Discrete tokenisation introduces
+quantisation error and constrains temporal resolution, while continuous conditioning
+requires maintaining full differentiability through the backbone, imposing substantial
+memory overhead and complicating frozen-backbone deployment. A hybrid approach that
+selectively combines discrete token prediction with hidden state conditioning based on
+the action phase has not been rigorously studied.
+
+\paragraph{Gap 2: Inadequate Exploitation of End-Effector Visual Context.}
+Most existing VLA models process visual context through a single shared encoder that
+receives a global overview image of the workspace. This design conflates information
+at markedly different spatial scales: the coarse, scene-level context necessary for
+goal identification and obstacle avoidance, and the fine-grained, proximity-level context
+necessary for precise grasping and manipulation. The role of a dedicated end-effector
+camera stream, processed through a specialised vision encoder such as
+DINOv3~\cite{oquab2023dinov2}, as a complementary input to the action generation module
+has received insufficient attention in prior architectural studies.
+
+\paragraph{Gap 3: Unclear Pre-Training Curriculum for Unified VLA Systems.}
+The pre-training stage of VLA models typically optimises a next-token prediction
+objective over instruction-state-action sequences. However, the optimal composition of
+auxiliary objectives---including object localisation prediction, state description
+generation, and action token reconstruction via masked autoencoding---and the scheduling
+of these objectives across training stages remain poorly understood. In particular, the
+extent to which spatial grounding tasks, such as predicting bounding box coordinates
+for task-relevant objects, improve downstream manipulation performance through improved
+spatial reasoning in the language backbone has not been systematically ablated.
+
+Building upon these identified gaps, this thesis poses the following primary research
+question:
+
+\begin{quote}
+\textit{How can a frozen Vision-Language Model backbone be effectively coupled with
+a diffusion-based action expert and a dedicated visual feature extractor to produce
+a VLA system that is computationally efficient, data-effective, and capable of
+generalising instruction-following manipulation policies to novel objects and
+scene configurations?}
+\end{quote}
+
+The following secondary questions are also addressed:
 \begin{enumerate}[label=\arabic*)]
-    \item It should address a specific research question or problem.
-    \item It should demonstrate a thorough understanding of the relevant literature.
-    \item It should employ appropriate research methodologies.
-    \item It should present original findings or contributions to the field.
-    \item It should be well-organized and clearly written.
+    \item What is the relative contribution of discrete action token conditioning
+    versus hidden state conditioning on the quality and consistency of generated
+    trajectories?
+    \item Does incorporating end-effector image features through a specialised encoder
+    yield measurable improvements in manipulation precision compared to overview-only
+    visual input?
+    \item To what extent does including object localisation as an auxiliary pre-training
+    task improve the spatial reasoning capacity and downstream task performance of
+    the language backbone?
 \end{enumerate}
 
-\section{THE IMPORTANCE OF THE THESIS PRESENTATION PROCESS}
 
-The sequence of steps in presenting or writing a thesis is of paramount
-importance for the understanding of the readers, whether they are the thesis
-examiners themselves or individuals who will use the thesis for research or reference
-in subsequent ranks. The central content of the thesis should ideally consist of three
-main subsections: the introduction, the main content section, and the conclusion.
+%─────────────────────────────────────────────────────────────────────────────
+\section{Objectives}
+%─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Introduction Section}
+The overarching objective of this research is to design, implement, and empirically
+evaluate a novel VLA architecture that effectively addresses the research gaps
+identified in the preceding section. To this end, the following specific objectives
+are pursued:
 
-The introduction section serves as the first chapter of the thesis, following the
-abstract. Many theses have a distinct separation between the abstract and the
-introduction. The abstract provides a concise overview of what the problem is, what
-the author has done, how it was done, and what the outcomes were. The introduction,
-on the other hand, leads the reader into the problem systematically. It often
-summarizes previous research in the field and then explicitly identifies the clear
-problem (problem identification) that the author will address or solve, followed by
-outlining the study or problem-solving process. This leads to the transition into the
-second section, which is the main content section.
+\begin{enumerate}[label=\arabic*)]
+    \item To propose a dual-encoder VLA architecture comprising a frozen
+    VLM backbone (Qwen3 with SigLIP vision encoder, approximately 2~billion parameters),
+    a dedicated end-effector vision expert (DINOv3, approximately 86~million parameters),
+    and a Diffusion Transformer (DiT) action expert (approximately 300~million parameters),
+    conditioned jointly on hidden states from the VLM and visual features from the
+    vision expert.
 
-\subsection{Main Content Section}
+    \item To design and implement a two-stage pre-training curriculum in which the
+    foundation model is trained via next-token prediction over a multi-task sequence
+    comprising object localisation coordinates, natural language state descriptions,
+    and FAST+ discrete action tokens, while the action expert is trained via
+    trajectory reconstruction and masked autoencoding loss.
 
-The main content section of the thesis is the largest part of the entire
-document. It typically comprises several chapters, ranging from 2 to 5 chapters or
-more, with each chapter having a similar length and content. Each chapter should not
-be overly long to ensure readability (usually around 20-40 pages). The first chapter in
-this section often discusses general principles or relevant theories and the research
-conducted by others (literature review). Subsequent chapters detail various stages of
-the study or problem-solving process, along with the results obtained. Many theses in
-this section conclude each chapter and provide an introduction to the next chapter.
+    \item To conduct ablation studies systematically evaluating the impact of (a)
+    discrete versus hidden state action conditioning, (b) end-effector visual feature
+    inclusion, and (c) object localisation as an auxiliary pre-training task on
+    downstream manipulation performance.
 
-\subsection{Conclusion Section}
+    \item To benchmark the proposed architecture against established VLA baselines,
+    including OpenVLA~\cite{kim2024openvla} and GR00T N1~\cite{nvidia2024groot}, across
+    a suite of simulated and physical manipulation tasks.
+\end{enumerate}
 
-This section of the thesis is crucial and consists of no fewer than the first two
-sections. It demonstrates the achievement of the study's objectives and showcases
-the depth of the researcher's understanding. It involves presenting analysis, critique, or
-recommendations. The conclusion section and the summary section should be clearly
-distinguished because the conclusion typically provides a concise overview of the
-study or research results.
 
-\section{LANGUAGE}
+%─────────────────────────────────────────────────────────────────────────────
+\section{Scope and Limitations}
+%─────────────────────────────────────────────────────────────────────────────
 
-In thesis writing, the author can write in either Thai or English. The language
-used for presenting the thesis is written language, not spoken language, and it is not
-about quantity but quality. Therefore, each page of the thesis must be concise, clear,
-and adhere to the principles of correct vocabulary and grammar usage. The use of
-technical terminology or foreign language words should also be considered. If possible,
-use translated terms or standard vocabulary in the Thai language (if the thesis is written
-in Thai). If unsure about conveying the meaning correctly, include the foreign language
-term in parentheses.
-It is essential to understand that the language used in thesis writing is a means
-of mutual understanding between the author and the readers of that thesis. In addition
-to using the correct words, the order of words presented is equally important. Each
-paragraph should clearly indicate its main point, and the transitions between adjacent
-paragraphs should serve as a good bridge for readers to follow seamlessly.
-Redundancy, misleading statements, and ambiguity should be avoided in thesis
-writing. Typically, authors do not intend for these issues to arise, but they often occur
-due to lack of carefulness. Some sentences or paragraphs may appear non-repetitive
-at first glance but summarizing them may reveal that they reiterate the same points
-made previously. Such repetition can lead to confusion. Always keep in mind that a
-paragraph or sentence should be summarizable, and readers should not conclude that
-the author is saying something different than what was previously stated.
-This thesis guide provides details on various aspects of thesis writing that
-authors should be aware of and adhere to the institute's regulations. In Chapter 1, the
-importance of the thesis, its different parts, and the language used in thesis writing are
-discussed. Chapter 2 provides details and formats for various parts of the thesis, starting
-from the cover page. Chapter 3 elaborates on the format of paper size, printing
-standards, and an acceptable format. The methods of referencing and writing
-bibliography and citations are discussed in Chapters 4 and 5, respectively. Appendices
-are divided into three main sections: the process of proposing a thesis and requesting
-thesis examination, various examples of thesis writing, the institute's regulations
-regarding graduate studies, and related form templates.
+To maintain clarity of focus, the scope of this research is delimited as follows.
+The proposed architecture targets table-top robotic manipulation tasks involving
+a single robotic arm with a parallel-jaw or compliant gripper. The study does not
+address bi-manual manipulation, mobile locomotion, or multi-agent coordination.
+Visual observations are assumed to be provided by two calibrated RGB cameras: one
+providing an overview of the workspace and one mounted at or near the end-effector.
+Depth sensing and proprioceptive state estimation are considered supplementary inputs
+and are not the primary focus of the architectural investigation. Pre-training data
+are drawn from publicly available robot demonstration datasets; data collection
+procedures and the construction of novel datasets fall outside the scope of this work.
+Furthermore, while inference latency and model compression are acknowledged as
+important practical considerations, they are treated as secondary metrics relative
+to task success rate and generalisation performance in the evaluation framework.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Contributions}
+%─────────────────────────────────────────────────────────────────────────────
+
+The principal contributions of this thesis are as follows:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{A novel dual-encoder VLA architecture} that decouples the processing
+    of overview and end-effector visual streams through a frozen VLM backbone and a
+    trainable DINOv3-based vision expert respectively, and conditions a DiT-based
+    action expert jointly on VLM hidden states and vision expert features.
+    This architectural decomposition is demonstrated to improve manipulation precision
+    without incurring proportional increases in computational cost.
+
+    \item \textbf{A structured two-stage pre-training curriculum} incorporating
+    object localisation, state description generation, and FAST+ action token
+    prediction as complementary next-token prediction tasks for the foundation model,
+    together with a reconstruction and masked autoencoding objective for the action
+    expert. The curriculum is shown empirically to accelerate convergence and improve
+    generalisation relative to single-objective training baselines.
+
+    \item \textbf{A systematic ablation study} characterising the relative
+    contributions of the discrete action token pathway and the hidden state
+    conditioning pathway to trajectory quality, as well as the incremental benefit
+    of end-effector visual features and spatial grounding auxiliary tasks.
+
+    \item \textbf{Open-source release} of the proposed architecture implementation,
+    pre-training pipeline, and evaluation benchmarks to facilitate reproducibility
+    and further community research.
+\end{enumerate}
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Thesis Organisation}
+%─────────────────────────────────────────────────────────────────────────────
+
+The remainder of this thesis is structured as follows. Chapter~\ref{chap:litreview}
+provides a comprehensive review of the relevant literature, tracing the development of
+VLA models from their foundational precursors in imitation learning and multimodal
+language modelling, and critically examining the architectural and training choices
+made in seminal works including OpenVLA, GR00T N1, and Diffusion-VLA.
+Chapter~\ref{chap:methodology} presents the proposed architecture in detail, covering
+the design rationale for each component, the mathematical formulation of the training
+objectives, and the implementation specifics of the pre-training and fine-tuning
+pipelines. Chapter~\ref{chap:experiments} describes the experimental setup, datasets,
+evaluation metrics, and baseline comparisons employed in this study, followed by a
+thorough presentation and discussion of the empirical results and ablation findings.
+Chapter~\ref{chap:conclusion} synthesises the conclusions drawn from the experimental
+evidence, revisits the research questions posed in this chapter, acknowledges the
+limitations of the current work, and identifies promising directions for future
+investigation.

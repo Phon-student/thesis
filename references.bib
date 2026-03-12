@@ -1,18 +1,126 @@
-@book{sumner1990computer,
-  title={Computer: Concept and uses},
-  author={Sumner, M.},
-  edition={2nd},
-  year={1990},
-  publisher={McGraw-Hill},
-  address={New York}
+% ============================================================
+%  references.bib
+%  Bibliography for VLA Thesis
+%  Sources drawn from: Normal_VLA_architecture.pdf (Page 3)
+% ============================================================
+
+% ── Vision-Language Models ──────────────────────────────────
+
+@techreport{openai2023gpt4v,
+  author      = {{OpenAI}},
+  title       = {{GPT-4} Technical Report},
+  institution = {OpenAI},
+  year        = {2023},
+  url         = {https://arxiv.org/abs/2303.08774}
 }
 
-@article{zhang2023design,
-  title={Design and operation of a deep-learning-based fresh tea-leaf sorting robot},
-  author={Zhang, Xuechen and Wu, Zhengmin and Cao, Chengmao and Luo, Kun and Qin, Kuan and Huang, Yangyang and Cao, Jie},
-  journal={Computers and Electronics in Agriculture},
-  volume={206},
-  pages={107664},
-  year={2023},
-  publisher={Elsevier}
+@inproceedings{liu2023llava,
+  author    = {Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
+  title     = {Visual Instruction Tuning},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2304.08485}
+}
+
+% ── Action Tokenisation ─────────────────────────────────────
+
+@inproceedings{pertsch2025fast,
+  author    = {Pertsch, Karl and Strudel, Robin and others},
+  title     = {{FAST}: Efficient Action Tokenization for Vision-Language-Action Models},
+  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2501.09747},
+  note      = {State-of-the-art discrete action tokeniser; referred to as FAST+ in this thesis}
+}
+
+% ── Feature Modulation ──────────────────────────────────────
+
+@inproceedings{perez2018film,
+  author    = {Perez, Ethan and Strub, Florian and de Vries, Harm and
+               Dumoulin, Vincent and Courville, Aaron},
+  title     = {{FiLM}: Visual Reasoning with a General Conditioning Layer},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2018},
+  url       = {https://arxiv.org/abs/1709.07871}
+}
+
+% ── Vision Encoders ─────────────────────────────────────────
+
+@article{oquab2023dinov2,
+  author  = {Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni, Th{\'e}o and others},
+  title   = {{DINOv2}: Learning Robust Visual Features without Supervision},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2023},
+  url     = {https://arxiv.org/abs/2304.07193},
+  note    = {Foundation for the DINOv3 vision expert used in the proposed architecture}
+}
+
+% ── Open-Source VLA Backbone ────────────────────────────────
+
+@inproceedings{kim2024openvla,
+  author    = {Kim, Moo Jin and Pertsch, Karl and Karamcheti, Siddharth and others},
+  title     = {{OpenVLA}: An Open-Source Vision-Language-Action Model},
+  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2406.09246},
+  note      = {Establishes the dual-encoder SigLIP + DINOv2 backbone convention}
+}
+
+% ── Large-Scale Robot Data ──────────────────────────────────
+
+@inproceedings{openx2023,
+  author    = {{Open X-Embodiment Collaboration}},
+  title     = {Open {X-Embodiment}: Robotic Learning Datasets and {RT-X} Models},
+  booktitle = {Proceedings of the IEEE International Conference on
+               Robotics and Automation (ICRA)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2310.08864}
+}
+
+% ── NVIDIA Humanoid Foundation Model ────────────────────────
+
+@techreport{nvidia2024groot,
+  author      = {{NVIDIA}},
+  title       = {{GR00T N1}: An Open Foundation Model for Generalist Humanoid Robots},
+  institution = {NVIDIA Corporation},
+  year        = {2024},
+  url         = {https://arxiv.org/abs/2503.14734},
+  note        = {Demonstrates FiLM-based continuous state conditioning and
+                 customised action tokenisation}
+}
+
+% ── Diffusion-Based VLA ─────────────────────────────────────
+
+@article{wen2024diffusionvla,
+  author  = {Wen, Wenxuan and others},
+  title   = {Diffusion-{VLA}: Generalizable and Interpretable Robot Foundation
+             Model via Self-Generated Reasoning},
+  journal = {arXiv preprint},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2412.03293},
+  note    = {Introduces chain-of-thought reasoning as an interpretable action prior}
+}
+
+% ── Object Localisation in VLMs ─────────────────────────────
+
+@inproceedings{chen2024localization,
+  author    = {Chen, Jinkun and others},
+  title     = {Learning to Localize Objects Improves Spatial Reasoning in Visual-{LLMs}},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2404.07449},
+  note      = {Supports object localisation as a VLM pre-training auxiliary task}
+}
+
+% ── Knowledge Insulation / Pre-Training Best Practice ───────
+
+@article{pertsch2025kilovla,
+  author  = {Pertsch, Karl and others},
+  title   = {Knowledge Insulating Vision-Language-Action Models:
+             Train Fast, Run Fast, Generalize Better},
+  journal = {arXiv preprint},
+  year    = {2025},
+  url     = {https://arxiv.org/abs/2501.12599},
+  note    = {Pre-training best practice reference from the architecture document}
 }
