@@ -95,5 +95,5 @@
 \contentsline {subsubsection}{\numberline {5.3.8.5}Visual Materials and Other Media}{27}{subsubsection.5.3.8.5}%
 \contentsline {subsubsection}{\numberline {5.3.8.6}Electronic Media}{27}{subsubsection.5.3.8.6}%
 \contentsline {chapter}{BIBLIOGRAPHY}{28}{subsubsection.5.3.8.6}%
-\contentsline {chapter}{Appendix A Guidelines and Procedures For Thesis Writing}{29}{chapter*.11}%
-\contentsline {chapter}{AUTHOR BIOGRAPHY}{32}{appendix*.12}%
+\contentsline {chapter}{Appendix A Guidelines and Procedures For Thesis Writing}{30}{chapter*.11}%
+\contentsline {chapter}{AUTHOR BIOGRAPHY}{33}{appendix*.12}%

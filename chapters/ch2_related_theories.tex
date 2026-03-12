@@ -1,4 +1,5 @@
 \chapter{RELATED THEORIES AND LITERATURE REVIEW}
+\label{chap:litreview}
 
 This chapter surveys the theoretical foundations and prior research directly relevant
 to the design of the Vision-Language-Action (VLA) architecture proposed in this thesis.
@@ -353,21 +354,32 @@ characteristics of the surveyed VLA models in relation to the proposed architect
 \centering
 \caption{Comparison of related VLA architectures. FM = Flow Matching,
          FS = Frozen Backbone, CT = Continuous Tokenisation,
-         DT = Discrete Tokenisation, HS = Hidden State Conditioning.}
+         DT = Discrete Tokenisation.}
 \label{tab:vla_comparison}
 \begin{tabular}{lcccccc}
 \hline
 \textbf{Model} & \textbf{Vision Enc.} & \textbf{Action Gen.} & \textbf{Tokeniser}
                & \textbf{FS} & \textbf{End-Eff. Cam.} & \textbf{Localisation} \\
 \hline
-OpenVLA         & SigLIP + DINOv2 & Autoregressive  & Uniform bin  & \texttimes & \texttimes & \texttimes \\
-GR00T N1        & SigLIP          & Diffusion (FM)  & Custom (CT)  & \checkmark & \checkmark & \texttimes \\
-Diffusion-VLA   & SigLIP          & Diffusion (FM)  & FAST+  (DT)  & \checkmark & \texttimes & \texttimes \\
-KILO-VLA        & SigLIP + DINOv2 & Autoregressive  & FAST+  (DT)  & \checkmark & \texttimes & \texttimes \\
-\textbf{Ours}   & SigLIP + DINOv3 & Diffusion (FM)  & FAST+  (DT)  & \checkmark & \checkmark & \checkmark \\
+OpenVLA
+  & SigLIP + DINOv2 & Autoregressive & Uniform bin
+  & \xmark & \xmark & \xmark \\
+GR00T N1
+  & SigLIP          & Diffusion (FM) & Custom (CT)
+  & \cmark & \cmark & \xmark \\
+Diffusion-VLA
+  & SigLIP          & Diffusion (FM) & FAST+ (DT)
+  & \cmark & \xmark & \xmark \\
+KILO-VLA
+  & SigLIP + DINOv2 & Autoregressive & FAST+ (DT)
+  & \cmark & \xmark & \xmark \\
+\textbf{Ours}
+  & SigLIP + DINOv3 & Diffusion (FM) & FAST+ (DT)
+  & \cmark & \cmark & \cmark \\
 \hline
 \end{tabular}
 \end{table}
+
 
 The comparison reveals a consistent gap across all surveyed architectures: no
 existing model simultaneously employs a dedicated end-effector vision expert,

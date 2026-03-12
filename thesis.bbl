@@ -1,4 +1,29 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{brohan2022rt1}
+Anthony Brohan, Noah Brown, Justice Carbajal, et~al.
+\newblock {RT-1}: Robotics transformer for real-world control at scale.
+\newblock In {\em Proceedings of Robotics: Science and Systems (RSS)}, 2023.
+
+\bibitem{chen2024localization}
+Jinkun Chen et~al.
+\newblock Learning to localize objects improves spatial reasoning in
+  visual-{LLMs}.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2024.
+\newblock Supports object localisation as a VLM pre-training auxiliary task.
+
+\bibitem{chi2023diffusionpolicy}
+Cheng Chi, Siyuan Feng, Yilun Du, Zhenjia Xu, Eric Cousineau, Benjamin
+  Burchfiel, and Shuran Song.
+\newblock Diffusion policy: Visuomotor policy learning via action diffusion.
+\newblock In {\em Proceedings of Robotics: Science and Systems (RSS)}, 2023.
+
+\bibitem{ho2020ddpm}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  2020.
 
 \bibitem{kim2024openvla}
 Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
@@ -6,6 +31,23 @@ Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
 \newblock In {\em Proceedings of the Conference on Robot Learning (CoRL)},
   2024.
 \newblock Establishes the dual-encoder SigLIP + DINOv2 backbone convention.
+
+\bibitem{lavalle2006planning}
+Steven~M. LaValle.
+\newblock {\em Planning Algorithms}.
+\newblock Cambridge University Press, 2006.
+
+\bibitem{levine2016end}
+Sergey Levine, Peter Pastor, Alex Krizhevsky, Julian Ibarz, and Deirdre
+  Quillen.
+\newblock End-to-end training of deep visuomotor policies.
+\newblock {\em Journal of Machine Learning Research}, 17(39):1--40, 2016.
+
+\bibitem{lipman2022flow}
+Yaron Lipman, Ricky T.~Q. Chen, Heli Ben-Hamu, Maximilian Nickel, and Matt Le.
+\newblock Flow matching for generative modeling.
+\newblock In {\em International Conference on Learning Representations (ICLR)},
+  2023.
 
 \bibitem{liu2023llava}
 Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
@@ -38,12 +80,25 @@ Maxime Oquab, Timoth{\'e}e Darcet, Th{\'e}o Moutakanni, et~al.
 \newblock Foundation for the DINOv3 vision expert used in the proposed
   architecture.
 
+\bibitem{peebles2023scalable}
+William Peebles and Saining Xie.
+\newblock Scalable diffusion models with transformers.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, 2023.
+
 \bibitem{perez2018film}
 Ethan Perez, Florian Strub, Harm de~Vries, Vincent Dumoulin, and Aaron
   Courville.
 \newblock {FiLM}: Visual reasoning with a general conditioning layer.
 \newblock In {\em Proceedings of the AAAI Conference on Artificial
   Intelligence}, 2018.
+
+\bibitem{pertsch2025kilovla}
+Karl Pertsch et~al.
+\newblock Knowledge insulating vision-language-action models: Train fast, run
+  fast, generalize better.
+\newblock {\em arXiv preprint}, 2025.
+\newblock Pre-training best practice reference from the architecture document.
 
 \bibitem{pertsch2025fast}
 Karl Pertsch, Robin Strudel, et~al.
@@ -53,5 +108,46 @@ Karl Pertsch, Robin Strudel, et~al.
   2025.
 \newblock State-of-the-art discrete action tokeniser; referred to as FAST+ in
   this thesis.
+
+\bibitem{pomerleau1989alvinn}
+Dean~A. Pomerleau.
+\newblock {ALVINN}: An autonomous land vehicle in a neural network.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  1989.
+
+\bibitem{radford2021clip}
+Alec Radford, Jong~Wook Kim, Chris Hallacy, et~al.
+\newblock Learning transferable visual models from natural language
+  supervision.
+\newblock In {\em Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2021.
+
+\bibitem{ross2011dagger}
+St{\'{e}}phane Ross, Geoffrey~J. Gordon, and Drew Bagnell.
+\newblock A reduction of imitation learning and structured prediction to
+  no-regret online learning.
+\newblock In {\em Proceedings of the International Conference on Artificial
+  Intelligence and Statistics (AISTATS)}, 2011.
+
+\bibitem{vaswani2017attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+  Aidan~N. Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  2017.
+
+\bibitem{wen2024diffusionvla}
+Wenxuan Wen et~al.
+\newblock Diffusion-{VLA}: Generalizable and interpretable robot foundation
+  model via self-generated reasoning.
+\newblock {\em arXiv preprint}, 2024.
+\newblock Introduces chain-of-thought reasoning as an interpretable action
+  prior.
+
+\bibitem{zhai2023sigmoid}
+Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer.
+\newblock Sigmoid loss for language image pre-training.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, 2023.
 
 \end{thebibliography}
