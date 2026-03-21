@@ -365,35 +365,202 @@ hyperparameters determined by grid search on the validation split.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{DATASET AND DATA PROCESSING}
+\section{DATASET COLLECTION PIPELINE}
+\label{sec:dataset}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Training Dataset}
+The training dataset used in this thesis is collected entirely in-house using a
+purpose-built data collection toolchain developed for the Dobot robotic
+arm~\cite{falightsk2025dobot}. This toolchain eliminates the dependency on
+third-party demonstration datasets and ensures that the collected data precisely
+matches the dual-camera input format and the 7-dimensional action space of the
+proposed architecture. The pipeline consists of four sequential stages:
+trajectory recording, trajectory post-processing, multimodal dataset creation,
+and data formatting.
 
-Pre-training data are drawn from the Open X-Embodiment dataset~\cite{openx2023},
-a large-scale collection of robot demonstration trajectories aggregated from
-multiple robotic platforms and research institutions. Demonstrations are filtered
-to retain only single-arm tabletop manipulation episodes recorded with at least
-one wrist-mounted or end-effector-adjacent camera, yielding a subset compatible
-with the dual-camera input format of the proposed architecture. Each episode is
-segmented into fixed-length trajectory chunks of $N = 16$ timesteps, with a
-stride of $N/2 = 8$ timesteps to produce overlapping chunks that increase the
-effective dataset size.
+\subsection{Hardware Setup}
 
-\subsection{State Description Annotation}
+The physical data collection platform comprises the following components:
 
-Natural language state descriptions $s_t$ are generated automatically for each
-trajectory chunk by querying a separate, larger VLM with the overview image and
-the instruction as context. The generated descriptions are manually validated on
-a held-out subset of 500 episodes to confirm that they correctly reflect the
-sub-goal of each chunk before being incorporated into the training sequences.
+\begin{itemize}
+    \item \textbf{Dobot robot arm} with a 6-DOF joint configuration and a
+    tool digital output (DO) channel for gripper control, connected to the host
+    workstation via TCP over a local Ethernet network. The dashboard command
+    interface is accessed on port~29999; real-time joint state feedback is
+    received on port~30004 at the native feedback rate.
 
-\subsection{Localisation Label Generation}
+    \item \textbf{Overview camera}: a USB RGB camera (OpenCV index~1) mounted
+    above and behind the workspace to provide a global, scene-level view of
+    the tabletop environment and the task objects.
 
-Bounding box labels for task-relevant objects are generated using a zero-shot
-open-vocabulary detector applied to each overview image. Detected boxes are
-discretised onto a $256 \times 256$ coordinate grid to produce the
-\texttt{<loc>} token sequences used in the localisation pre-training sub-task.
+    \item \textbf{End-effector camera}: an IP camera accessed via an HTTP
+    MJPEG stream (\texttt{http://192.168.137.21:81/stream}), mounted at the
+    wrist of the robot arm to provide close-range, proximity-level visual context
+    of the gripper and the immediate manipulation target.
+\end{itemize}
+
+This dual-camera configuration corresponds directly to the two visual input
+streams consumed by the proposed VLA architecture: the overview image
+$I^{\text{ov}}_t$ and the end-effector image $I^{\text{ef}}_t$, as defined in
+Section~\ref{sec:vlm}.
+
+\subsection{Stage 1: Trajectory Recording}
+
+Human demonstrations are recorded using the \texttt{record\_trajectory()} method
+of the \texttt{DobotController} class. At the onset of recording, the robot is
+placed in drag (gravity-compensation) mode via the \texttt{StartDrag()} command,
+allowing the operator to guide the robot arm by hand through the desired
+manipulation motion. Joint states are sampled from the real-time feedback thread
+at a configurable rate (default: 50~Hz) for a configurable duration (default:
+10~seconds), yielding a raw trajectory array of shape $(T, 7)$ where $T$ is the
+total number of recorded frames.
+
+Each row of the trajectory array encodes:
+
+\begin{equation}
+    \mathbf{r}_t =
+    \bigl[\,\Delta q_1,\; \Delta q_2,\; \Delta q_3,\; \Delta q_4,\;
+            \Delta q_5,\; \Delta q_6,\; d_t\,\bigr]
+    \label{eq:raw_traj}
+\end{equation}
+
+where $\Delta q_j \in \mathbb{R}$ denotes the relative joint delta (in degrees)
+of the $j$-th joint with respect to the previous timestep, and $d_t \in \{0, 1\}$
+is the binary state of the tool digital output channel, representing the
+open/closed state of the gripper. A deadband filter with threshold
+$\delta = 0.01$\,degrees is applied during recording: if the maximum absolute
+delta across all joints falls below $\delta$, the delta is set to zero, preventing
+sensor noise from being recorded as spurious motion.
+
+\subsection{Stage 2: Trajectory Post-Processing}
+
+The raw recorded trajectory is post-processed by the
+\texttt{post\_process\_trajectory()} method to remove redundant frames that would
+otherwise artificially inflate the dataset size and degrade training efficiency.
+Three criteria are jointly evaluated for each frame:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Duplicate detection}: a frame is flagged as a duplicate if
+    its maximum absolute difference from the preceding frame across all seven
+    channels falls below $10^{-6}$.
+
+    \item \textbf{Static movement detection}: a frame is flagged as static if
+    the maximum absolute joint delta across the first six channels falls below
+    $10^{-6}$, indicating that no joint motion occurred.
+
+    \item \textbf{IO stability}: a frame is flagged as IO-stable if the tool
+    digital output value is unchanged from the preceding frame.
+\end{enumerate}
+
+A frame is removed if and only if all three conditions are simultaneously
+satisfied---a design choice that ensures frames in which the gripper state changes
+are always retained, even during otherwise static pauses in the demonstration.
+Additionally, all frames following the last retained movement frame are
+unconditionally preserved to maintain the natural termination behaviour of each
+demonstration. The post-processed trajectory is saved as a \texttt{.npy} file.
+
+\subsection{Stage 3: Multimodal Dataset Creation}
+
+The post-processed trajectory is replayed on the physical robot by the
+\texttt{dataset\_creation.py} script to generate the multimodal dataset. The
+replay-and-capture procedure iterates through the trajectory in non-overlapping
+segments of fixed length $N_\text{seg} = 40$ timesteps. Before executing each
+segment, the following data are captured and saved:
+
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Robot state} $\mathbf{s}_t \in \mathbb{R}^7$: the current
+    absolute joint angles $[q_1, \ldots, q_6]$ concatenated with the current
+    digital output state, read directly from the feedback thread. Saved as a
+    \texttt{.npy} file at \texttt{dataset/state/<task>/<index>.npy}.
+
+    \item \textbf{Overview image}: a single RGB frame captured from the overhead
+    USB camera. Saved as a PNG file at
+    \texttt{dataset/image/<task>/<index>.png}.
+
+    \item \textbf{End-effector image}: a single RGB frame captured from the
+    wrist IP camera. The camera buffer is flushed by reading three consecutive
+    frames before saving to avoid stale frames from internal buffering. Saved as
+    a PNG file at \texttt{dataset/image/<task>/<index>\_end.png}.
+\end{enumerate}
+
+After saving the three data modalities, the corresponding trajectory segment---
+augmented with a look-ahead buffer of $N_\text{buf} = N_\text{seg}/2 = 20$
+additional timesteps---is saved as a \texttt{.npy} file at
+\texttt{dataset/trajectory/<task>/<index>.npy}. The robot then executes the
+segment (without the buffer) using the \texttt{move\_trajectory\_smooth()} method
+at a control frequency of 80~Hz and a speed scale of 0.5, before advancing to the
+next segment.
+
+\subsection{Stage 4: Smooth Trajectory Execution}
+
+The \texttt{move\_trajectory\_smooth()} method implements a virtual governor
+controller for precise, low-latency trajectory replay. Rather than commanding the
+robot directly to each waypoint in the recorded trajectory, the method maintains a
+\emph{virtual joint state} $\tilde{q}_t$ that moves from the robot's current
+position toward each successive waypoint at a controlled velocity, updated at the
+specified control frequency. The velocity profile follows a trapezoidal scheme:
+
+\begin{equation}
+    v_{t+1} = \text{clip}\!\left(v_t \pm \alpha,\; v_{\min},\; V_{\max}\right)
+    \label{eq:vel_profile}
+\end{equation}
+
+where $\alpha = 0.05$\,deg/step is the acceleration increment, $V_{\max} = 1.0
+\times \eta$\,deg/step is the speed-scaled maximum velocity (with $\eta \in [0,1]$
+the speed scale factor), and $v_{\min} = 0.05$\,deg/step is a minimum creep
+velocity enforced at the final waypoint to ensure arrival. The robot is commanded
+to the virtual joint state at each control step via \texttt{ServoJ()}, which
+bypasses trajectory planning and applies the command directly to the joint
+servos, enabling smooth motion at 80~Hz without introducing planning latency.
+For the final waypoint only, a braking profile is applied:
+
+\begin{equation}
+    v_{\text{brake}} = \sqrt{2\,\alpha\,\|\tilde{q}_t - q_{\text{final}}\|_\infty}
+    \label{eq:brake}
+\end{equation}
+
+ensuring that the robot decelerates smoothly to rest at the terminal position
+rather than abruptly stopping. A post-execution settling loop holds the final
+commanded position for up to 0.5~seconds until the physical joint error falls
+below a configurable threshold $\varepsilon = 0.5$\,degrees.
+
+The method additionally supports preemptive interruption via a \texttt{Queue}
+object: if a new trajectory signal arrives in the queue during execution, the
+current trajectory is immediately interrupted and the starting index of the
+interrupted segment is returned, enabling trajectory blending in the
+\texttt{inference()} method for real-time VLA deployment.
+
+\subsection{Dataset Summary and Formatting}
+
+The resulting dataset for each task episode consists of temporally aligned
+triplets of (overview image, end-effector image, robot state) paired with a
+corresponding trajectory fragment. Table~\ref{tab:dataset_format} summarises the
+data format for a single recorded episode.
+
+\begin{table}[ht]
+\centering
+\caption{Data format of a single episode in the collected dataset.
+         $N_\text{seg}$ = 40, $N_\text{buf}$ = 20.}
+\label{tab:dataset_format}
+\begin{tabular}{llll}
+\hline
+\textbf{Modality}        & \textbf{Format}   & \textbf{Shape / Size}  & \textbf{Description} \\
+\hline
+Overview image           & PNG               & $H \times W \times 3$  & Workspace scene view \\
+End-effector image       & PNG               & $H' \times W' \times 3$ & Wrist-camera view \\
+Robot state              & \texttt{.npy}     & $(7,)$                 & Joint angles + DO \\
+Trajectory fragment      & \texttt{.npy}     & $(N_\text{seg} + N_\text{buf},\; 7)$ & Relative deltas + DO \\
+\hline
+\end{tabular}
+\end{table}
+
+The trajectory fragments are stored in relative delta format as per
+equation~(\ref{eq:raw_traj}). Before being passed to the FAST+ tokeniser and
+the training pipeline, they are converted to absolute joint coordinates by
+cumulatively summing the deltas from the initial robot state, yielding absolute
+trajectory arrays of shape $(N_\text{seg} + N_\text{buf},\; 7)$ that are
+subsequently chunked into overlapping windows of length $N = 16$ timesteps
+with stride 8 for training.
 
 
 %─────────────────────────────────────────────────────────────────────────────

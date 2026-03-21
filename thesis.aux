@@ -5,10 +5,10 @@
 \@writefile{toc}{\vspace {-.5\baselineskip }\noindent \makebox  [\textwidth ][r]{\bfseries  Page}\par \vspace {.5\baselineskip }}
 \@writefile{toc}{\contentsline {chapter}{Abstract}{ii}{Doc-Start}\protected@file@percent }
 \@writefile{toc}{\contentsline {chapter}{ACKNOWLEDGEMENT}{iii}{chapter*.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{TABLE OF CONTENTS}{vi}{chapter*.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{LIST OF TABLES}{vii}{chapter*.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{LIST OF FIGURES}{viii}{chapter*.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{LIST OF ABBREVIATIONS AND SYMBOLS}{ix}{chapter*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{TABLE OF CONTENTS}{vii}{chapter*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{LIST OF TABLES}{viii}{chapter*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{LIST OF FIGURES}{ix}{chapter*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{LIST OF ABBREVIATIONS AND SYMBOLS}{x}{chapter*.4}\protected@file@percent }
 \citation{openai2023gpt4v}
 \citation{liu2023llava}
 \citation{openx2023}
@@ -121,72 +121,81 @@
 \newlabel{sec:pretraining}{{3.4}{14}{PRE-TRAINING CURRICULUM}{section.3.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Foundation Model Track: Next-Token Prediction}{14}{subsection.3.4.1}\protected@file@percent }
 \newlabel{eq:ntp_sequence}{{3.4}{14}{Foundation Model Track: Next-Token Prediction}{equation.3.4}{}}
-\citation{openx2023}
+\citation{falightsk2025dobot}
 \newlabel{eq:ntp_loss}{{3.5}{15}{Foundation Model Track: Next-Token Prediction}{equation.3.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Action Expert Track: Reconstruction and Masked Autoencoding}{15}{subsection.3.4.2}\protected@file@percent }
 \newlabel{eq:flow_interpolation}{{3.6}{15}{Action Expert Track: Reconstruction and Masked Autoencoding}{equation.3.6}{}}
 \newlabel{eq:flow_loss}{{3.7}{15}{Action Expert Track: Reconstruction and Masked Autoencoding}{equation.3.7}{}}
 \newlabel{eq:mae_loss}{{3.8}{15}{Action Expert Track: Reconstruction and Masked Autoencoding}{equation.3.8}{}}
 \newlabel{eq:total_loss}{{3.9}{15}{Action Expert Track: Reconstruction and Masked Autoencoding}{equation.3.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}DATASET COLLECTION PIPELINE}{16}{section.3.5}\protected@file@percent }
+\newlabel{sec:dataset}{{3.5}{16}{DATASET COLLECTION PIPELINE}{section.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Hardware Setup}{16}{subsection.3.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Stage 1: Trajectory Recording}{16}{subsection.3.5.2}\protected@file@percent }
+\newlabel{eq:raw_traj}{{3.10}{16}{Stage 1: Trajectory Recording}{equation.3.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}Stage 2: Trajectory Post-Processing}{17}{subsection.3.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.4}Stage 3: Multimodal Dataset Creation}{17}{subsection.3.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.5}Stage 4: Smooth Trajectory Execution}{17}{subsection.3.5.5}\protected@file@percent }
 \citation{paszke2019pytorch}
 \citation{wolf2020transformers}
+\newlabel{eq:vel_profile}{{3.11}{18}{Stage 4: Smooth Trajectory Execution}{equation.3.11}{}}
+\newlabel{eq:brake}{{3.12}{18}{Stage 4: Smooth Trajectory Execution}{equation.3.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.6}Dataset Summary and Formatting}{18}{subsection.3.5.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Data format of a single episode in the collected dataset. $N_\text  {seg}$ = 40, $N_\text  {buf}$ = 20.}}{18}{table.caption.10}\protected@file@percent }
+\newlabel{tab:dataset_format}{{3.1}{18}{Data format of a single episode in the collected dataset. $N_\text {seg}$ = 40, $N_\text {buf}$ = 20}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}IMPLEMENTATION DETAILS}{18}{section.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}Hardware and Software}{18}{subsection.3.6.1}\protected@file@percent }
 \citation{loshchilov2019adamw}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}DATASET AND DATA PROCESSING}{16}{section.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Training Dataset}{16}{subsection.3.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}State Description Annotation}{16}{subsection.3.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}Localisation Label Generation}{16}{subsection.3.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}IMPLEMENTATION DETAILS}{16}{section.3.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}Hardware and Software}{16}{subsection.3.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}Optimiser and Learning Rate Schedule}{16}{subsection.3.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}Hyperparameter Summary}{16}{subsection.3.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}INFERENCE PROCEDURE}{16}{section.3.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Key hyperparameters of the proposed VLA architecture.}}{17}{table.caption.10}\protected@file@percent }
-\newlabel{tab:hyperparams}{{3.1}{17}{Key hyperparameters of the proposed VLA architecture}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}REFERENCE AND CITATION}{18}{chapter.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}Optimiser and Learning Rate Schedule}{19}{subsection.3.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}Hyperparameter Summary}{19}{subsection.3.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Key hyperparameters of the proposed VLA architecture.}}{19}{table.caption.11}\protected@file@percent }
+\newlabel{tab:hyperparams}{{3.2}{19}{Key hyperparameters of the proposed VLA architecture}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}INFERENCE PROCEDURE}{19}{section.3.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}REFERENCE AND CITATION}{20}{chapter.4}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:experiments}{{4}{18}{REFERENCE AND CITATION}{chapter.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}IN-TEXT CITATION IN THE NAME-YEAR SYSTEM}{18}{section.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}IN-TEXT CITATION IN THE NUMERICAL SEQUENCE SYSTEM}{19}{section.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}BIBLIOGRAPHY AND REFERENCES}{21}{chapter.5}\protected@file@percent }
+\newlabel{chap:experiments}{{4}{20}{REFERENCE AND CITATION}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}IN-TEXT CITATION IN THE NAME-YEAR SYSTEM}{20}{section.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}IN-TEXT CITATION IN THE NUMERICAL SEQUENCE SYSTEM}{21}{section.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}BIBLIOGRAPHY AND REFERENCES}{23}{chapter.5}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:conclusion}{{5}{21}{BIBLIOGRAPHY AND REFERENCES}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}GUIDELINES FOR WRITING BIBLIOGRAPHY}{21}{section.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}GUIDELINES FOR WRITING REFERENCES}{21}{section.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}METHOD OF LISTING BIBLIOGRAPHY}{21}{section.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Authors}{21}{subsection.5.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}Article Titles}{22}{subsection.5.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.3}Book or Journal Titles}{22}{subsection.5.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.4}Editions}{22}{subsection.5.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.5}Place of Publication and Publisher}{22}{subsection.5.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.6}Year of Publication}{23}{subsection.5.3.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.7}Example of Bibliography Format}{23}{subsection.5.3.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.1}Book}{23}{subsubsection.5.3.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.2}Translated Books}{24}{subsubsection.5.3.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.3}Translated Books with Unspecified Original Author in the Original Language}{24}{subsubsection.5.3.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.4}Books Authored by Organizations}{24}{subsubsection.5.3.7.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.5}Editors or Compilers}{24}{subsubsection.5.3.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.6}Conference Proceeding or Articles from Books}{25}{subsubsection.5.3.7.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.7}Journal Articles}{25}{subsubsection.5.3.7.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.8}Thesis and Dissertation}{25}{subsubsection.5.3.7.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.9}Reviews}{25}{subsubsection.5.3.7.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.10}Articles in Encyclopedias or Dictionaries}{26}{subsubsection.5.3.7.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.11}Newspaper Articles}{26}{subsubsection.5.3.7.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.12}News Monitoring and Facts Checking in Newspapers Over a Period}{26}{subsubsection.5.3.7.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.13}Newsletters, Photocopies, and Unpublished Documents}{26}{subsubsection.5.3.7.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.14}Government Publications and Other Official Documents}{26}{subsubsection.5.3.7.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.15}Interviews}{27}{subsubsection.5.3.7.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.16}Audiovisual Materials}{27}{subsubsection.5.3.7.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.17}Patents}{27}{subsubsection.5.3.7.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.18}Electronic Media}{27}{subsubsection.5.3.7.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.8}Example Formats for References Citation}{28}{subsection.5.3.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.1}Book}{28}{subsubsection.5.3.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.2}Articles from Journals, Books, or Conference Proceedings}{28}{subsubsection.5.3.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.3}Thesis and Dissertation}{29}{subsubsection.5.3.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.4}Patents}{29}{subsubsection.5.3.8.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.5}Visual Materials and Other Media}{29}{subsubsection.5.3.8.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.6}Electronic Media}{29}{subsubsection.5.3.8.6}\protected@file@percent }
+\newlabel{chap:conclusion}{{5}{23}{BIBLIOGRAPHY AND REFERENCES}{chapter.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}GUIDELINES FOR WRITING BIBLIOGRAPHY}{23}{section.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}GUIDELINES FOR WRITING REFERENCES}{23}{section.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}METHOD OF LISTING BIBLIOGRAPHY}{23}{section.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Authors}{23}{subsection.5.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}Article Titles}{24}{subsection.5.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.3}Book or Journal Titles}{24}{subsection.5.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.4}Editions}{24}{subsection.5.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.5}Place of Publication and Publisher}{24}{subsection.5.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.6}Year of Publication}{25}{subsection.5.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.7}Example of Bibliography Format}{25}{subsection.5.3.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.1}Book}{25}{subsubsection.5.3.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.2}Translated Books}{26}{subsubsection.5.3.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.3}Translated Books with Unspecified Original Author in the Original Language}{26}{subsubsection.5.3.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.4}Books Authored by Organizations}{26}{subsubsection.5.3.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.5}Editors or Compilers}{26}{subsubsection.5.3.7.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.6}Conference Proceeding or Articles from Books}{27}{subsubsection.5.3.7.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.7}Journal Articles}{27}{subsubsection.5.3.7.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.8}Thesis and Dissertation}{27}{subsubsection.5.3.7.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.9}Reviews}{27}{subsubsection.5.3.7.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.10}Articles in Encyclopedias or Dictionaries}{28}{subsubsection.5.3.7.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.11}Newspaper Articles}{28}{subsubsection.5.3.7.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.12}News Monitoring and Facts Checking in Newspapers Over a Period}{28}{subsubsection.5.3.7.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.13}Newsletters, Photocopies, and Unpublished Documents}{28}{subsubsection.5.3.7.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.14}Government Publications and Other Official Documents}{28}{subsubsection.5.3.7.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.15}Interviews}{29}{subsubsection.5.3.7.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.16}Audiovisual Materials}{29}{subsubsection.5.3.7.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.17}Patents}{29}{subsubsection.5.3.7.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.7.18}Electronic Media}{29}{subsubsection.5.3.7.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.8}Example Formats for References Citation}{30}{subsection.5.3.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.1}Book}{30}{subsubsection.5.3.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.2}Articles from Journals, Books, or Conference Proceedings}{30}{subsubsection.5.3.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.3}Thesis and Dissertation}{31}{subsubsection.5.3.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.4}Patents}{31}{subsubsection.5.3.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.5}Visual Materials and Other Media}{31}{subsubsection.5.3.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.8.6}Electronic Media}{31}{subsubsection.5.3.8.6}\protected@file@percent }
 \bibstyle{plain}
 \bibdata{references}
 \bibcite{brohan2022rt1}{1}
@@ -204,7 +213,7 @@
 \bibcite{oquab2023dinov2}{13}
 \bibcite{peebles2023scalable}{14}
 \bibcite{perez2018film}{15}
-\@writefile{toc}{\contentsline {chapter}{BIBLIOGRAPHY}{30}{subsubsection.5.3.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{BIBLIOGRAPHY}{32}{subsubsection.5.3.8.6}\protected@file@percent }
 \bibcite{pertsch2025kilovla}{16}
 \bibcite{pertsch2025fast}{17}
 \bibcite{pomerleau1989alvinn}{18}
@@ -213,6 +222,6 @@
 \bibcite{vaswani2017attention}{21}
 \bibcite{wen2024diffusionvla}{22}
 \bibcite{zhai2023sigmoid}{23}
-\@writefile{toc}{\contentsline {chapter}{Appendix A Guidelines and Procedures For Thesis Writing}{32}{chapter*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{AUTHOR BIOGRAPHY}{35}{appendix*.12}\protected@file@percent }
-\gdef \@abspage@last{46}
+\@writefile{toc}{\contentsline {chapter}{Appendix A Guidelines and Procedures For Thesis Writing}{34}{chapter*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{AUTHOR BIOGRAPHY}{37}{appendix*.13}\protected@file@percent }
+\gdef \@abspage@last{49}
