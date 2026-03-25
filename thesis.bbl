@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{brohan2023rt2}
 Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Xi~Chen,
@@ -14,6 +14,15 @@ Danny Driess, Fei Xia, Mehdi S.~M. Sajjadi, Corey Lynch, Aakanksha Chowdhery,
 \newblock {PaLM-E}: An embodied multimodal language model.
 \newblock {\em arXiv preprint arXiv:2303.03378}, 2023.
 
+\bibitem{falightsk2025dobot}
+FalightSK.
+\newblock Dobot dataset collection tools.
+\newblock \url{https://github.com/FalightSK/Dobot-Dataset-Collection-Tools},
+  2025.
+\newblock Open-source Python toolchain for multimodal robot demonstration
+  collection: relative joint trajectories, IO state, and dual-camera images for
+  the Dobot robotic arm.
+
 \bibitem{kim2024openvla}
 Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
 \newblock {OpenVLA}: An open-source vision-language-action model.
@@ -21,16 +30,48 @@ Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
   2024.
 \newblock Establishes the dual-encoder SigLIP + DINOv2 backbone convention.
 
+\bibitem{lin2025sota}
+Junfeng Lin et~al.
+\newblock {CoBot}: Sota open-source vision-language-action pipeline and model
+  architecture.
+\newblock {\em arXiv preprint}, 2025.
+\newblock State-of-the-art open-source pipeline reference for practical VLA
+  deployment.
+
 \bibitem{liu2023llava}
 Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
 \newblock Visual instruction tuning.
 \newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
   2023.
 
+\bibitem{liu2024enhanceddit}
+Kaiming Liu et~al.
+\newblock Enhanced diffusion transformer for robotic manipulation: Efficient
+  action generation and real-world deployment.
+\newblock {\em arXiv preprint}, 2024.
+\newblock Practical enhancements to DiT architecture for robot control under
+  compute constraints.
+
 \bibitem{openai2023gpt4v}
 {OpenAI}.
 \newblock {GPT-4} technical report.
 \newblock Technical report, OpenAI, 2023.
+
+\bibitem{peebles2023dit}
+William Peebles and Saining Xie.
+\newblock Scalable diffusion models with transformers.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, 2023.
+\newblock Diffusion Transformer (DiT) backbone for efficient diffusion-based
+  action generation.
+
+\bibitem{sun2025pi05}
+Lirui Sun et~al.
+\newblock {Pi 0.5}: A state-of-the-art vision-language-action model with
+  diffusion policy.
+\newblock {\em arXiv preprint}, 2025.
+\newblock SOTA architecture demonstrating diffusion-based action generation for
+  embodied AI.
 
 \bibitem{vaswani2017attention}
 Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,

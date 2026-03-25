@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 21:06
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 22:45
  restricted system commands enabled.
 **thesis.tex
 (./thesis.tex
@@ -1249,129 +1249,150 @@ warning  (pdf backend): ignoring duplicate destination with the name 'page.1'
 Chapter 2.
 [4
 
-] [5]) (./chapters/ch3_design_construction.tex [6] [7]
-Chapter 3.
-[8
+] [5]
 
-] [9] [10] [11] [12]) (./chapters/ch4_results.tex [13]
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 127.
+
+[6] [7]
+Overfull \hbox (0.46796pt too wide) in paragraph at lines 253--255
+[]\TU/THSarabun.ttf(0)/b/n/12 In-ter-face sta-bil-ity\TU/THSarabun.ttf(0)/m/n/1
+2 : sta-ble, hardware-compatible ac-tion spaces re-duce ex-e-cu-tion noise and 
+en-able smoother
+ []
+
+) (./chapters/ch3_design_construction.tex [8]
+Chapter 3.
+[9
+
+] [10] [11] [12] [13]) (./chapters/ch4_results.tex [14]
 Chapter 4.
-[14
+[15
 
 ]
-<images/episode_0_task_redcubeplaceonpurple.png, id=714, 1806.75pt x 1204.5pt>
+<images/episode_0_task_redcubeplaceonpurple.png, id=754, 1806.75pt x 1204.5pt>
 File: images/episode_0_task_redcubeplaceonpurple.png Graphic file (type png)
 <use images/episode_0_task_redcubeplaceonpurple.png>
 Package luatex.def Info: images/episode_0_task_redcubeplaceonpurple.png  used o
 n input line 106.
 (luatex.def)             Requested size: 416.83289pt x 277.87462pt.
- [15]
-<images/DiT_attn_heatmap.png, id=721, 3011.25pt x 1505.625pt>
+ [16]
+<images/DiT_attn_heatmap.png, id=761, 3011.25pt x 1505.625pt>
 File: images/DiT_attn_heatmap.png Graphic file (type png)
 <use images/DiT_attn_heatmap.png>
 Package luatex.def Info: images/DiT_attn_heatmap.png  used on input line 154.
 (luatex.def)             Requested size: 416.83289pt x 208.39677pt.
- [16<./images/episode_0_task_redcubeplaceonpurple.png>]
-<images/raw_qwen_img_token.png, id=728, 1027.84pt x 434.62375pt>
+ [17<./images/episode_0_task_redcubeplaceonpurple.png>]
+<images/raw_qwen_img_token.png, id=768, 1027.84pt x 434.62375pt>
 File: images/raw_qwen_img_token.png Graphic file (type png)
 <use images/raw_qwen_img_token.png>
 Package luatex.def Info: images/raw_qwen_img_token.png  used on input line 166.
 
 (luatex.def)             Requested size: 416.83289pt x 176.26039pt.
- [17<./images/DiT_attn_heatmap.png><./images/raw_qwen_img_token.png>]
-<images/Qwen_context_embeding_cluster.png, id=735, 2694.065pt x 2070.73625pt>
+ [18<./images/DiT_attn_heatmap.png><./images/raw_qwen_img_token.png>]
+<images/Qwen_context_embeding_cluster.png, id=775, 2694.065pt x 2070.73625pt>
 File: images/Qwen_context_embeding_cluster.png Graphic file (type png)
 <use images/Qwen_context_embeding_cluster.png>
 Package luatex.def Info: images/Qwen_context_embeding_cluster.png  used on inpu
 t line 210.
 (luatex.def)             Requested size: 416.83289pt x 320.39206pt.
- [18<./images/Qwen_context_embeding_cluster.png>]
-<images/auto_reg_chucking_proof.png, id=742, 2107.875pt x 903.375pt>
+ [19<./images/Qwen_context_embeding_cluster.png>]
+<images/auto_reg_chucking_proof.png, id=782, 2107.875pt x 903.375pt>
 File: images/auto_reg_chucking_proof.png Graphic file (type png)
 <use images/auto_reg_chucking_proof.png>
 Package luatex.def Info: images/auto_reg_chucking_proof.png  used on input line
  258.
 (luatex.def)             Requested size: 416.83289pt x 178.63171pt.
- [19<./images/auto_reg_chucking_proof.png>]
-<images/trajectory_ttrd.png, id=749, 3011.25pt x 2409.0pt>
+ [20<./images/auto_reg_chucking_proof.png>]
+<images/trajectory_ttrd.png, id=790, 3011.25pt x 2409.0pt>
 File: images/trajectory_ttrd.png Graphic file (type png)
 <use images/trajectory_ttrd.png>
 Package luatex.def Info: images/trajectory_ttrd.png  used on input line 304.
 (luatex.def)             Requested size: 395.98996pt x 316.78331pt.
-<images/joint_distributions.png, id=751, 867.24pt x 1445.4pt>
+<images/joint_distributions.png, id=792, 867.24pt x 1445.4pt>
 File: images/joint_distributions.png Graphic file (type png)
 <use images/joint_distributions.png>
 Package luatex.def Info: images/joint_distributions.png  used on input line 317
 .
 (luatex.def)             Requested size: 395.98996pt x 659.99586pt.
- [20<./images/trajectory_ttrd.png>] [21<./images/joint_distributions.png>]
-<images/joit_pos_cor_matrix.png, id=764, 1505.625pt x 1204.5pt>
+ [21<./images/trajectory_ttrd.png>] [22<./images/joint_distributions.png>]
+<images/joit_pos_cor_matrix.png, id=804, 1505.625pt x 1204.5pt>
 File: images/joit_pos_cor_matrix.png Graphic file (type png)
 <use images/joit_pos_cor_matrix.png>
 Package luatex.def Info: images/joit_pos_cor_matrix.png  used on input line 329
 .
 (luatex.def)             Requested size: 395.98996pt x 316.78331pt.
-<images/joit_pos_cor_matrix_not_lerobot.png, id=765, 1204.5pt x 1053.9375pt>
+<images/joit_pos_cor_matrix_not_lerobot.png, id=805, 1204.5pt x 1053.9375pt>
 File: images/joit_pos_cor_matrix_not_lerobot.png Graphic file (type png)
 <use images/joit_pos_cor_matrix_not_lerobot.png>
 Package luatex.def Info: images/joit_pos_cor_matrix_not_lerobot.png  used on in
 put line 336.
 (luatex.def)             Requested size: 395.98996pt x 346.49783pt.
- [22<./images/joit_pos_cor_matrix.png>]
-<images/per_ep_joint_pos.png, id=773, 2107.875pt x 3432.825pt>
+ [23<./images/joit_pos_cor_matrix.png>]
+<images/per_ep_joint_pos.png, id=813, 2107.875pt x 3432.825pt>
 File: images/per_ep_joint_pos.png Graphic file (type png)
 <use images/per_ep_joint_pos.png>
 Package luatex.def Info: images/per_ep_joint_pos.png  used on input line 349.
 (luatex.def)             Requested size: 395.98996pt x 644.85786pt.
- [23<./images/joit_pos_cor_matrix_not_lerobot.png>]
-[24<./images/per_ep_joint_pos.png>]
-<images/end_eff_space_cover.png, id=785, 2710.125pt x 1806.75pt>
+ [24<./images/joit_pos_cor_matrix_not_lerobot.png>]
+[25<./images/per_ep_joint_pos.png>]
+<images/end_eff_space_cover.png, id=825, 2710.125pt x 1806.75pt>
 File: images/end_eff_space_cover.png Graphic file (type png)
 <use images/end_eff_space_cover.png>
 Package luatex.def Info: images/end_eff_space_cover.png  used on input line 361
 .
 (luatex.def)             Requested size: 395.98996pt x 263.97078pt.
- [25<./images/end_eff_space_cover.png>]
-[26]) (./chapters/ch5_conclusion.tex
+ [26<./images/end_eff_space_cover.png>]
+[27]) (./chapters/ch5_conclusion.tex
 Chapter 5.
-[27
+[28
 
 
-]) [28] (./thesis.bbl) (./chapters/appendix.tex [29
+]) [29] (./thesis.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 18--25
+[]\TU/THSarabun.ttf(0)/m/n/12 Fa-lightSK.  Dobot dataset col-lec-tion tools.  [
+][]$\TU/lmtt/m/n/12 https://github.com/FalightSK/
+ []
+
+
+Underfull \hbox (badness 2591) in paragraph at lines 18--25
+\TU/lmtt/m/n/12 Dobot-[]Dataset-[]Collection-[]Tools$[][]\TU/THSarabun.ttf(0)/m
+/n/12 , 2025.  Open-source Python toolchain for mul-ti-
+ []
+
+) (./chapters/appendix.tex [30
 
 
 ]
 Appendix A.
-[30
+[31
 
 
-] [31]) (./thesis.aux)
+] [32] [33]) (./thesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 6E936B5A1E2F17D748E2061096A224AD;13908.
+(rerunfilecheck)             Checksum: 46DD6F2BF2E9B8D28BB97CC125D93D6F;14908.
 )
 
 Here is how much of LuaTeX's memory you used:
- 20238 strings out of 476076
+ 20262 strings out of 476076
  100000,953878 words of node,token memory allocated
- 794 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 21 attribute, 93 glue_spec
-, 21 attribute_list, 2 write, 7 pdf_action nodes
-   avail lists: 2:1243,3:479,4:320,5:263,6:161,7:6772,8:37,9:790,10:15,11:670
- 42049 multiletter control sequences out of 65536+600000
- 76 fonts using 30487487 bytes
- 79i,12n,97p,392b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 804 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 22 attribute, 93 glue_spec
+, 22 attribute_list, 2 write, 8 pdf_action nodes
+   avail lists: 2:1211,3:467,4:312,5:257,6:156,7:7924,8:59,9:772,10:27,11:838
+ 42062 multiletter control sequences out of 65536+600000
+ 76 fonts using 30487407 bytes
+ 79i,12n,97p,392b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
 no12-regular.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./
 fonts/THSarabunItalic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
-Output written on thesis.pdf (42 pages, 3946100 bytes).
+Output written on thesis.pdf (44 pages, 3962570 bytes).
 
-PDF statistics: 893 PDF objects out of 1000 (max. 8388607)
- 217 named destinations out of 1000 (max. 1048576)
- 609 words of extra memory for PDF output out of 10000 (max. 100000000)
-
- out of 1000 (max. 1048576)
- 609 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 943 PDF objects out of 1000 (max. 8388607)
+ 228 named destinations out of 1000 (max. 1048576)
+ 641 words of extra memory for PDF output out of 10000 (max. 100000000)
 

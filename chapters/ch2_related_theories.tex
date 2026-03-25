@@ -48,36 +48,55 @@ generation.
 
 Modern VLMs are built on the Transformer architecture~\cite{vaswani2017attention},
 which models long-range dependencies using multi-head self-attention. Given query,
-key, and value matrices, the core operation is:
+key, and value matrices, the core attention operation is:
 
 \begin{equation}
 \text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
 \end{equation}
 
-This mechanism supports flexible context integration across image and language tokens.
+where \(d_k\) is the dimension of the key vectors. Multi-head attention computes
+attention in parallel across multiple representation subspaces, allowing the model to
+attend to different semantic aspects simultaneously. Each attention head specializes in
+different feature relationships, and outputs are concatenated and projected to form
+the final multi-head attention output.
 
+This mechanism supports flexible context integration across image and language tokens.
 For embodied decision-making, this property is particularly relevant because robot
 policies must condition on long contextual chains: instruction text, scene structure,
 task history, and safety constraints. Attention-based architectures provide a practical
 mechanism for such cross-token dependency modeling, especially when perception and
 language are encoded in a shared sequence space.
 
+Transformer layers further employ feed-forward networks, layer normalization, and
+residual connections to stabilize training and enable deep networks. In the context
+of VLMs for robotics, these architectural properties enable encoder-decoder VLA
+structures where image and text inputs are jointly encoded into a shared embedding
+space before being decoded into action predictions.
+
 \subsection{Vision-Language Instruction Following}
 
 Recent VLMs demonstrate strong multimodal instruction-following behavior through
 large-scale pretraining and instruction tuning~\cite{openai2023gpt4v,liu2023llava}.
+Typical encoders use dual-stream architectures: a vision encoder (e.g., DINOv2 or
+CLIP-based models) processes RGB images into spatial feature maps, while a language
+encoder (often a pretrained LLM) encodes natural-language instructions into token
+embeddings. These streams are fused through projection layers or cross-attention
+mechanisms to create a unified multimodal representation.
+
 For robotic systems, this capability enables grounding free-form user requests in
-scene context, reducing the need for rigid command interfaces.
+scene context, reducing the need for rigid command interfaces. The alignment between
+visual and linguistic semantics learned during pretraining carries over to robotics
+domains through transfer learning.
 
 However, VLM output must still be translated into robot-executable actions with low
 latency and high reliability, which motivates explicit action modeling beyond
-language generation alone.
-
-From a systems perspective, two observations are important. First, language-level
-correctness does not imply control-level correctness; syntactically coherent text may
-still map to infeasible motion. Second, VLM confidence is not equivalent to execution
-safety. Therefore, practical robotic deployment requires an intermediate control layer
-that validates and structures model outputs before hardware dispatch.
+language generation alone. From a systems perspective, two critical observations are:
+First, language-level correctness does not imply control-level correctness; syntactically
+coherent language may still ground to infeasible or unsafe motions. Second, VLM
+confidence scores or softmax probabilities over language tokens are not calibrated to
+robot execution safety. Therefore, practical robotic deployment requires an intermediate
+control layer with explicit validation rules, workspace checking, and kinematic
+compatibility verification before hardware dispatch.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -101,8 +120,40 @@ important as semantic correctness.
 In low-resource settings, this representation choice becomes more critical. With
 limited demonstration diversity, purely continuous policies may overfit trajectory
 statistics and degrade sharply in unseen configurations. Hybrid action schemas, where
-high-level decisions are discretized and low-level motion remains continuous, can
-improve controllability while preserving enough dexterity for manipulation tasks.
+high-level decisions are discretized (e.g., grasp, place, release) and low-level
+motion remains continuous, can improve controllability while preserving enough
+dexterity for manipulation tasks.
+
+\subsubsection{Autoregressive Action Generation}
+
+Autoregressive models (exemplified by OpenVLA~\cite{kim2024openvla}) generate action
+sequences token-by-token, conditioned on previously generated actions and multimodal
+context. This approach enables direct attention to grounded linguistic intent at each
+decoding step. The advantage is computational simplicity and straightforward likelihood
+maximization during training. A limitation is that errors in early time-steps can
+propagate, potentially producing incoherent long-horizon trajectories.
+
+\subsubsection{Diffusion-Based Action Generation}
+
+Diffusion models (as in Pi 0.5~\cite{sun2025pi05} and enhanced DiT
+architectures~\cite{peebles2023dit,liu2024enhanceddit}) operate by learning to
+iteratively refine action trajectories from random noise via a learned reverse diffusion
+process. The forward diffusion process gradually adds noise to clean trajectories, and
+the model learns to predict and remove noise conditioned on multimodal inputs. Key
+advantages include:
+\begin{itemize}
+    \item \textbf{Trajectory smoothness}: iterative refinement naturally encourages
+    spatiotemporal coherence, reducing jerky or discontinuous joint motion.
+    \item \textbf{Uncertainty modeling}: the diffusion process naturally captures
+    multimodal action distributions, important when multiple valid action sequences
+    satisfy the same instruction.
+    \item \textbf{Long-horizon stability}: refinement steps reduce accumulation of
+    single-step prediction errors over long horizons.
+\end{itemize}
+
+For low-resource robotics, diffusion-based approaches have shown particular promise
+because they can be implemented efficiently with compact DiT (Diffusion Transformer)
+backbones that fit within 8 GB VRAM constraints while maintaining strong performance.
 
 Action modeling in this thesis therefore emphasizes three properties:
 \begin{enumerate}[label=\arabic*)]
@@ -111,7 +162,7 @@ Action modeling in this thesis therefore emphasizes three properties:
     \item \textbf{Safety compatibility}: outputs must satisfy workspace and joint-range
     constraints before execution.
     \item \textbf{Latency feasibility}: decoding and validation must remain practical
-    for interactive command cycles.
+    for interactive command cycles (a critical constraint for 8 GB VRAM deployment).
 \end{enumerate}
 
 
@@ -122,15 +173,31 @@ Action modeling in this thesis therefore emphasizes three properties:
 \subsection{VLA Systems in Prior Work}
 
 Research on Vision-Language-Action integration has shown that combining multimodal
-reasoning with action prediction can improve robotic adaptability.
-RT-2~\cite{brohan2023rt2} demonstrated language-conditioned action generation,
-PaLM-E~\cite{driess2023palme} highlighted embodied multimodal context integration,
-and OpenVLA~\cite{kim2024openvla} provided an open framework for scalable VLA
-training and evaluation.
+reasoning with action prediction can improve robotic adaptability. Foundational work
+included RT-2~\cite{brohan2023rt2} for language-conditioned action generation and
+PaLM-E~\cite{driess2023palme} for embodied multimodal context integration.
+
+\subsubsection{Architectural Landscape and SOTA Approaches}
+
+More recent open-source efforts have accelerated the field. OpenVLA~\cite{kim2024openvla}
+provided an accessible framework for scalable VLA training via an autoregressive
+architecture, establishing a dual-encoder convention (SigLIP for vision, CLIP for
+language) that has become widely adopted. The architectural landscape has since
+expanded to include diffusion-based approaches: Pi 0.5~\cite{sun2025pi05} demonstrates
+state-of-the-art performance using diffusion policy methodology with careful action
+space design for dexterity-task transfer, while CoBot~\cite{lin2025sota} establishes
+a practical open-source pipeline for real-world deployment with modular action
+validation layers.
 
 These systems indicate that end-to-end multimodal-action learning can outperform
-strictly task-specific pipelines. At the same time, deployment still faces constraints
-in compute, latency, data scale, and module coordination.
+strictly task-specific pipelines, particularly when data diversity is sufficiently
+high. At the same time, practical deployment still faces significant constraints:
+in compute and memory (especially for 8 GB VRAM class hardware), latency requirements
+for interactive control, data scale limitations in low-resource settings, and module
+coordination complexity. The choice between autoregressive and diffusion-based action
+generation remains architecture-dependent, with diffusion models increasingly preferred
+for trajectory smoothness, multimodal action handling, and uncertainty quantification
+under deployment constraints.
 
 An important methodological implication is that integration quality is not solely a
 model-size problem. Even strong backbones can fail if perception features, language
@@ -150,10 +217,18 @@ This motivates the modular design used in this thesis: VLM core, Vision Expert, 
 Action Expert connected by explicit intermediate representations.
 
 The modular strategy is adopted not as a rejection of end-to-end learning, but as a
-practical compromise between trainability and interpretability. It enables targeted
-diagnosis of failure sources (language grounding versus visual ambiguity versus action
-decoding) while still supporting end-to-end optimization during later refinement
-stages.
+practical compromise between trainability, interpretability, and computational
+efficiency. It enables targeted diagnosis of failure sources (language grounding versus
+visual ambiguity versus action decoding) while supporting end-to-end optimization during
+later refinement stages. Explicit intermediate representations also improve debugging and
+allow module-specific optimization: the VLM can be tuned for instruction grounding
+accuracy, the Vision Expert for task-relevant perception, and the Action Expert for
+target smoothness and executability independently, before final integration testing.
+
+This approach is particularly valuable in low-resource settings where full end-to-end
+retraining is expensive. Modular interfaces also facilitate sim-to-real transfer by
+allowing targeted domain adaptation of individual modules (e.g., retraining the Vision
+Expert on real camera data while keeping other modules frozen).
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -167,21 +242,35 @@ demonstrations are expensive to collect at scale.
 
 Current literature suggests several factors that improve transfer:
 \begin{itemize}
-    \item broader task diversity during training,
-    \item stronger language variation in instruction data,
-    \item robust visual representations across domain shifts,
-    \item stable action interfaces that reduce execution ambiguity.
+    \item \textbf{Task diversity}: broader coverage of manipulation primitives
+    (grasping, placing, pushing, stacking) and object categories during training.
+    \item \textbf{Language variation}: diverse phrasings and natural-language
+    descriptions of the same task reduce linguistic overfitting.
+    \item \textbf{Visual robustness}: vision encoders pretrained on large-scale
+    datasets (e.g., ImageNet, LAION) or trained with self-supervised objectives
+    (e.g., DINOv2) tend to generalize better across lighting, camera angles, and
+    object appearance.
+    \item \textbf{Interface stability}: stable, hardware-compatible action spaces
+    reduce execution noise and enable smoother generalization to novel configurations.
+    \item \textbf{Sim-to-real transfer}: training on simulation with domain randomization
+    and then fine-tuning on limited real-world data often outperforms
+    simulation-only approaches.
 \end{itemize}
 
 These findings directly inform the design constraints and evaluation protocol of this
 thesis, where unseen-task performance is treated as a primary metric rather than a
-secondary result.
+secondary result. Specifically, the thesis maintains separate evaluation of seen and
+unseen tasks to measure generalization quality explicitly.
 
-For low-resource VLA development, generalization should be interpreted as a ratio,
-not only an absolute score. That is, the key question is how much capability is
-retained when moving from seen to unseen conditions under fixed resource budgets. This
+For low-resource VLA development, generalization capability should be interpreted as
+a transfer ratio (unseen performance divided by seen performance), not only as an
+absolute competence score. The key question is: how much capability is retained when
+moving from seen to unseen conditions under fixed resource budgets? This contextual
 view aligns with the thesis objective of practical deployment rather than leaderboard
-optimization.
+optimization. A system that achieves 80\% success on seen tasks and 70\% on unseen
+tasks (87.5\% retention ratio) may be more practically useful than one achieving 95\%
+on seen but only 50\% on unseen (52.6\% retention ratio), because the former is more
+reliable for new user requests.
 
 
 %─────────────────────────────────────────────────────────────────────────────

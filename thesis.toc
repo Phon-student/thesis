@@ -23,59 +23,63 @@
 \contentsline {subsection}{\numberline {2.2.1}Transformer Backbone}{4}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}Vision-Language Instruction Following}{5}{subsection.2.2.2}%
 \contentsline {section}{\numberline {2.3}ACTION MODELING FOR ROBOT MANIPULATION}{5}{section.2.3}%
-\contentsline {section}{\numberline {2.4}VISION-LANGUAGE-ACTION INTEGRATION}{5}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}VLA Systems in Prior Work}{5}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Need for Modular Integration}{6}{subsection.2.4.2}%
-\contentsline {section}{\numberline {2.5}GENERALIZATION IN ROBOT LEARNING}{6}{section.2.5}%
-\contentsline {section}{\numberline {2.6}CHAPTER SUMMARY}{6}{section.2.6}%
-\contentsline {chapter}{\numberline {3}RESEARCH METHODOLOGY AND SYSTEM DESIGN}{8}{chapter.3}%
-\contentsline {section}{\numberline {3.1}METHODOLOGY OVERVIEW}{8}{section.3.1}%
-\contentsline {section}{\numberline {3.2}PROBLEM-DRIVEN DESIGN REQUIREMENTS}{8}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Dataset Quantity and Variety Constraint}{9}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Hardware Constraint (Commercial GPU)}{9}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Safety and Inference Standard Constraint}{9}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}VISION-LANGUAGE-ACTION SYSTEM ARCHITECTURE}{9}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Input and Output Definition}{9}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}VLM Core}{10}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Vision Expert}{10}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}Action Expert}{10}{subsection.3.3.4}%
-\contentsline {subsection}{\numberline {3.3.5}Module Coordination}{10}{subsection.3.3.5}%
-\contentsline {section}{\numberline {3.4}IMPLEMENTATION STRATEGY}{10}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Dataset Collection Strategy}{10}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Model Development and Training Strategy}{11}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Inference and Model Analysis}{11}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}Model Improvement Loop}{11}{subsection.3.4.4}%
-\contentsline {subsection}{\numberline {3.4.5}Latency and Memory Optimization}{11}{subsection.3.4.5}%
-\contentsline {section}{\numberline {3.5}EVALUATION PROTOCOL FOR MANIPULATION TASKS}{11}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Evaluation Objectives}{11}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}Evaluation Domains}{12}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}Task Categories}{12}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3.5.4}Evaluation Metrics}{12}{subsection.3.5.4}%
-\contentsline {section}{\numberline {3.6}CHAPTER SUMMARY}{13}{section.3.6}%
-\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{14}{chapter.4}%
-\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{14}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{14}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{14}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{14}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Metrics}{14}{subsection.4.1.4}%
-\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{15}{section.4.2}%
-\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{16}{section.4.3}%
-\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{18}{section.4.4}%
-\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{19}{section.4.5}%
-\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{19}{section.4.6}%
-\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{25}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{25}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4.7.2}Latency}{25}{subsection.4.7.2}%
-\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{26}{subsection.4.7.3}%
-\contentsline {section}{\numberline {4.8}DISCUSSION}{26}{section.4.8}%
-\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{27}{chapter.5}%
-\contentsline {section}{\numberline {5.1}CONCLUSION}{27}{section.5.1}%
-\contentsline {section}{\numberline {5.2}LIMITATIONS}{27}{section.5.2}%
-\contentsline {section}{\numberline {5.3}FUTURE WORK}{27}{section.5.3}%
-\contentsline {chapter}{BIBLIOGRAPHY}{29}{Item.63}%
-\contentsline {chapter}{\numberline {A}Supplementary Materials}{30}{appendix.A}%
-\contentsline {section}{\numberline {A.1}System Configuration Summary}{30}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{30}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Extended Results}{30}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Implementation Notes}{31}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{31}{section.A.5}%
+\contentsline {subsubsection}{\numberline {2.3.0.1}Autoregressive Action Generation}{6}{subsubsection.2.3.0.1}%
+\contentsline {subsubsection}{\numberline {2.3.0.2}Diffusion-Based Action Generation}{6}{subsubsection.2.3.0.2}%
+\contentsline {section}{\numberline {2.4}VISION-LANGUAGE-ACTION INTEGRATION}{6}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}VLA Systems in Prior Work}{6}{subsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.1.1}Architectural Landscape and SOTA Approaches}{6}{subsubsection.2.4.1.1}%
+\contentsline {subsection}{\numberline {2.4.2}Need for Modular Integration}{7}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}GENERALIZATION IN ROBOT LEARNING}{7}{section.2.5}%
+\contentsline {section}{\numberline {2.6}CHAPTER SUMMARY}{8}{section.2.6}%
+\contentsline {chapter}{\numberline {3}RESEARCH METHODOLOGY AND SYSTEM DESIGN}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}METHODOLOGY OVERVIEW}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}PROBLEM-DRIVEN DESIGN REQUIREMENTS}{9}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Dataset Quantity and Variety Constraint}{10}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Hardware Constraint (Commercial GPU)}{10}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Safety and Inference Standard Constraint}{10}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}VISION-LANGUAGE-ACTION SYSTEM ARCHITECTURE}{10}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Input and Output Definition}{10}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}VLM Core}{11}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Vision Expert}{11}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Action Expert}{11}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Module Coordination}{11}{subsection.3.3.5}%
+\contentsline {section}{\numberline {3.4}IMPLEMENTATION STRATEGY}{11}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Dataset Collection Strategy}{11}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Model Development and Training Strategy}{12}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Inference and Model Analysis}{12}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Model Improvement Loop}{12}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Latency and Memory Optimization}{12}{subsection.3.4.5}%
+\contentsline {section}{\numberline {3.5}EVALUATION PROTOCOL FOR MANIPULATION TASKS}{12}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Evaluation Objectives}{12}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Evaluation Domains}{13}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Task Categories}{13}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}Evaluation Metrics}{13}{subsection.3.5.4}%
+\contentsline {section}{\numberline {3.6}CHAPTER SUMMARY}{14}{section.3.6}%
+\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{15}{chapter.4}%
+\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{15}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{15}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{15}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{15}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Metrics}{15}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{16}{section.4.2}%
+\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{17}{section.4.3}%
+\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{19}{section.4.4}%
+\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{20}{section.4.5}%
+\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{20}{section.4.6}%
+\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{26}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{26}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Latency}{26}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{27}{subsection.4.7.3}%
+\contentsline {section}{\numberline {4.8}DISCUSSION}{27}{section.4.8}%
+\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{28}{chapter.5}%
+\contentsline {section}{\numberline {5.1}CONCLUSION}{28}{section.5.1}%
+\contentsline {section}{\numberline {5.2}LIMITATIONS}{28}{section.5.2}%
+\contentsline {section}{\numberline {5.3}FUTURE WORK}{28}{section.5.3}%
+\contentsline {chapter}{BIBLIOGRAPHY}{30}{Item.63}%
+\contentsline {chapter}{\numberline {A}Supplementary Materials}{31}{appendix.A}%
+\contentsline {section}{\numberline {A.1}System Configuration Summary}{31}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{31}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Extended Results}{31}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Implementation Notes}{32}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{32}{section.A.5}%
+\contentsline {section}{\numberline {A.6}Open-Source Tools and Resources}{32}{section.A.6}%

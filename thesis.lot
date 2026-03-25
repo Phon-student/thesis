@@ -2,12 +2,12 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.}}{15}{table.caption.9}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.}}{16}{table.caption.11}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.}}{18}{table.caption.14}%
-\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.}}{19}{table.caption.16}%
-\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.}}{20}{table.caption.18}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.}}{16}{table.caption.9}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.}}{17}{table.caption.11}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.}}{19}{table.caption.14}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.}}{20}{table.caption.16}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.}}{21}{table.caption.18}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{30}{table.caption.26}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{31}{table.caption.27}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{31}{table.caption.26}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{32}{table.caption.27}%
