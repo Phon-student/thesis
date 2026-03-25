@@ -401,6 +401,155 @@ TCP/IP adapter.
 
 
 %─────────────────────────────────────────────────────────────────────────────
+\section{VLM INTERPRETABILITY SUB-PROJECT RESULTS}
+\label{sec:vlm_interp_results}
+%─────────────────────────────────────────────────────────────────────────────
+
+This section reports the outcomes of the mechanistic interpretability sub-project
+described in Section~\ref{sec:vlm_interp}. Evidence is organized along the four
+pipeline stages: dataset construction, activation harvesting and SAE training,
+feature identification, and behavioral steering evaluation. Where results are
+observational rather than numerically aggregated, the evidence type is stated
+explicitly.
+
+\subsection{Dataset Construction Outcome}
+
+The automated multi-threaded pipeline completed successfully, generating 10\,000
+JSONL records from EO-Data1.5M scene frames using 10 parallel Gemini workers.
+Manual inspection of a sample of records confirmed that every assistant turn is
+a syntactically valid \texttt{call\_robot()} invocation and that multi-turn records
+follow the intended three-step structure (approach $\to$ visual verification $\to$
+place). The dataset covers all four target manipulation categories: pick-and-place,
+stacking, drawer open/close, and multi-object sequencing. The presence of the
+\texttt{is\_multi\_turn} flag enables controlled analysis of single-turn versus
+sequential planning activations at the SAE training stage.
+
+\subsection{Activation Harvesting and SAE Training}
+
+The harvesting pipeline processed 100\,000 multimodal samples, producing 100 shard
+files (1\,000 samples per shard, up to 128 token positions per sample) and an
+activation corpus of up to 12.8\,million \texttt{float16} vectors of dimension 2\,048.
+The use of teacher-forcing at harvest time (full input-output pairs rather than
+prompt-only) ensured that the corpus reflects the model's internal state during
+action \emph{generation}, not merely instruction reading; this design choice is
+important for the quality of action-related features subsequently discovered by
+the SAE.
+
+The production SAE (\texttt{sae\_topk\_production.pt}) was trained with Adam, learning
+rate $1 \times 10^{-4}$, batch size 4\,096, for 20 epochs. The TopK constraint
+($k = 32$) was key to training stability: unlike $L_1$-penalized SAEs, the hard
+top-$k$ masking maintains a constant expected sparsity at every iteration, preventing
+the collapse or explosion of active-feature counts that can occur during early training.
+The agentic SAE (\texttt{sae\_agentic\_model.pt}) was trained for 30 epochs at
+$5 \times 10^{-4}$ on the full mixed corpus to sharpen feature separation in the
+more complex multi-turn activation space.
+
+\subsection{Feature Identification: Agentic Neuron Discovery}
+
+The cosine-similarity probe (Section~\ref{subsec:steering_protocol}, Phase 4a) was
+run against the \texttt{sae\_agentic\_model.pt} decoder matrix using the tool-call
+prefix \texttt{call\_robot(`pick a} as the behavioral anchor. \textbf{Feature \#5086}
+consistently ranked in the top-3 by cosine similarity across multiple scene images
+and instruction phrasings, indicating that this decoder direction is strongly aligned
+with the model's internal state when it is about to issue a robotic pick command.
+
+The max-activation analysis (Phase 4b) corroborates this: scanning 5\,000 EO-Data1.5M
+samples for the top activating inputs of Feature \#5086 revealed that the highest-scoring
+prompts were uniformly task-planning requests involving multi-step object handling
+(e.g., ``grab the banana and place it in the bag,'' ``stack the crates in order from
+largest to smallest''). No purely descriptive or question-answering prompts appeared
+in the top-5, confirming that Feature \#5086 specifically encodes \emph{agentic task
+planning} rather than general language understanding.
+
+A parallel analysis on the production checkpoint identified Feature \#9622 as
+encoding ``Procedural Robotic Planning'' --- a related but broader concept covering
+single-step tool calls. The two features are complementary: \#9622 activates on
+any \texttt{call\_robot()} context, while \#5086 activates most strongly when the
+model must sequence multiple steps. This distinction motivates the two-checkpoint
+design described in Section~\ref{subsec:sae_training}.
+
+\subsection{Activation Steering Evaluation}
+
+\paragraph{Two-Prompt Test Design.}
+Each strength level was evaluated on two contrasting prompt types simultaneously:
+(1) a general knowledge question with no robotic context (``What is the capital of
+France?''), and (2) a direct robot trajectory planning request (``Plan a trajectory
+to pick up the red cube.''). This design tests whether the steering effect is
+\emph{task-conditioned}---only reformatting outputs that are already robotics-relevant---or
+\emph{unconditioned}---overriding all model outputs regardless of input. The distinction
+matters for safe deployment: an unconditioned feature would corrupt non-robotic
+responses at any non-zero $\alpha$.
+
+\paragraph{Steering Sweep Results.}
+Feature \#5086 was injected across $\alpha \in \{0, 2, 5, 10, 20, 50, 80\}$.
+Table~\ref{tab:steering_sweep} summarizes the observed behavioral progression.
+
+\begin{table}[ht]
+\centering
+\caption{Observed output behavior across Feature \#5086 injection strengths.
+The two-prompt test distinguishes task-conditioned from unconditioned steering effects.}
+\label{tab:steering_sweep}
+\begin{tabular}{cp{5.5cm}p{5.5cm}}
+\hline
+\textbf{$\alpha$} & \textbf{Robot Prompt Output} & \textbf{General Prompt Output} \\
+\hline
+0  & Free-form natural language; no \texttt{call\_robot()} structure.
+   & Normal factual answer (e.g., ``Paris''). \\
+2  & Occasional \texttt{call\_robot()} fragments; incomplete action strings.
+   & Largely unaffected; minor phrasing shift. \\
+5  & Consistent \texttt{call\_robot()} prefix; action type specified but coordinates absent.
+   & Mild topic drift toward spatial language. \\
+10 & Structured action sequences with object specification; high task alignment.
+   & Begins to reference object positions; factual accuracy degrading. \\
+20 & High-specificity coordinate sequences; best task-alignment quality observed.
+   & Robotic output format imposed; factual answer lost. \\
+50 & Structured output maintained; coordinate precision degrading.
+   & Fully overridden to robotic format; response no longer coherent as general QA. \\
+80 & Repetition penalty suppresses loops; sequence coherence degrades.
+   & Same as $\alpha = 50$ with higher degeneration risk. \\
+\hline
+\end{tabular}
+\end{table}
+
+The steering effect is task-conditioned at low strengths ($\alpha \leq 5$) and
+becomes unconditioned at high strengths ($\alpha \geq 20$). The practical operating
+range for safe deployment is therefore $\alpha \in [10, 20]$, where robotic prompts
+receive structured \texttt{call\_robot()} outputs and the non-robotic prompt damage
+is still limited and reversible by reducing $\alpha$.
+
+\paragraph{Multi-Turn Coherence.}
+Three-turn grasp-sequence conversations (approach $\to$ visual verification $\to$
+place) were validated at $\alpha = 15$. The steered model correctly referenced
+objects mentioned in earlier turns, produced a distinct \texttt{call\_robot()} command
+for each step without restating the full scene, and did not repeat the approach
+command during the place step. This demonstrates that the steering mechanism preserves
+the model's context-retention capability even while redirecting its output format.
+
+\paragraph{Task-Category Coverage.}
+All four manipulation categories were tested at $\alpha = 15$ using distinct scene
+images for each category. Every test produced a syntactically valid
+\texttt{call\_robot()} invocation, confirming that Feature \#5086 encodes a
+general robotic-action-generation mode rather than a task-type-specific pattern.
+
+\subsection{Summary of Evidence and Limitations}
+
+The results across all four pipeline stages form a coherent chain of evidence:
+the dataset provides robot-action-grounded training signal; the SAE discovers
+a feature that cosine-similarity analysis and max-activation interpretability both
+independently confirm as encoding agentic task planning; and activation steering
+with that feature reliably elicits structured \texttt{call\_robot()} outputs across
+diverse scene images, instruction phrasings, and task categories.
+
+The primary limitation of the current results is that the steering evaluation is
+observational: output quality is assessed by inspecting format and content rather
+than by executing the generated \texttt{call\_robot()} commands on a physical robot
+and measuring task success rate. Connecting the interpretability sub-project to the
+main VLA evaluation framework --- so that steering-induced outputs are tested
+end-to-end on the Dobot CR5 --- is identified as a priority for future work
+(Section~\ref{chap:conclusion}).
+
+
+%─────────────────────────────────────────────────────────────────────────────
 \section{DISCUSSION}
 %─────────────────────────────────────────────────────────────────────────────
 

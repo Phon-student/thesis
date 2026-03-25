@@ -1,4 +1,11 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{bricken2023monosemanticity}
+Trenton Bricken, Adly Templeton, Joshua Batson, Brian Chen, Adam Jermyn, Tom
+  Conerly, Nick Turner, Cem Anil, Carson Denison, Amanda Askell, et~al.
+\newblock Towards monosemanticity: Decomposing language models with dictionary
+  learning.
+\newblock {\em Transformer Circuits Thread}, 2023.
 
 \bibitem{brohan2023rt2}
 Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Xi~Chen,
@@ -8,11 +15,37 @@ Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Xi~Chen,
   robotic control.
 \newblock {\em arXiv preprint arXiv:2307.15818}, 2023.
 
+\bibitem{cunningham2023sparse}
+Hoagy Cunningham, Aidan Ewart, Logan Sherborne, Robert Cooney, and Neel Nanda.
+\newblock Sparse autoencoders find highly interpretable features in language
+  models.
+\newblock {\em arXiv preprint arXiv:2309.08600}, 2023.
+
 \bibitem{driess2023palme}
 Danny Driess, Fei Xia, Mehdi S.~M. Sajjadi, Corey Lynch, Aakanksha Chowdhery,
   Brian Ichter, Ayzaan Wahid, Jonathan Tompson, Quan Vuong, Tianhe Yu, et~al.
 \newblock {PaLM-E}: An embodied multimodal language model.
 \newblock {\em arXiv preprint arXiv:2303.03378}, 2023.
+
+\bibitem{elhage2022superposition}
+Nelson Elhage, Tristan Hume, Catherine Olsson, Nicholas Schiefer, Tom Henighan,
+  Shauna Kravec, Zac Hatfield-Dodds, Robert Lasenby, Dawn Drain, Carol Chen,
+  et~al.
+\newblock Toy models of superposition.
+\newblock {\em Transformer Circuits Thread}, 2022.
+
+\bibitem{gao2024scaling}
+Leo Gao, Tom~Dun{\'e}ton la~Tour, Henk Tillman, Gabriel Goh, Rajan Troll, Alec
+  Radford, Ilya Sutskever, Jan Leike, and Jeffrey Wu.
+\newblock Scaling and evaluating sparse autoencoders.
+\newblock {\em arXiv preprint arXiv:2406.04093}, 2024.
+
+\bibitem{eodata2024}
+{IPEC-COMMUNITY}.
+\newblock {EO-Data1.5M}: A large-scale multimodal dataset for embodied object
+  understanding and task planning.
+\newblock Hugging Face Datasets.
+  \url{https://huggingface.co/datasets/IPEC-COMMUNITY/EO-Data1.5M}, 2024.
 
 \bibitem{kim2024openvla}
 Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, et~al.
@@ -32,11 +65,22 @@ Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
 \newblock {GPT-4} technical report.
 \newblock Technical report, OpenAI, 2023.
 
+\bibitem{qwen3vl2025}
+{Qwen Team}.
+\newblock {Qwen3-VL}: Technical report.
+\newblock {\em arXiv preprint arXiv:2505.09875}, 2025.
+
 \bibitem{vaswani2017attention}
 Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
   Aidan~N. Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
 \newblock Attention is all you need.
 \newblock In {\em Advances in Neural Information Processing Systems},
   volume~30, 2017.
+
+\bibitem{zou2023representation}
+Andy Zou, Long Phan, Sarah Chen, James Campbell, Phillip Guo, Richard Ren,
+  Alexander Pan, Xuwang Yin, Mantas Mazeika, Ann-Kathrin Dombrowski, et~al.
+\newblock Representation engineering: A top-down approach to {AI} transparency.
+\newblock {\em arXiv preprint arXiv:2310.01405}, 2023.
 
 \end{thebibliography}

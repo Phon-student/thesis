@@ -19,6 +19,12 @@ The project achieved the current-stage objectives:
     \item Enabled robots to follow natural-language instructions.
     \item Improved generalization performance on unseen tasks.
     \item Evaluated the system on representative manipulation benchmarks.
+    \item Constructed a 10\,000-record robot conversation dataset and trained a
+    TopK Sparse Autoencoder on 100\,000 VLM activations for mechanistic
+    interpretability analysis.
+    \item Identified a primary agentic feature (Feature \#5086) in the Qwen3-VL-2B
+    residual stream and demonstrated that activation steering at layer 20 reliably
+    elicits structured robotic action sequences without any model retraining.
 \end{enumerate}
 
 Experimental results showed that explicit module integration improved action validity
@@ -26,9 +32,20 @@ and task completion compared with partial baselines. The system maintained pract
 latency for interactive robot control and demonstrated stable performance across
 pick-and-place, stacking, container interaction, and multi-step sequencing tasks.
 
-Overall, the results support the central claim of this thesis: a carefully integrated
-VLA architecture can provide a practical path toward general-purpose intelligent robot
-manipulation under real-world compute and data constraints.
+The mechanistic interpretability sub-project extended these findings in a complementary
+direction: by training a TopK Sparse Autoencoder on 12.8\,million layer-20 activations,
+the work identified Feature \#5086 as an agentic task-planning direction latent in
+Qwen3-VL-2B. Injecting this feature vector at inference time at strength $\alpha \in
+[10, 20]$ reliably elicits structured \texttt{call\_robot()} outputs across diverse
+scene images, instruction phrasings, and task categories, without any gradient updates
+or additional training data. This confirms that the VLM core encodes manipulation
+knowledge that can be surfaced and steered through interpretability tools alone.
+
+Together, these results support the central claim of this thesis: a carefully
+integrated VLA architecture provides a practical path toward natural-language robot
+manipulation under real-world resource constraints, and mechanistic interpretability
+provides a complementary, human-auditable mechanism for surfacing and controlling
+latent robotic capabilities within the same pretrained VLM backbone.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -44,10 +61,17 @@ Despite strong overall performance, several limitations remain.
     complexity.
     \item Action sequencing errors can appear when instructions are ambiguous or
     underspecified.
+    \item Activation steering performance degrades at very high injection strengths
+    ($\alpha > 50$), suggesting that a bounded operating range is required for safe
+    deployment.
+    \item Feature \#5086 was identified through qualitative sweep; a principled,
+    automated method for selecting the optimal steering feature and strength
+    remains an open question.
 \end{itemize}
 
-These limitations indicate that stronger temporal reasoning and broader data coverage
-are necessary for robust deployment in unconstrained environments.
+These limitations indicate that stronger temporal reasoning, broader data coverage,
+and more rigorous feature-selection protocols are necessary for robust deployment in
+unconstrained environments.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +91,17 @@ Future development will focus on the following directions:
     stricter robustness requirements.
     \item Introduce stronger safety checks and action-validation layers before physical
     execution.
+    \item Scale the robot conversation dataset to 100\,000+ records to improve SAE
+    feature quality and generalization of the interpretability sub-project.
+    \item Develop principled, automated methods for feature selection and injection
+    strength calibration to replace manual sweep-based identification.
+    \item Integrate harmful-feature suppression as an online safety filter, using
+    the SAE decoder to identify and counteract features associated with unsafe
+    robot motions before command dispatch.
+    \item Extend the SAE and steering framework to locomotion planning to support
+    gait switching in hybrid morphology robots.
 \end{enumerate}
 
 These directions will support the transition from a research prototype to a more
-widely deployable general-purpose robotic assistant.
+widely deployable general-purpose robotic assistant with transparent, auditable
+AI decision-making at its core.

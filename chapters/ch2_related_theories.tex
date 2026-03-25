@@ -185,6 +185,91 @@ optimization.
 
 
 %─────────────────────────────────────────────────────────────────────────────
+\section{MECHANISTIC INTERPRETABILITY OF VISION-LANGUAGE MODELS}
+%─────────────────────────────────────────────────────────────────────────────
+
+A complementary research direction to standard VLA training is mechanistic
+interpretability: understanding \textit{how} VLMs encode and process information
+internally, rather than only measuring what they output. This perspective is
+increasingly relevant for robotics, where emergent capabilities such as spatial
+reasoning or action planning may already be latent within pretrained VLMs and could
+be surfaced without additional supervised training.
+
+\subsection{Feature Superposition and Sparse Decomposition}
+
+Neural networks, particularly large Transformer-based models, are believed to store
+far more concepts than they have neurons through a phenomenon called
+\textit{superposition}~\cite{elhage2022superposition}. Individual neurons rarely
+correspond to cleanly interpretable concepts. Instead, each neuron participates in
+representing many overlapping features simultaneously, making it difficult to isolate
+specific behavioral directions by direct inspection.
+
+Sparse decomposition addresses this by seeking a set of \textit{basis directions} in
+activation space such that any forward-pass activation can be expressed as a sparse
+linear combination of those directions. Each basis direction ideally corresponds to a
+single interpretable feature. Sparse Autoencoders (SAEs) provide a tractable
+mechanism for learning such decompositions from data.
+
+\subsection{Sparse Autoencoders for Feature Discovery}
+
+A Sparse Autoencoder is a two-layer bottleneck network trained to reconstruct model
+activations through a high-dimensional intermediate representation under a sparsity
+constraint~\cite{cunningham2023sparse}. Given an input activation vector
+$\mathbf{x} \in \mathbb{R}^{d_\text{model}}$, an SAE produces:
+
+\begin{equation}
+\hat{\mathbf{x}} = W_\text{dec}\,\text{TopK}(W_\text{enc}\mathbf{x} + \mathbf{b}_\text{enc}) + \mathbf{b}_\text{dec},
+\end{equation}
+
+where $W_\text{enc} \in \mathbb{R}^{d_\text{sae} \times d_\text{model}}$ and
+$W_\text{dec} \in \mathbb{R}^{d_\text{model} \times d_\text{sae}}$ are the encoder
+and decoder weight matrices, and $\text{TopK}(\cdot)$ retains only the $k$ largest
+non-negative pre-activations, zeroing the rest. The expansion ratio
+$d_\text{sae} / d_\text{model}$ controls the dictionary size relative to the original
+representation space. The TopK constraint directly enforces sparsity rather than
+relying on an $L_1$ penalty, which produces more stable and monosemantic features in
+practice~\cite{gao2024scaling}.
+
+Once trained, each column $\mathbf{d}_i$ of the decoder matrix $W_\text{dec}$
+defines a \textit{feature direction} in the model's hidden space. A high activation
+value for feature $i$ on a given input implies that the model's internal state
+strongly aligns with that direction during processing of that input.
+
+\subsection{Activation Steering via Feature Injection}
+
+Activation steering is a technique for directly modifying model behavior by adding a
+target direction to its internal activations during inference~\cite{zou2023representation}.
+If a feature direction $\mathbf{d}_i \in \mathbb{R}^{d_\text{model}}$ has been
+identified as encoding a concept of interest, the steered output at layer $\ell$ is:
+
+\begin{equation}
+\tilde{\mathbf{h}}_t^{(\ell)} = \mathbf{h}_t^{(\ell)} + \alpha\,\mathbf{d}_i,
+\end{equation}
+
+where $\mathbf{h}_t^{(\ell)}$ is the residual-stream hidden state at token position
+$t$ and layer $\ell$, and $\alpha$ is an injection strength hyperparameter. This
+technique bypasses the need for gradient updates and allows targeted behavioral
+modification at inference time.
+
+For robotic applications, activation steering is particularly relevant because it
+provides a lightweight path to zero-shot specialization: a general-purpose VLM can
+potentially be steered toward manipulation-relevant output modes without any
+task-specific fine-tuning, data collection, or retraining cost.
+
+\subsection{Application to Robotic Trajectory Planning}
+
+Prior work has demonstrated that language models encode factual, logical, and
+stylistic concepts as recoverable feature directions. The hypothesis motivating the
+present work is that a multimodal VLM trained at scale may also encode latent
+representations of \textit{spatial kinematics and manipulation procedures} that are
+not surfaced by standard prompting, but that can be discovered via SAE analysis and
+activated via steering. This motivates the VLM mechanistic interpretability
+sub-project described in Chapter~\ref{chap:methodology}, which applies SAE-based
+feature discovery and activation steering to Qwen3-VL-2B for zero-shot robotic
+trajectory planning.
+
+
+%─────────────────────────────────────────────────────────────────────────────
 \section{CHAPTER SUMMARY}
 %─────────────────────────────────────────────────────────────────────────────
 
@@ -194,3 +279,7 @@ robot learning but also highlights unresolved issues in flexibility, natural-lan
 interaction, and generalization. These gaps motivate the VLA architecture developed in
 Chapter~\ref{chap:methodology}, where a VLM, Vision Expert, and Action Expert are
 integrated for practical robot manipulation under real-world constraints.
+Additionally, the chapter surveyed mechanistic interpretability techniques---in
+particular Sparse Autoencoders and activation steering---which form the theoretical
+basis for the complementary VLM interpretability sub-project described in the same
+chapter.

@@ -2,16 +2,16 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.}}{16}{figure.caption.10}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.}}{17}{figure.caption.12}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.}}{17}{figure.caption.13}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.}}{18}{figure.caption.15}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.}}{19}{figure.caption.17}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.}}{20}{figure.caption.19}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.}}{21}{figure.caption.20}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.}}{22}{figure.caption.21}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.}}{23}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.}}{24}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.}}{25}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.\relax }}{20}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.\relax }}{21}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.\relax }}{21}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.\relax }}{22}{figure.caption.26}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.\relax }}{23}{figure.caption.28}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.\relax }}{24}{figure.caption.30}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.\relax }}{25}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.\relax }}{26}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.\relax }}{27}{figure.caption.33}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.\relax }}{28}{figure.caption.34}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.\relax }}{29}{figure.caption.35}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
