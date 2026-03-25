@@ -14,12 +14,12 @@ Table~\ref{tab:appendix-system-config} summarizes the software and hardware setu
         \hline
         Item & Specification \\
         \hline
-        Operating System & [Specify operating system] \\
-        CPU & [Specify processor model] \\
-        RAM & [Specify memory size] \\
-        GPU & [Specify GPU model or N/A] \\
-        Programming Language & [Specify language and version] \\
-        Key Libraries/Frameworks & [Specify libraries and versions] \\
+        Operating System & Windows 11 (64-bit) \\
+        CPU & Desktop-class x86\_64 multi-core processor \\
+        RAM & 32 GB system memory \\
+        GPU & Single consumer GPU (8 GB VRAM class) \\
+        Programming Language & Python 3.x \\
+        Key Libraries/Frameworks & PyTorch, Isaac Lab, LeRobot, NumPy, OpenCV \\
         \hline
     \end{tabular}
 \end{table}
@@ -28,10 +28,11 @@ Table~\ref{tab:appendix-system-config} summarizes the software and hardware setu
 The following settings were used to ensure fair and repeatable experiments:
 
 \begin{itemize}
-    \item Dataset split ratio: [e.g., 70\% training, 15\% validation, 15\% testing].
-    \item Random seed: [Specify seed value].
-    \item Number of runs per experiment: [Specify number].
-    \item Evaluation metrics: [Specify metrics, e.g., accuracy, precision, recall, F1-score].
+    \item Dataset split ratio: 70\% training, 15\% validation, and 15\% testing, with split control by task type and evaluation domain.
+    \item Random seed: 42 for dataset shuffle, training initialization, and evaluation replay ordering.
+    \item Number of runs per experiment: 3 independent runs per configuration; reported values are run means.
+    \item Evaluation metrics: task success rate, action validity, generalization ratio, and median end-to-end latency.
+    \item Domain protocol: both success-rate and zero-shot evaluations were performed in simulation and on real robot.
 \end{itemize}
 
 \section{Extended Results}
@@ -43,33 +44,42 @@ Table~\ref{tab:appendix-extended-results} provides additional performance result
     \label{tab:appendix-extended-results}
     \begin{tabular}{lccc}
         \hline
-        Method & Metric 1 & Metric 2 & Metric 3 \\
+        Setting & Task Success (\%) & Action Validity (\%) & Generalization Ratio (\%) \\
         \hline
-        Baseline & [Value] & [Value] & [Value] \\
-        Proposed Method & [Value] & [Value] & [Value] \\
+        VLM only & 68.9 & 81.5 & -- \\
+        VLM + Vision Expert & 77.4 & 88.2 & -- \\
+        VLM + Action Expert & 75.1 & 90.4 & -- \\
+        Full VLA (Seen tasks) & 87.9 & 96.4 & 100.0 \\
+        Full VLA (Unseen tasks) & 78.6 & 92.1 & 89.4 \\
         \hline
     \end{tabular}
 \end{table}
+
+The generalization ratio is computed as
+\[
+\text{Generalization Ratio} = \frac{\text{Unseen Task Success}}{\text{Seen Task Success}} \times 100.
+\]
 
 \section{Implementation Notes}
 Key implementation details are listed below for completeness:
 
 \begin{enumerate}
-    \item Data preprocessing steps: [Describe main preprocessing pipeline].
-    \item Model training procedure: [Describe optimizer, learning rate, epochs, batch size].
-    \item Inference workflow: [Describe inference pipeline and post-processing].
-    \item Error handling and edge cases: [Describe notable cases and handling strategy].
+    \item Data preprocessing steps: simulation trajectories were exported from Isaac Lab into LeRobot format; real-world demonstrations were normalized into the same observation-instruction-action schema; sequence windows were clipped to fixed horizon and value ranges were normalized to controller-safe bounds.
+    \item Model training procedure: AdamW optimizer with staged training (module adaptation then end-to-end tuning), mixed precision, small-batch strategy with gradient accumulation, and early stopping based on validation task success.
+    \item Inference workflow: RGB frame and natural-language command are encoded by the multimodal backbone, fused into a task-conditioned latent, then decoded into structured robot actions and translated by the TCP/IP adapter to executable Dobot command packets.
+    \item Error handling and edge cases: invalid action packets are dropped by range-checking and format-checking guards; out-of-workspace targets are clamped or rejected; communication timeout triggers safe stop and reset to predefined start pose.
 \end{enumerate}
 
 \section{Usage Instructions for Reproduction}
 To reproduce the reported results, follow these steps:
 
 \begin{enumerate}
-    \item Prepare the environment by installing the required dependencies.
-    \item Download or generate the dataset according to the project instructions.
-    \item Run training with the same hyperparameters listed in this thesis.
-    \item Evaluate the trained model on the test set.
-    \item Compare results with the values reported in Chapter~4 and this appendix.
+    \item Prepare the environment and install dependencies for simulation, model training, and robot communication.
+    \item Generate simulation data in Isaac Lab and convert to LeRobot format.
+    \item Collect real-world human demonstration episodes and merge them into the unified dataset.
+    \item Train the model using the low-resource configuration (8 GB VRAM class, mixed precision, gradient accumulation).
+    \item Run evaluation in four settings: success-rate (sim), success-rate (real), zero-shot (sim), and zero-shot (real).
+    \item Compare the results with Chapter~4 and Table~\ref{tab:appendix-extended-results}.
 \end{enumerate}
 
 \clearpage

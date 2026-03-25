@@ -2,77 +2,104 @@
 \label{chap:methodology}
 
 This chapter presents the methodology and system design of the proposed
-Vision-Language-Action (VLA) framework for robot manipulation. The chapter focuses on
-three priorities of the current project stage: (1) building an integrated
-Vision-Language-Action pipeline, (2) satisfying practical design constraints for real
-robot deployment, and (3) evaluating performance on representative manipulation tasks.
+Vision-Language-Action (VLA) framework for robot manipulation under constrained
+resources. The chapter focuses on three project priorities: (1) constructing an
+end-to-end VLA pipeline that is practical for commercial setups, (2) satisfying data,
+hardware, and safety constraints for Dobot CR5 deployment, and (3) defining a clear
+evaluation protocol across simulation and real-world domains.
+
+To improve traceability between design and evidence, the chapter is structured from
+requirements to implementation and then to evaluation. Each design decision is
+explicitly linked to one or more project constraints introduced in
+Chapter~\ref{chap:introduction}.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{METHODOLOGY OVERVIEW}
 %─────────────────────────────────────────────────────────────────────────────
 
-The research workflow is organized into five stages:
+The research workflow is organized as an implementation pipeline from communication
+infrastructure to model refinement:
 
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{VLA System Development}: design an end-to-end architecture that
-    receives visual observations and natural-language instructions, then produces
-    executable robot actions.
+    \item \textbf{AI-to-Robot Communication Interface}: build a module that converts
+    Dobot TCP/IP command primitives into a machine-learning-friendly composable action
+    format and vice versa.
 
-    \item \textbf{Module Integration}: integrate three cooperating modules ---
-    a VLM core, a Vision Expert, and an Action Expert --- into one synchronized
-    inference pipeline.
+    \item \textbf{Dataset Collection}: construct training data from two sources:
+    (a) simulation trajectories in Isaac Lab exported to LeRobot format, and
+    (b) real-world human demonstrations on the physical robot.
 
-    \item \textbf{Instruction Following}: train and configure the system so the robot
-    can follow natural-language user requests reliably.
+    \item \textbf{Model Development}: implement and integrate multimodal perception,
+    language grounding, and action prediction modules into one end-to-end model.
 
-    \item \textbf{Generalization Optimization}: improve robustness to unseen objects,
-    task compositions, and environment variations.
+    \item \textbf{Training Objective Design}: define losses and optimization settings
+    for stable learning under low-data and limited-memory conditions.
 
-    \item \textbf{Manipulation Evaluation}: benchmark performance on core robot
-    manipulation tasks under controlled experimental settings.
+    \item \textbf{Inference and Model Analysis}: inspect prediction behavior,
+    latency, failure modes, and sim-to-real transfer quality.
+
+    \item \textbf{Model Improvement}: apply targeted refinement based on analysis,
+    including data balancing, prompt/interface tuning, and architecture adjustments.
 \end{enumerate}
+
+At a high level, the learning problem is to estimate a policy
+\(\pi_\theta\) that maps multimodal context to controller-executable actions:
+\[
+a_t = \pi_\theta(I_t, \mathcal{U}, h_t),
+\]
+where \(I_t\) is the RGB observation, \(\mathcal{U}\) is the natural-language
+instruction, and \(h_t\) is optional history/state context. The methodology seeks to
+maximize task success under three constraints: limited demonstrations, limited memory,
+and safety-constrained execution.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{PROBLEM-DRIVEN DESIGN REQUIREMENTS}
 %─────────────────────────────────────────────────────────────────────────────
 
-The system design is directly derived from the identified problem and motivation:
-classical robot systems are task-specific, inflexible, weak in unseen-task
-generalization, and limited in natural-language understanding. To address these
-limitations, the proposed VLA design follows five constraints.
+The system design is directly derived from the project constraints. Unlike large-scale
+VLA studies that rely on broad datasets and high-end servers, this thesis targets a
+minimal commercial setup. Therefore, design decisions are driven by three major
+constraints.
 
-\subsection{Computation and Memory Constraint}
+\subsection{Dataset Quantity and Variety Constraint}
 
-Large multimodal backbones and action generators require significant memory and
-compute budget. The implementation must operate within available GPU memory while
-preserving action quality. This requires compact model configuration, mixed precision,
-and efficient batching.
+The available dataset is intentionally limited: approximately one hour of total robot
+motion with only three task families. This is significantly smaller than many VLA
+pipelines that use more than ten hours of demonstrations and broader task diversity.
+As a result, the methodology prioritizes sample efficiency, high data quality,
+cross-domain consistency (sim and real), and curriculum-style task coverage.
 
-\subsection{Latency Constraint}
+In practical terms, this means the pipeline avoids data-hungry assumptions and instead
+prioritizes representation reuse, careful trajectory normalization, and targeted
+coverage of failure-prone scenarios.
 
-Robot control requires low-latency generation. The inference path from
-image-plus-text input to executable action output must remain real-time, so each
-module is designed for fast forward pass and minimal inter-module overhead.
+\subsection{Hardware Constraint (Commercial GPU)}
 
-\subsection{Action Representation Constraint}
+The model architecture must fit within practical hardware specifications,
+specifically around 8 GB of VRAM. This restricts parameter count, sequence length,
+and batch-size strategy, and motivates memory-aware training techniques such as mixed
+precision, gradient accumulation, compact tokenization, and lightweight heads.
 
-Robot actions can be represented in discrete, continuous, or hybrid forms.
-The Action Expert must balance expressiveness and stability: discrete outputs improve
-parsing reliability, while continuous outputs improve motion fidelity.
+This constraint also affects experiment planning: ablations and evaluation schedules
+must be designed to preserve comparability without requiring large parallel runs.
 
-\subsection{Data Constraint}
+\subsection{Safety and Inference Standard Constraint}
 
-Robot demonstration data is limited and expensive to collect. The training strategy
-must maximize sample efficiency through data curation, augmentation, and transfer from
-pretrained visual-language knowledge.
+For safe and repeatable operation on Dobot CR5, robot joint-position standards are
+fixed before inference to define a consistent workspace and startup condition. The
+exact joint preset is recorded in the experiment configuration file and should be
+reported as
+\texttt{[Joint preset values for Dobot CR5 to be specified in final version]}.
+This standardization reduces run-to-run variance and lowers risk during autonomous
+execution.
 
-\subsection{Integration Constraint}
+The safety layer is treated as a first-class system component rather than a post hoc
+filter. This design choice is critical when model predictions are generated from
+natural-language input, where ambiguity can propagate to unsafe control proposals.
 
-The final system must coordinate perception, language grounding, and action generation
-without module mismatch. Interface contracts between modules are explicitly defined to
-avoid semantic drift and unstable action outputs.
+
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -87,14 +114,23 @@ At each control cycle, the system receives:
     \item a natural-language instruction $\mathcal{U}$ from the user.
 \end{itemize}
 
-The system outputs a structured action command that can be executed by the robot arm
-controller, plus an optional natural-language confirmation message for the operator.
+The system outputs a structured action command executable by the robot arm controller.
+The output is designed to be composable with the TCP/IP communication interface so it
+can be translated safely into Dobot command streams.
+
+Operationally, the architecture separates semantic grounding from command realization.
+This improves debuggability and allows independent validation of perception-language
+alignment and action executability.
 
 \subsection{VLM Core}
 
 The VLM module performs multimodal understanding and instruction grounding. It
-extracts intent from language, associates intent with scene context, and produces a
-high-level task representation suitable for manipulation planning.
+extracts intent from natural language, associates intent with current scene context,
+and generates a high-level task state for downstream action production.
+
+The VLM output is intentionally constrained to a structured intermediate task state
+instead of free-form control text. This reduces ambiguity at the interface with the
+action generator.
 
 \subsection{Vision Expert}
 
@@ -102,12 +138,19 @@ The Vision Expert provides task-relevant visual features (object cues, target
 relations, and workspace context) that support robust action planning. It is designed
 to improve perception reliability under object and scene variation.
 
+To support low-resource training, the Vision Expert emphasizes transferable features
+that remain stable across simulation and real camera conditions.
+
 \subsection{Action Expert}
 
 The Action Expert converts grounded task representations into executable robot
-manipulation commands. The module supports structured output formatting for robust
-execution and can be configured for discrete, continuous, or hybrid action spaces
-depending on controller requirements.
+manipulation commands. The module is constrained by communication safety rules,
+workspace limits, and robot kinematics, ensuring that generated actions remain valid
+for runtime execution.
+
+The Action Expert also acts as a control regularizer: it converts semantic intent into
+bounded command trajectories that are compatible with controller timing and packet
+format requirements.
 
 \subsection{Module Coordination}
 
@@ -121,32 +164,80 @@ The three modules are connected through explicit intermediate representations:
 This separation improves maintainability and enables targeted optimization of each
 module while keeping end-to-end behavior coherent.
 
+In addition, the architecture introduces a protocol adapter between the Action Expert
+and Dobot controller. This adapter maps model-level action semantics to TCP/IP command
+payloads with explicit validation rules (range checks, rate checks, and command
+structure checks) before dispatch.
+
+The protocol adapter provides deterministic verification before hardware dispatch,
+which is essential for reproducibility and for safe execution in real-robot tests.
+
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{IMPLEMENTATION STRATEGY}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Training and Tuning Strategy}
+\subsection{Dataset Collection Strategy}
+
+The data pipeline combines simulation and real-world trajectories:
+\begin{enumerate}[label=\arabic*)]
+    \item Generate simulation trajectories in Isaac Lab.
+    \item Export trajectories to LeRobot-compatible format.
+    \item Collect human demonstrations on the physical Dobot CR5.
+    \item Normalize both sources into a unified schema of observation,
+    instruction, and action tuples.
+\end{enumerate}
+
+This two-source design improves sample efficiency: simulation contributes scalable
+coverage of trajectory patterns, while real demonstrations provide embodiment-specific
+corrections for dynamics and sensing mismatch.
+
+\subsection{Model Development and Training Strategy}
 
 The system is trained and tuned in stages:
 \begin{enumerate}[label=\arabic*)]
-    \item Initialize the VLM-based instruction-following backbone.
-    \item Train or adapt the Vision Expert for manipulation-relevant perception.
-    \item Train the Action Expert to map integrated features to executable commands.
-    \item Perform end-to-end tuning to reduce cross-module mismatch.
+    \item Initialize the VLA backbone with pretrained multimodal knowledge.
+    \item Adapt perception and action heads to robot-manipulation dynamics.
+    \item Train with low-resource-aware objectives for stability and action validity.
+    \item Perform end-to-end tuning to reduce module mismatch and command noise.
 \end{enumerate}
+
+The training objective combines command prediction and execution validity terms:
+\[
+\mathcal{L}_{\text{total}} = \lambda_1 \mathcal{L}_{\text{action}}
++ \lambda_2 \mathcal{L}_{\text{validity}}
++ \lambda_3 \mathcal{L}_{\text{alignment}},
+\]
+where \(\mathcal{L}_{\text{action}}\) supervises target actions,
+\(\mathcal{L}_{\text{validity}}\) penalizes unsafe or non-executable outputs, and
+\(\mathcal{L}_{\text{alignment}}\) preserves language-vision-task consistency.
+
+\subsection{Inference and Model Analysis}
+
+After training, inference behavior is analyzed in both simulation and physical setups,
+including latency profile, command validity, failure taxonomy, and transfer behavior.
+This analysis identifies whether errors are caused by perception ambiguity, language
+misgrounding, or action decoding instability.
+
+Failure analysis is organized by stage so corrective interventions can be applied with
+minimal retraining overhead.
+
+\subsection{Model Improvement Loop}
+
+Based on analysis findings, iterative improvements are applied through data balancing,
+task reweighting, communication-level safeguards, and architectural tuning.
+
+This closed-loop process is central to low-resource development because each
+improvement cycle must produce measurable gains without expensive data re-collection.
 
 \subsection{Latency and Memory Optimization}
 
 To satisfy real-time robot-control requirements, the implementation applies practical
 optimization techniques, including mixed precision inference, efficient token/image
-preprocessing, and lightweight module interfaces.
+preprocessing, and lightweight module interfaces that remain feasible on 8 GB VRAM.
 
-\subsection{Data Utilization}
-
-Given limited robot demonstrations, the project emphasizes data quality over raw
-quantity. The dataset pipeline prioritizes task diversity, instruction variety,
-and balanced coverage of manipulation scenarios.
+Together, these optimizations convert the architecture from a proof-of-concept model
+into an executable pipeline for interactive robot operation.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -163,6 +254,29 @@ Evaluation is designed to measure whether the system satisfies the project goals
     \item satisfies real-time execution constraints.
 \end{itemize}
 
+The protocol deliberately separates robustness assessment (success-rate domain) from
+transfer assessment (zero-shot domain), because these dimensions often improve at
+different rates in constrained-data training.
+
+\subsection{Evaluation Domains}
+
+The protocol consists of two main domains:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Success-Rate Evaluation}:
+    assess task completion under standard conditions.
+    \item \textbf{Zero-Shot Evaluation}:
+    assess transfer to unseen combinations without additional fine-tuning.
+\end{enumerate}
+
+Each domain is evaluated in both environments:
+\begin{itemize}
+    \item On simulation,
+    \item On real robot.
+\end{itemize}
+
+This matrix of \{success-rate, zero-shot\} \(\times\) \{sim, real\} is used to
+distinguish pure policy quality from embodiment transfer effects.
+
 \subsection{Task Categories}
 
 The benchmark includes representative robot manipulation tasks such as:
@@ -177,23 +291,33 @@ The benchmark includes representative robot manipulation tasks such as:
 
 The following metrics are used:
 \begin{itemize}
-    \item \textbf{Instruction-following success rate}: whether generated actions satisfy
-    the user command.
-    \item \textbf{Generalization score}: performance on unseen tasks relative to seen
-    tasks.
+    \item \textbf{Task success rate}: whether generated actions satisfy the command
+    objective in each task.
+    \item \textbf{Zero-shot success rate}: performance on unseen combinations relative
+    to standard seen conditions.
     \item \textbf{Action validity}: percentage of outputs that are executable by the
     robot controller.
     \item \textbf{Latency}: end-to-end action generation time per command cycle.
 \end{itemize}
+
+For comparative reporting, unseen-task retention is additionally summarized as:
+\[
+\text{Generalization Ratio} =
+\frac{\text{Unseen Task Success}}{\text{Seen Task Success}} \times 100.
+\]
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{CHAPTER SUMMARY}
 %─────────────────────────────────────────────────────────────────────────────
 
-This chapter defined a VLA-centered system design aligned with the current project
-scope. The proposed architecture integrates a VLM, a Vision Expert, and an Action
-Expert to enable natural-language robot manipulation. The design explicitly addresses
-compute, latency, representation, data, and integration constraints, and establishes
-a task-based evaluation protocol for measuring instruction following and
-unseen-task generalization.
+This chapter defined a practical VLA methodology aligned with low-resource
+implementation goals. The proposed system integrates multimodal reasoning and robot
+action generation through a standardized AI-to-robot interface. The design explicitly
+addresses limited dataset scale, 8 GB VRAM hardware constraints, and Dobot CR5 safety
+standards, and establishes an evaluation protocol across simulation and real-world
+domains for both standard success-rate and zero-shot tests.
+
+With this methodology in place, Chapter~\ref{chap:experiments} evaluates whether the
+designed pipeline delivers measurable gains in action validity, instruction following,
+and transfer performance under the targeted resource constraints.

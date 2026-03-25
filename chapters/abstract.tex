@@ -2,8 +2,12 @@
 \begin{tabular}{ll}
 \textbf{Thesis}          & Vision-Language-Action Integration for Natural-Language Robot Arm Control \\
                          & with Improved Generalization to Unseen Manipulation Tasks \\
-\textbf{Student}         & Mr.~Tanakorn Youngmeesuk \\
-\textbf{Student ID.}     & 65011563 \\
+\textbf{Students}        & Mr.~Sittipon Kumda \\
+                         & Mr.~Rachata Pratheep Na Thalang \\
+                         & Mr.~Sippaphat Pitiwan \\
+                         & Mr.~Tanakorn Youngmeesuk \\
+                         & Ms.~Thanchanok Nuengcham Nong \\
+\textbf{Student IDs}     & 65011539, 65011499, 65011525, 65011563, 65011586 \\
 \textbf{Degree}          & Bachelor of Engineering \\
 \textbf{Program}         & Robotics and AI Engineering \\
 \textbf{Year}            & 2026 \\
@@ -21,22 +25,25 @@
 This thesis presents a Vision-Language-Action (VLA) framework for robot arm
 manipulation in which visual perception, language understanding, and action generation
 are integrated into a single control pipeline. The work addresses key limitations of
-classical robot systems: task-specific design, weak generalization to unseen tasks,
-limited natural-language interaction, and fragmented integration between vision,
-language, and control modules.
+current VLA practice in low-resource settings: high data collection cost, limited
+access to high-memory hardware, and fragmented integration between multimodal AI and
+robot-controller execution.
 
 The proposed architecture combines three coordinated components: a Vision-Language
 Model (VLM) core for instruction grounding, a Vision Expert for task-relevant visual
 feature extraction, and an Action Expert for executable robot action generation.
 The system receives an RGB scene observation and a free-form natural-language command,
-then produces structured manipulation actions suitable for robot-controller execution.
+then produces structured manipulation actions suitable for safe robot-controller
+execution through a TCP/IP communication adapter. The design specifically targets a
+commercial setup with limited dataset volume and an 8 GB VRAM class training budget.
 
 Experiments on representative robot manipulation tasks show that explicit VLM + Vision
 Expert + Action Expert integration improves action validity and task success compared
-with partial baselines. The system follows natural-language instructions reliably,
-maintains practical real-time latency, and demonstrates improved performance on unseen
-task settings relative to conventional task-specific pipelines. The results support the
-feasibility of general-purpose VLA-based robot control under realistic computation,
+with partial baselines. Evaluation across simulation and real-robot domains,
+including zero-shot settings, shows that the system follows natural-language
+instructions reliably, maintains practical real-time latency, and retains competitive
+performance under constrained training resources. The results support the feasibility
+of practical low-resource VLA-based robot control under realistic computation,
 data, and integration constraints.
 
 \vspace{0.4cm}

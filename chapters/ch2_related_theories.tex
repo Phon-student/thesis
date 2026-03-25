@@ -1,11 +1,19 @@
+
 \chapter{RELATED THEORIES AND LITERATURE REVIEW}
 \label{chap:litreview}
 
-This chapter reviews the theory and prior work that support the proposed
-Vision-Language-Action (VLA) framework for robot arm manipulation. The discussion
-focuses on five areas: limitations of classical robot pipelines, foundations of
-Vision-Language Models (VLMs), action modeling for manipulation, integrated VLA
-systems, and generalization challenges in robot learning.
+This chapter synthesizes the theoretical and empirical foundations that motivate the
+proposed Vision-Language-Action (VLA) framework. Rather than surveying prior work in
+isolation, the chapter connects core theories to the concrete problem addressed in
+this thesis: building practical natural-language robot manipulation under limited data
+and constrained compute.
+
+The discussion is organized into five themes: (1) limitations of classical robot
+pipelines, (2) foundations of Vision-Language Models (VLMs), (3) action modeling for
+manipulation, (4) integrated VLA system design in recent literature, and (5)
+generalization and transfer challenges. These themes form the conceptual bridge from
+problem statement (Chapter~\ref{chap:introduction}) to methodology
+(Chapter~\ref{chap:methodology}).
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -20,9 +28,16 @@ features, rules, and control logic.
 
 A major weakness is limited generalization. Policies tuned for narrow task templates
 frequently fail in unseen scenarios, especially when visual context and language
-instructions vary simultaneously. This motivates unified learning-based approaches
-that can jointly reason over visual and linguistic context while producing executable
-actions.
+instructions vary simultaneously. In practical terms, this leads to high maintenance
+cost, brittle behavior outside curated test distributions, and poor accessibility for
+non-expert users.
+
+Another structural limitation is interface rigidity. Classical systems commonly depend
+on deterministic command schemas or finite-state interfaces that assume predefined task
+structure. Such assumptions conflict with natural-language interaction, where intent is
+often underspecified, rephrased, or context dependent. This gap motivates multimodal
+approaches that can jointly interpret language and visual context before action
+generation.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -41,6 +56,12 @@ key, and value matrices, the core operation is:
 
 This mechanism supports flexible context integration across image and language tokens.
 
+For embodied decision-making, this property is particularly relevant because robot
+policies must condition on long contextual chains: instruction text, scene structure,
+task history, and safety constraints. Attention-based architectures provide a practical
+mechanism for such cross-token dependency modeling, especially when perception and
+language are encoded in a shared sequence space.
+
 \subsection{Vision-Language Instruction Following}
 
 Recent VLMs demonstrate strong multimodal instruction-following behavior through
@@ -51,6 +72,12 @@ scene context, reducing the need for rigid command interfaces.
 However, VLM output must still be translated into robot-executable actions with low
 latency and high reliability, which motivates explicit action modeling beyond
 language generation alone.
+
+From a systems perspective, two observations are important. First, language-level
+correctness does not imply control-level correctness; syntactically coherent text may
+still map to infeasible motion. Second, VLM confidence is not equivalent to execution
+safety. Therefore, practical robotic deployment requires an intermediate control layer
+that validates and structures model outputs before hardware dispatch.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -71,6 +98,22 @@ In practice, many systems use structured or mixed forms to balance robustness an
 expressiveness. For real-time control, action validity and execution safety are as
 important as semantic correctness.
 
+In low-resource settings, this representation choice becomes more critical. With
+limited demonstration diversity, purely continuous policies may overfit trajectory
+statistics and degrade sharply in unseen configurations. Hybrid action schemas, where
+high-level decisions are discretized and low-level motion remains continuous, can
+improve controllability while preserving enough dexterity for manipulation tasks.
+
+Action modeling in this thesis therefore emphasizes three properties:
+\begin{enumerate}[label=\arabic*)]
+    \item \textbf{Executability}: model outputs must map directly to controller-valid
+    commands.
+    \item \textbf{Safety compatibility}: outputs must satisfy workspace and joint-range
+    constraints before execution.
+    \item \textbf{Latency feasibility}: decoding and validation must remain practical
+    for interactive command cycles.
+\end{enumerate}
+
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{VISION-LANGUAGE-ACTION INTEGRATION}
@@ -89,6 +132,11 @@ These systems indicate that end-to-end multimodal-action learning can outperform
 strictly task-specific pipelines. At the same time, deployment still faces constraints
 in compute, latency, data scale, and module coordination.
 
+An important methodological implication is that integration quality is not solely a
+model-size problem. Even strong backbones can fail if perception features, language
+intent representations, and action outputs are weakly coupled. Consequently,
+architectural clarity and interface design are central to robust VLA behavior.
+
 \subsection{Need for Modular Integration}
 
 A practical VLA system must synchronize three capabilities:
@@ -100,6 +148,12 @@ A practical VLA system must synchronize three capabilities:
 
 This motivates the modular design used in this thesis: VLM core, Vision Expert, and
 Action Expert connected by explicit intermediate representations.
+
+The modular strategy is adopted not as a rejection of end-to-end learning, but as a
+practical compromise between trainability and interpretability. It enables targeted
+diagnosis of failure sources (language grounding versus visual ambiguity versus action
+decoding) while still supporting end-to-end optimization during later refinement
+stages.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -122,6 +176,12 @@ Current literature suggests several factors that improve transfer:
 These findings directly inform the design constraints and evaluation protocol of this
 thesis, where unseen-task performance is treated as a primary metric rather than a
 secondary result.
+
+For low-resource VLA development, generalization should be interpreted as a ratio,
+not only an absolute score. That is, the key question is how much capability is
+retained when moving from seen to unseen conditions under fixed resource budgets. This
+view aligns with the thesis objective of practical deployment rather than leaderboard
+optimization.
 
 
 %─────────────────────────────────────────────────────────────────────────────

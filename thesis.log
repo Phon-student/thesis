@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 15:52
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 18:26
  restricted system commands enabled.
  file:line:error style messages enabled.
 **d:/gitrepo/LaTeX-Thesis-Template/thesis
@@ -1250,35 +1250,100 @@ warning  (pdf backend): ignoring duplicate destination with the name 'page.1'
 Chapter 2.
 [4
 
-]
-
-LaTeX Warning: Citation `brohan2023rt2' on page 5 undefined on input line 83.
-
-
-LaTeX Warning: Citation `driess2023palme' on page 5 undefined on input line 84.
-
-
-) (./chapters/ch3_design_construction.tex [5] [6]
+] [5]) (./chapters/ch3_design_construction.tex [6] [7]
 Chapter 3.
-[7
+[8
 
-]
-Overfull \hbox (9.45879pt too wide) in paragraph at lines 101--104
+] [9]
+Overfull \hbox (9.45879pt too wide) in paragraph at lines 137--140
 []\TU/THSarabun.ttf(0)/m/n/12 The Vi-sion Ex-pert pro-vides task-relevant vi-sua
 l fea-tures (ob-ject cues, tar-get re-la-tions, and workspace
  []
 
-[8] [9]) (./chapters/ch4_results.tex [10]
+[10] [11] [12]) (./chapters/ch4_results.tex [13]
 Chapter 4.
+[14
 
-Overfull \hbox (6.24423pt too wide) in paragraph at lines 69--71
+]
+Overfull \hbox (6.24423pt too wide) in paragraph at lines 97--99
 []\TU/THSarabun.ttf(0)/m/n/12 These re-sults in-di-cate that the VLA pipeline is
  func-tion-ally com-plete and suit-able for manipulation-
  []
 
-[11
+<images/episode_0_task_redcubeplaceonpurple.png, id=714, 1806.75pt x 1204.5pt>
+File: images/episode_0_task_redcubeplaceonpurple.png Graphic file (type png)
+<use images/episode_0_task_redcubeplaceonpurple.png>
+Package luatex.def Info: images/episode_0_task_redcubeplaceonpurple.png  used o
+n input line 106.
+(luatex.def)             Requested size: 416.83289pt x 277.87462pt.
+[15]
+<images/DiT_attn_heatmap.png, id=721, 3011.25pt x 1505.625pt>
+File: images/DiT_attn_heatmap.png Graphic file (type png)
+<use images/DiT_attn_heatmap.png>
+Package luatex.def Info: images/DiT_attn_heatmap.png  used on input line 154.
+(luatex.def)             Requested size: 416.83289pt x 208.39677pt.
+ [16<./images/episode_0_task_redcubeplaceonpurple.png>]
+<images/raw_qwen_img_token.png, id=728, 1027.84pt x 434.62375pt>
+File: images/raw_qwen_img_token.png Graphic file (type png)
+<use images/raw_qwen_img_token.png>
+Package luatex.def Info: images/raw_qwen_img_token.png  used on input line 166.
 
-] [12]) (./chapters/ch5_conclusion.tex [13]
+(luatex.def)             Requested size: 416.83289pt x 176.26039pt.
+ [17<./images/DiT_attn_heatmap.png><./images/raw_qwen_img_token.png>]
+<images/Qwen_context_embeding_cluster.png, id=735, 2694.065pt x 2070.73625pt>
+File: images/Qwen_context_embeding_cluster.png Graphic file (type png)
+<use images/Qwen_context_embeding_cluster.png>
+Package luatex.def Info: images/Qwen_context_embeding_cluster.png  used on inpu
+t line 210.
+(luatex.def)             Requested size: 416.83289pt x 320.39206pt.
+ [18<./images/Qwen_context_embeding_cluster.png>]
+<images/auto_reg_chucking_proof.png, id=742, 2107.875pt x 903.375pt>
+File: images/auto_reg_chucking_proof.png Graphic file (type png)
+<use images/auto_reg_chucking_proof.png>
+Package luatex.def Info: images/auto_reg_chucking_proof.png  used on input line
+ 258.
+(luatex.def)             Requested size: 416.83289pt x 178.63171pt.
+ [19<./images/auto_reg_chucking_proof.png>]
+<images/trajectory_ttrd.png, id=749, 3011.25pt x 2409.0pt>
+File: images/trajectory_ttrd.png Graphic file (type png)
+<use images/trajectory_ttrd.png>
+Package luatex.def Info: images/trajectory_ttrd.png  used on input line 304.
+(luatex.def)             Requested size: 395.98996pt x 316.78331pt.
+<images/joint_distributions.png, id=751, 867.24pt x 1445.4pt>
+File: images/joint_distributions.png Graphic file (type png)
+<use images/joint_distributions.png>
+Package luatex.def Info: images/joint_distributions.png  used on input line 317
+.
+(luatex.def)             Requested size: 395.98996pt x 659.99586pt.
+ [20<./images/trajectory_ttrd.png>] [21<./images/joint_distributions.png>]
+<images/joit_pos_cor_matrix.png, id=764, 1505.625pt x 1204.5pt>
+File: images/joit_pos_cor_matrix.png Graphic file (type png)
+<use images/joit_pos_cor_matrix.png>
+Package luatex.def Info: images/joit_pos_cor_matrix.png  used on input line 329
+.
+(luatex.def)             Requested size: 395.98996pt x 316.78331pt.
+<images/joit_pos_cor_matrix_not_lerobot.png, id=765, 1204.5pt x 1053.9375pt>
+File: images/joit_pos_cor_matrix_not_lerobot.png Graphic file (type png)
+<use images/joit_pos_cor_matrix_not_lerobot.png>
+Package luatex.def Info: images/joit_pos_cor_matrix_not_lerobot.png  used on in
+put line 336.
+(luatex.def)             Requested size: 395.98996pt x 346.49783pt.
+ [22<./images/joit_pos_cor_matrix.png>]
+<images/per_ep_joint_pos.png, id=773, 2107.875pt x 3432.825pt>
+File: images/per_ep_joint_pos.png Graphic file (type png)
+<use images/per_ep_joint_pos.png>
+Package luatex.def Info: images/per_ep_joint_pos.png  used on input line 349.
+(luatex.def)             Requested size: 395.98996pt x 644.85786pt.
+ [23<./images/joit_pos_cor_matrix_not_lerobot.png>] [24<./images/per_ep_joint_po
+s.png>]
+<images/end_eff_space_cover.png, id=785, 2710.125pt x 1806.75pt>
+File: images/end_eff_space_cover.png Graphic file (type png)
+<use images/end_eff_space_cover.png>
+Package luatex.def Info: images/end_eff_space_cover.png  used on input line 361
+.
+(luatex.def)             Requested size: 395.98996pt x 263.97078pt.
+ [25<./images/end_eff_space_cover.png>] [26])
+(./chapters/ch5_conclusion.tex
 Chapter 5.
 
 Overfull \hbox (10.25075pt too wide) in paragraph at lines 60--62
@@ -1286,49 +1351,45 @@ Overfull \hbox (10.25075pt too wide) in paragraph at lines 60--62
 -ject, scene, and in-struc-tion di-ver-sity to strengthen
  []
 
-[14
-
-]) [15] (./thesis.bbl [16
+[27
 
 
-]) (./chapters/appendix.tex [17]
+]) [28] (./thesis.bbl) (./chapters/appendix.tex [29
+
+
+]
 Appendix A.
-[18
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[30
 
 
-] [19])
-
-Package caption Warning: Unused \captionsetup[figure] on input line 38.
-See the caption package documentation for explanation.
-
-(./thesis.aux)
+] [31]) (./thesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: F3A405CC811520D0A771241A084606E8;13318.
+(rerunfilecheck)             Checksum: 6E936B5A1E2F17D748E2061096A224AD;13908.
 )
 
 Here is how much of LuaTeX's memory you used:
- 20074 strings out of 476076
+ 20238 strings out of 476076
  100000,953878 words of node,token memory allocated
- 704 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 9 attribute, 93 glue_spec,
- 9 attribute_list, 2 write nodes
-   avail lists: 2:1237,3:467,4:312,5:259,6:164,7:6815,8:37,9:772,10:13,11:665
- 41945 multiletter control sequences out of 65536+600000
- 75 fonts using 30361479 bytes
- 79i,12n,97p,464b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./fonts/THSarabunIt
-alic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
-Output written on thesis.pdf (30 pages, 226930 bytes).
+ 794 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 21 attribute, 93 glue_spec
+, 21 attribute_list, 2 write, 7 pdf_action nodes
+   avail lists: 2:1243,3:479,4:320,5:263,6:161,7:6772,8:37,9:790,10:15,11:670
+ 42049 multiletter control sequences out of 65536+600000
+ 76 fonts using 30487327 bytes
+ 79i,12n,97p,421b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
+no12-regular.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./
+fonts/THSarabunItalic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
+Output written on thesis.pdf (42 pages, 3946092 bytes).
 
-PDF statistics: 733 PDF objects out of 1000 (max. 8388607)
- 190 named destinations out of 1000 (max. 1048576)
- 585 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 893 PDF objects out of 1000 (max. 8388607)
+ 217 named destinations out of 1000 (max. 1048576)
+ 609 words of extra memory for PDF output out of 10000 (max. 100000000)
 
