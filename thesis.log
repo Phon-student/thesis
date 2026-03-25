@@ -1,7 +1,8 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 22:45
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 23:33
  restricted system commands enabled.
-**thesis.tex
-(./thesis.tex
+ file:line:error style messages enabled.
+**d:/gitrepo/LaTeX-Thesis-Template/thesis
+(d:/gitrepo/LaTeX-Thesis-Template/thesis.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
 Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
@@ -1385,12 +1386,12 @@ Here is how much of LuaTeX's memory you used:
 , 22 attribute_list, 2 write, 8 pdf_action nodes
    avail lists: 2:1211,3:467,4:312,5:257,6:156,7:7924,8:59,9:772,10:27,11:838
  42062 multiletter control sequences out of 65536+600000
- 76 fonts using 30487407 bytes
- 79i,12n,97p,392b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 76 fonts using 30487247 bytes
+ 79i,12n,97p,421b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
 no12-regular.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./
 fonts/THSarabunItalic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
-Output written on thesis.pdf (44 pages, 3962570 bytes).
+Output written on thesis.pdf (44 pages, 3962853 bytes).
 
 PDF statistics: 943 PDF objects out of 1000 (max. 8388607)
  228 named destinations out of 1000 (max. 1048576)

@@ -5,25 +5,29 @@
 \section{Background and Motivation}
 %─────────────────────────────────────────────────────────────────────────────
 
-Vision-Language Models (VLMs) have recently demonstrated high global impact in
-multimodal reasoning, instruction following, and human-computer interaction. They can
-understand free-form text and visual context in a way that significantly reduces the
-interface barrier between human intent and machine behavior. A natural next step is to
-migrate this intelligence from digital environments to the physical world, where robots
-must perceive, reason, and act under real constraints.
+Vision-Language Models (VLMs) have recently shown strong capability in multimodal
+reasoning, instruction following, and human-computer interaction. Free-form language
+and visual observations can now be interpreted within a unified representation, so the
+gap between human intent and machine response can be reduced.
 
-However, building practical Vision-Language-Action (VLA) systems remains difficult.
-Most high-performing solutions require large amounts of specialized robot datasets,
-long data-collection time, and heavy hardware setups. These requirements make VLA
-development inaccessible for many university teams and small labs. In particular,
-real-world robot data collection is expensive, and large GPU memory is not always
-available for end-to-end training and deployment.
+The next research direction is the migration of this capability from digital tasks to
+physical execution. In this context, practical world impact is expected in domains where
+natural-language instructions must be converted into reliable actions, such as warehouse
+pick-and-place assistance, small-batch manufacturing support, laboratory sample handling,
+and assistive service operations in constrained indoor environments.
 
-This thesis is motivated by the following question: can an end-to-end pipeline enable
-VLA development under a minimal commercial setup, including low-volume data and
-moderate GPU resources? To answer this, we design and evaluate a practical VLA
-framework that combines multimodal understanding and robot control in one trainable
-pipeline while maintaining feasibility for constrained environments.
+However, practical Vision-Language-Action (VLA) development is still constrained by
+resource requirements. In many published settings, more than 10 hours of robot motion,
+specialized data-collection infrastructure, and high-memory GPU hardware are required.
+Such requirements are difficult to satisfy for students, independent researchers, and
+small university laboratories. Real-robot data collection is costly and time-intensive,
+while access to large GPU memory is often limited.
+
+Accordingly, this thesis is motivated by the following question: can an end-to-end VLA
+pipeline be developed under a minimal commercial setup, using low-volume data and
+moderate compute resources, while retaining usable manipulation performance? To address
+this question, a practical framework is developed and evaluated to integrate multimodal
+understanding and robot control in a single trainable pipeline for constrained settings.
 
 
 %─────────────────────────────────────────────────────────────────────────────
