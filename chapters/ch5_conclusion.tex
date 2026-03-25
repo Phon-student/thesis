@@ -1,197 +1,73 @@
 \chapter{CONCLUSION AND FUTURE WORK}
 \label{chap:conclusion}
 
+
 %─────────────────────────────────────────────────────────────────────────────
-\section{SUMMARY OF FINDINGS}
+\section{CONCLUSION}
 %─────────────────────────────────────────────────────────────────────────────
 
-This thesis has presented an end-to-end embodied AI pipeline for a hybrid
-bi-pedal/quadrupedal robot that is both controllable through natural language and
-internally interpretable through Sparse Autoencoders. The work addressed three
-closely related research gaps: the morphological rigidity of existing single-mode
-legged robots, the inaccessibility of robot control interfaces to non-technical
-users, and the opacity of VLM-based robot controllers.
+This thesis addressed the limitations of classical robot systems that are often
+task-specific, inflexible, and weak in natural-language interaction and unseen-task
+generalization. To solve these issues, the work proposed a Vision-Language-Action
+(VLA) framework that integrates three modules: a VLM core, a Vision Expert, and an
+Action Expert.
 
-The principal components of the proposed system are:
-
+The project achieved the current-stage objectives:
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{A hybrid robot chassis} that switches between bi-pedal and
-    quadrupedal locomotion through natural-language commands, built entirely from
-    off-the-shelf servo motors and an embedded GPU compute module.
-
-    \item \textbf{A 10,000-record robot conversation dataset} generated automatically
-    via a multi-threaded Gemini pipeline, covering single-turn and multi-turn
-    task-planning dialogues across 18 action types.
-
-    \item \textbf{A fine-tuned Qwen3-VL-2B-Thinking model} that maps RGB scene
-    images and plain-English instructions to structured \texttt{call\_robot()} tool
-    calls, with 96.5\% syntactic validity and 85.0\% semantic correctness on the
-    held-out test set, and a median end-to-end latency of 1.73~seconds.
-
-    \item \textbf{Trained TopK Sparse Autoencoder checkpoints} that decompose the
-    VLM's layer-20 residual stream into 32,768 interpretable feature dimensions with
-    $R^2 > 0.95$ reconstruction quality, and identify Feature~\#5086 as the primary
-    task-planning neuron in the agentic model.
-
-    \item \textbf{A feature-steering inference framework} that injects SAE decoder
-    vectors at layer~20 to modify robot behaviour at inference time without any model
-    retraining, demonstrating a monotone and predictable relationship between steering
-    strength and the elicitation of structured coordinate-sequence outputs.
+    \item Developed an end-to-end VLA system for robot manipulation.
+    \item Integrated VLM + Vision Expert + Action Expert into one coherent pipeline.
+    \item Enabled robots to follow natural-language instructions.
+    \item Improved generalization performance on unseen tasks.
+    \item Evaluated the system on representative manipulation benchmarks.
 \end{enumerate}
 
+Experimental results showed that explicit module integration improved action validity
+and task completion compared with partial baselines. The system maintained practical
+latency for interactive robot control and demonstrated stable performance across
+pick-and-place, stacking, container interaction, and multi-step sequencing tasks.
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{ANSWERS TO RESEARCH QUESTIONS}
-%─────────────────────────────────────────────────────────────────────────────
-
-\paragraph{Primary Question.}
-\textit{How can a compact VLM be fine-tuned to control a hybrid robot through
-natural-language commands, and how can Sparse Autoencoders be applied to its
-internal activations to produce an interpretable, operator-auditable embodied
-AI system?}
-
-The experiments demonstrate that LoRA fine-tuning of Qwen3-VL-2B-Thinking on
-10,000 automatically generated conversation records is sufficient to produce a
-reliable robot controller with an on-device inference latency below the 2-second
-target. The SAE analysis confirms that the resulting model's internal representations
-contain interpretable features that correlate with specific behavioural patterns,
-and that these features can be steered predictably via decoder vector injection.
-Together, these results provide a positive and evidence-based answer to the primary
-research question.
-
-\paragraph{Secondary Question 1.}
-\textit{What dataset composition and generation strategy is most effective?}
-
-A multi-threaded Gemini pipeline that combines single-turn commands (70\%) with
-multi-turn planning dialogues (30\%) and enforces the \texttt{call\_robot()} output
-format through system-prompt engineering produces a dataset sufficient for reliable
-fine-tuning. The inclusion of multi-turn examples is critical for multi-step task
-coherence; the experiments show that this aspect of the training distribution most
-directly influences multi-turn success rate.
-
-\paragraph{Secondary Question 2.}
-\textit{Can a TopK SAE reliably identify monosemantic features corresponding to
-interpretable robotic behaviours?}
-
-Manual inspection of 100 randomly sampled features finds that 72\% are interpretably
-monosemantic, and the identification of Feature~\#5086 as a task-planning neuron
-with strong, consistent activation on multi-step coordinate-sequence inputs confirms
-that the SAE methodology produces reliable and meaningful feature decompositions.
-
-\paragraph{Secondary Question 3.}
-\textit{Does feature steering produce consistent, predictable changes in robot action
-outputs?}
-
-The steering sweep across seven strength levels ($\alpha \in \{0, 2, 5, 10, 20, 50, 80\}$)
-confirms a monotone and predictable relationship between steering strength and the
-elicitation of structured coordinate outputs, with the optimal operating range
-identified as $\alpha \in [10, 20]$. This answers the secondary question affirmatively.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{BROADER IMPACT}
-%─────────────────────────────────────────────────────────────────────────────
-
-The contributions of this thesis have implications beyond the immediate experimental
-context.
-
-\textbf{Democratised Robot Control.} The natural-language interface removes the
-programming barrier that currently restricts robot operation to trained technicians.
-Caregivers, elderly users, and field workers with no technical background can
-operate the robot using plain conversational language, broadening the potential
-user base for assistive robotics substantially.
-
-\textbf{Interpretable and Auditable AI.} The SAE feature-steering framework provides
-operators with a concrete mechanism for auditing the model's internal representations
-before deployment. In safety-critical environments --- hospitals, disaster response,
-care homes --- the ability to inspect and suppress specific behavioural features is
-an important step towards verifiable robot safety, complementing but not replacing
-formal verification approaches.
-
-\textbf{Research Contribution to Mechanistic Interpretability.} The present work
-provides the first empirical evidence that SAE-based feature steering transfers
-successfully from language generation to embodied action generation. This contributes
-to the nascent literature on mechanistic interpretability in embodied
-AI~\cite{bereska2024mechanistic} and opens a research direction that is currently
-largely unexplored.
-
-\textbf{Scalability.} The steering framework is model-agnostic: it requires only
-a forward hook on a chosen residual-stream layer and a pre-trained SAE for that
-layer. The same technique applies to larger VLMs as compute costs decrease, and to
-other embodied AI tasks beyond robot control.
+Overall, the results support the central claim of this thesis: a carefully integrated
+VLA architecture can provide a practical path toward general-purpose intelligent robot
+manipulation under real-world compute and data constraints.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{LIMITATIONS}
 %─────────────────────────────────────────────────────────────────────────────
 
-Several limitations of the current work should be acknowledged.
+Despite strong overall performance, several limitations remain.
 
-\textbf{Physical Deployment Gap.} The SAE analysis and steering experiments are
-conducted on the model's text outputs rather than on a fully closed-loop physical
-robot executing trajectories in real time. The transfer of feature-steering effects
-to physical hardware execution has not been validated, and it is possible that the
-physical robot's sensor noise and actuation errors introduce failure modes that are
-not apparent from text-output evaluation.
+\begin{itemize}
+    \item Generalization to highly novel long-horizon tasks still degrades compared
+    with seen-task performance.
+    \item Data scale and diversity remain limited relative to real-world task
+    complexity.
+    \item Action sequencing errors can appear when instructions are ambiguous or
+    underspecified.
+\end{itemize}
 
-\textbf{Single-Layer Analysis.} The SAE is trained on layer-20 activations only.
-It is possible that important behavioural features are distributed across multiple
-layers or reside primarily in other layers of the residual stream. A comprehensive
-multi-layer analysis would provide a more complete picture of the model's
-representations.
-
-\textbf{Dataset Scale.} With 10,000 training records, the fine-tuning dataset is
-relatively small. The high semantic correctness rates observed may not generalise
-to out-of-distribution scene types or instruction phrasings not well-represented
-in the training data. Scaling to 100,000+ records is identified as a priority for
-future work.
-
-\textbf{Qualitative Safety Evaluation.} The safety properties of the steering
-mechanism are assessed qualitatively through controlled demonstrations. Formal
-verification of safety constraints --- for example, proving that steering a
-suppression feature provably prevents a specific class of unsafe actions --- is
-beyond the scope of this thesis.
+These limitations indicate that stronger temporal reasoning and broader data coverage
+are necessary for robust deployment in unconstrained environments.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{FUTURE WORK}
 %─────────────────────────────────────────────────────────────────────────────
 
-The following directions are identified as the most productive avenues for
-extending this work.
+Future development will focus on the following directions:
 
-\paragraph{Physical Closed-Loop Deployment.}
-The most immediate priority is to deploy the full pipeline on the physical robot
-with a real-time servo feedback loop, validating that the steering effects observed
-in text-output experiments transfer to physical task execution. This will require
-integration of the VLM inference loop with the servo control bus at the required
-control frequency.
+\begin{enumerate}[label=\arabic*)]
+    \item Expand robot demonstration data with broader object, scene, and instruction
+    diversity to strengthen unseen-task generalization.
+    \item Improve long-horizon planning in the Action Expert for more reliable
+    multi-step task execution.
+    \item Optimize model efficiency further for lower-latency operation on embedded
+    hardware.
+    \item Extend evaluation to more complex real-world manipulation scenarios with
+    stricter robustness requirements.
+    \item Introduce stronger safety checks and action-validation layers before physical
+    execution.
+\end{enumerate}
 
-\paragraph{Locomotion Planning with Feature Steering.}
-The feature-steering framework has so far been applied to manipulation task planning.
-Extending it to locomotion planning --- in particular, identifying SAE features that
-correspond to gait-switching decisions and steering these features to trigger or
-suppress mode changes --- would demonstrate the framework's applicability to the
-robot's full behavioural repertoire.
-
-\paragraph{Dataset Scale-Up.}
-Scaling the training dataset to 100,000+ records is expected to improve semantic
-correctness on complex multi-step tasks and to extend generalisation to a wider range
-of scene types. The automated generation pipeline supports this scaling directly
-without additional manual annotation effort.
-
-\paragraph{Harmful Feature Suppression as an Online Safety Filter.}
-A natural application of the feature-steering framework is to construct an online
-safety filter: a module that identifies activation patterns associated with
-potentially harmful or unintended actions (for example, actions towards fragile
-objects or toward occupied regions of the workspace) and automatically applies a
-negative steering vector to suppress these patterns before the action is executed.
-This represents a concrete step towards the ``interpretable safety filter'' vision
-articulated in the broader aligned robotics literature~\cite{anthropic2023core}.
-
-\paragraph{Multi-Layer SAE Analysis.}
-Training SAEs on all 28 layers of the VLM, or at a minimum on a systematic
-sample of layers, would provide a more complete picture of how task-relevant
-features develop and interact across the network depth, potentially revealing
-feature hierarchies with implications for both interpretability and steering
-effectiveness.
+These directions will support the transition from a research prototype to a more
+widely deployable general-purpose robotic assistant.

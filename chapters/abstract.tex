@@ -1,7 +1,7 @@
 \noindent
 \begin{tabular}{ll}
-\textbf{Thesis}          & Interpretable Embodied AI for a Hybrid Bi-pedal/Quadrupedal Robot \\
-                         & Using Sparse Autoencoders and Vision-Language Model Feature Steering \\
+\textbf{Thesis}          & Vision-Language-Action Integration for Natural-Language Robot Arm Control \\
+                         & with Improved Generalization to Unseen Manipulation Tasks \\
 \textbf{Student}         & Mr.~Tanakorn Youngmeesuk \\
 \textbf{Student ID.}     & 65011563 \\
 \textbf{Degree}          & Bachelor of Engineering \\
@@ -18,31 +18,28 @@
 
 \vspace{0.5cm}
 
-This thesis presents an end-to-end embodied artificial intelligence pipeline for a
-hybrid bi-pedal/quadrupedal robot whose locomotion mode can be switched on demand.
-The central challenge addressed is twofold: enabling a robot with multiple locomotion
-configurations to accept and execute natural-language commands without requiring any
-programming knowledge from the operator, and making the internal decision-making
-process of the underlying Vision-Language Model transparent and auditable.
+This thesis presents a Vision-Language-Action (VLA) framework for robot arm
+manipulation in which visual perception, language understanding, and action generation
+are integrated into a single control pipeline. The work addresses key limitations of
+classical robot systems: task-specific design, weak generalization to unseen tasks,
+limited natural-language interaction, and fragmented integration between vision,
+language, and control modules.
 
-The AI brain is built upon Qwen3-VL-2B-Thinking, a compact two-billion-parameter
-multimodal model fine-tuned on a purpose-built dataset of 10{,}000 robot-conversation
-records generated through an automated multi-threaded pipeline. Fine-tuning teaches
-the model to produce structured \texttt{call\_robot()} tool-call outputs from RGB
-scene images and free-form user requests. To expose the model's internal
-representations, a TopK Sparse Autoencoder (SAE) is trained on 100{,}000 layer-20
-hidden-state activations, decomposing the model's 2{,}048-dimensional residual stream
-into 32{,}768 interpretable, near-mono\-semantic feature dimensions. Feature-level
-steering is demonstrated by injecting SAE decoder column vectors directly at the
-identified layer, modifying robot behaviour at inference time without any model
-retraining. Experiments confirm that Feature~\#5086 in the agentic SAE model acts as
-a primary task-planning neuron: steering this feature reliably elicits structured
-coordinate-sequence outputs across a range of pick-and-place, stacking, and
-drawer-manipulation tasks. The complete system is deployed through a Gradio web
-interface with a real-time steering-strength slider, making interpretable robot
-control accessible to non-technical users.
+The proposed architecture combines three coordinated components: a Vision-Language
+Model (VLM) core for instruction grounding, a Vision Expert for task-relevant visual
+feature extraction, and an Action Expert for executable robot action generation.
+The system receives an RGB scene observation and a free-form natural-language command,
+then produces structured manipulation actions suitable for robot-controller execution.
+
+Experiments on representative robot manipulation tasks show that explicit VLM + Vision
+Expert + Action Expert integration improves action validity and task success compared
+with partial baselines. The system follows natural-language instructions reliably,
+maintains practical real-time latency, and demonstrates improved performance on unseen
+task settings relative to conventional task-specific pipelines. The results support the
+feasibility of general-purpose VLA-based robot control under realistic computation,
+data, and integration constraints.
 
 \vspace{0.4cm}
-\noindent\textbf{Keywords:} Vision-Language Model, Sparse Autoencoder, Mechanistic
-Interpretability, Feature Steering, Hybrid Robot, Embodied AI, Natural-Language
-Robot Control
+\noindent\textbf{Keywords:} Vision-Language-Action, Robot Manipulation,
+Natural-Language Robot Control, Multimodal Integration, Generalization,
+Embodied AI

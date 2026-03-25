@@ -1,14 +1,13 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{\ignorespaces Comparison of related embodied AI systems against the proposed approach. NL = Natural-Language interface; Interp. = Interpretability mechanism; Hybrid = Hybrid morphology support.}}{9}{table.caption.8}%
-\addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces Summary statistics of the generated robot conversation dataset.}}{15}{table.caption.10}%
-\contentsline {table}{\numberline {3.2}{\ignorespaces Key hyperparameters of the proposed embodied AI system.}}{18}{table.caption.11}%
-\addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces VLM fine-tuning evaluation results (200 test cases, 50 per category).}}{20}{table.caption.12}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces SAE reconstruction quality at convergence (evaluated on a held-out set of 10{,}000 activation vectors).}}{20}{table.caption.13}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Qualitative outcomes of the Feature~\#5086 steering sweep across 20 test inputs per strength level.}}{21}{table.caption.14}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{30}{table.caption.25}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{31}{table.caption.26}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.}}{12}{table.caption.9}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.}}{12}{table.caption.10}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.}}{12}{table.caption.11}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.}}{13}{table.caption.12}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.}}{13}{table.caption.13}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{18}{table.caption.15}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{18}{table.caption.16}%

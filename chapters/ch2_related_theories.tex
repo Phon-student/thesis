@@ -1,330 +1,136 @@
 \chapter{RELATED THEORIES AND LITERATURE REVIEW}
 \label{chap:litreview}
 
-This chapter surveys the theoretical foundations and prior work most directly relevant
-to the proposed system. The review is organised into five areas: legged robot
-locomotion and hybrid morphologies, Vision-Language Models and their application to
-robot control, mechanistic interpretability and Sparse Autoencoders, large-scale
-dataset generation for robot learning, and a comparative analysis of prior embodied
-AI systems that inform the design decisions presented in
-Chapter~\ref{chap:methodology}.
+This chapter reviews the theory and prior work that support the proposed
+Vision-Language-Action (VLA) framework for robot arm manipulation. The discussion
+focuses on five areas: limitations of classical robot pipelines, foundations of
+Vision-Language Models (VLMs), action modeling for manipulation, integrated VLA
+systems, and generalization challenges in robot learning.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{LEGGED ROBOT LOCOMOTION AND HYBRID MORPHOLOGIES}
+\section{LIMITATIONS OF CLASSICAL ROBOT SYSTEMS}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Bipedal Locomotion}
+Classical robot systems are typically composed of hand-engineered perception,
+planning, and control modules. This design provides predictable behavior in fixed
+conditions, but it is often task-specific and difficult to scale to open-world
+settings. Changes in objects, layouts, or command style can require redesign of
+features, rules, and control logic.
 
-Bipedal robots are designed to replicate the upright, two-legged gait of humans,
-enabling them to operate in environments built around human ergonomics --- doorways,
-stairs, worktables, and manipulation zones at human workspace heights. Classic
-control approaches for bipedal locomotion rely on Zero Moment Point (ZMP)
-stability criteria~\cite{vukobratovic1972stability} and model-predictive
-control~\cite{wieber2016modeling}, which plan joint trajectories such that the
-robot's centre of pressure remains within the support polygon defined by its feet.
-More recent learning-based approaches have demonstrated robust bipedal locomotion
-over rough terrain through reinforcement learning in simulation followed by
-sim-to-real transfer~\cite{siekmann2021blind,kumar2021rma}. Despite these advances,
-bipedal platforms remain energetically costly and dynamically unstable at low speeds
-or during quasi-static manipulation, where the narrow support polygon offers
-little margin against external perturbations.
-
-\subsection{Quadrupedal Locomotion}
-
-Quadrupedal robots distribute their weight across four contact points, providing a
-substantially wider support polygon and greater static stability. This makes them
-well-suited to tasks requiring a stable base, rough-terrain navigation, and payload
-carrying. Platforms such as Boston Dynamics Spot~\cite{boston_dynamics2022atlas},
-Unitree Go2~\cite{unitree2023h1}, and ANYmal~\cite{hutter2016anymal} have demonstrated
-reliable outdoor mobility. Learning-based locomotion controllers for quadrupeds have
-achieved particularly impressive results: Hwangbo et al.~\cite{hwangbo2019learning}
-demonstrated that an actuator network trained in simulation could transfer directly to
-hardware, and Kumar et al.~\cite{kumar2021rma} introduced Rapid Motor Adaptation, which
-allows quadrupeds to adapt their gait online to unseen terrain properties. However,
-quadrupedal morphologies are not well-suited to ascending human-scale stairs, reaching
-elevated surfaces, or performing fine manipulation tasks that require upright posture.
-
-\subsection{Hybrid and Reconfigurable Morphologies}
-
-The complementary strengths of bipedal and quadrupedal morphologies motivate
-the development of reconfigurable robots that can switch between locomotion modes.
-Early work on reconfigurable robots demonstrated the feasibility of modular
-self-reconfiguration~\cite{yim2007modular}. More recent platforms have demonstrated
-practical mode-switching: the robot CENTAURO~\cite{kamedula2019centauro} combines a
-quadrupedal lower body with an upper body capable of manipulation, while several
-research groups have explored servo-based platforms that can adopt both biped and
-quadruped stances through body morphology changes~\cite{kenneally2016design}. The
-present work contributes to this thread by constructing an affordable, open-source
-hybrid platform using off-the-shelf servo motors, and by pairing it with a
-natural-language AI interface that allows the locomotion mode to be switched through
-plain-English commands.
+A major weakness is limited generalization. Policies tuned for narrow task templates
+frequently fail in unseen scenarios, especially when visual context and language
+instructions vary simultaneously. This motivates unified learning-based approaches
+that can jointly reason over visual and linguistic context while producing executable
+actions.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{VISION-LANGUAGE MODELS}
+\section{VISION-LANGUAGE MODEL FOUNDATIONS}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Transformer Architecture}
+\subsection{Transformer Backbone}
 
-The Transformer~\cite{vaswani2017attention} is the foundational architecture
-underlying all modern VLMs. It processes input sequences through stacked blocks of
-multi-head self-attention and position-wise feed-forward layers. The core attention
-operation computes a weighted aggregation of value vectors:
+Modern VLMs are built on the Transformer architecture~\cite{vaswani2017attention},
+which models long-range dependencies using multi-head self-attention. Given query,
+key, and value matrices, the core operation is:
 
 \begin{equation}
-    \text{Attention}(Q, K, V)
-    = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
-    \label{eq:attention}
+\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
 \end{equation}
 
-where $Q$, $K$, and $V$ are linear projections of the input sequence and $d_k$ is
-the key dimensionality. The self-attention mechanism allows every token position to
-attend to all other positions, enabling the model to capture long-range dependencies
-that recurrent architectures handle less efficiently. Large language models are built
-by stacking many Transformer blocks and pre-training on internet-scale text corpora
-via next-token prediction.
+This mechanism supports flexible context integration across image and language tokens.
 
-\subsection{Multimodal Extension and Instruction Tuning}
+\subsection{Vision-Language Instruction Following}
 
-Modern VLMs extend the language Transformer to process interleaved image and text
-tokens. A vision encoder --- typically a Vision Transformer (ViT)~\cite{dosovitskiy2021vit}
-trained with a contrastive objective such as CLIP~\cite{radford2021clip} or
-SigLIP~\cite{zhai2023sigmoid} --- maps raw image pixels into a sequence of patch
-embeddings. A learned linear projector maps these embeddings into the language
-model's token space, after which the image and text tokens are processed jointly
-by the language backbone. Pre-training on large-scale image-text corpora, followed
-by instruction tuning on curated demonstrations of instruction-following
-behaviour~\cite{liu2023llava,openai2023gpt4v}, yields models that can respond to
-complex compositional queries about visual content with high accuracy and
-generalisation.
+Recent VLMs demonstrate strong multimodal instruction-following behavior through
+large-scale pretraining and instruction tuning~\cite{openai2023gpt4v,liu2023llava}.
+For robotic systems, this capability enables grounding free-form user requests in
+scene context, reducing the need for rigid command interfaces.
 
-\subsection{Qwen3-VL-2B-Thinking}
-
-This project adopts Qwen3-VL-2B-Thinking~\cite{qwen3vl2025} as the VLM backbone.
-Qwen3-VL is the third-generation multimodal model in the Qwen series developed by
-Alibaba Cloud. The 2B-parameter variant is specifically designed for efficient
-on-device inference: it supports dynamic resolution image encoding via a Naive
-Dynamic Resolution mechanism and processes image tokens using Multimodal Rotary
-Position Embedding (M-RoPE)~\cite{bai2025qwen25vl} to preserve spatial relationships
-across varying aspect ratios. The ``Thinking'' variant incorporates a chain-of-thought
-reasoning capability, allowing the model to produce an internal scratchpad before
-committing to a final answer, which improves performance on multi-step task-planning
-requests. Critically, the 2B parameter count enables the model to run comfortably
-within a 24~GB VRAM budget, making on-robot inference feasible without cloud
-connectivity.
-
-\subsection{VLMs for Robot Control}
-
-The application of VLMs to robot control has emerged as an active research direction
-under the umbrella of Vision-Language-Action (VLA) models~\cite{brohan2023rt2,
-driess2023palme,kim2024openvla}. RT-2~\cite{brohan2023rt2} demonstrated that a large
-VLM pre-trained on internet data could be fine-tuned to output robot actions as
-text tokens, generalising to novel objects and instructions seen only during
-language pre-training. PaLM-E~\cite{driess2023palme} further showed that embodied
-language models could integrate sensor readings, scene graphs, and natural-language
-instructions within a unified sequence, enabling complex multi-step task planning.
-The present work follows this paradigm but targets a compact model suitable for
-on-device deployment, and introduces interpretability mechanisms that these prior
-systems lack.
+However, VLM output must still be translated into robot-executable actions with low
+latency and high reliability, which motivates explicit action modeling beyond
+language generation alone.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{MECHANISTIC INTERPRETABILITY AND SPARSE AUTOENCODERS}
+\section{ACTION MODELING FOR ROBOT MANIPULATION}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{The Superposition Hypothesis}
+Action generation for manipulation usually requires a design choice between discrete
+and continuous representations.
 
-A fundamental obstacle to understanding neural networks is the superposition
-hypothesis~\cite{elhage2022superposition}: the claim that neural networks store far
-more features than they have neurons, by representing multiple features as
-overlapping linear combinations in the same set of activations. A neuron in a
-superposed network is not monosemantic --- it does not respond to a single,
-interpretable concept --- but rather polysemantic, activating for several unrelated
-inputs. This polysemanticity is the primary reason that simply inspecting individual
-neuron activations does not yield human-interpretable explanations of model
-behaviour.
+\begin{itemize}
+    \item \textbf{Discrete actions} are easier to validate and parse but may reduce
+    motion fidelity.
+    \item \textbf{Continuous actions} allow fine-grained control but are more
+    sensitive to model errors and deployment noise.
+\end{itemize}
 
-\subsection{Sparse Dictionary Learning and Sparse Autoencoders}
-
-Sparse dictionary learning offers a principled solution to the superposition problem.
-If a model's activations can be expressed as sparse linear combinations of a larger
-set of basis vectors (a ``dictionary''), then each basis vector can be
-interpretable even if the original neurons are not. A Sparse Autoencoder (SAE)
-implements this decomposition as a neural network~\cite{olshausen1997sparse,
-cunningham2023sparse}: an encoder maps an activation vector $\mathbf{h}$ to a
-sparse code $\mathbf{f}$, and a decoder reconstructs the activation from the sparse code:
-
-\begin{equation}
-    \mathbf{f} = \text{TopK}\!\left(W_{\text{enc}}\,\mathbf{h} + \mathbf{b}_{\text{enc}}\right),
-    \qquad
-    \hat{\mathbf{h}} = W_{\text{dec}}\,\mathbf{f} + \mathbf{b}_{\text{dec}}
-    \label{eq:sae}
-\end{equation}
-
-where $W_{\text{enc}} \in \mathbb{R}^{d_{\text{sae}} \times d_{\text{model}}}$,
-$W_{\text{dec}} \in \mathbb{R}^{d_{\text{model}} \times d_{\text{sae}}}$, and TopK
-retains only the $k$ largest activations, enforcing sparsity. The SAE is trained to
-minimise the reconstruction loss $\|\mathbf{h} - \hat{\mathbf{h}}\|_2^2$ subject to
-the sparsity constraint imposed by TopK. In the TopK formulation~\cite{gao2024scaling},
-the sparsity level $k$ is fixed as a hyperparameter, which produces more predictable
-and controllable activation patterns than the $L_1$ penalty used in earlier
-variants~\cite{cunningham2023sparse}.
-
-Because the dictionary size $d_{\text{sae}}$ is made much larger than the model
-dimension $d_{\text{model}}$ (an ``expansion factor'' of 16$\times$ in this work,
-giving $d_{\text{sae}} = 32{,}768$ for $d_{\text{model}} = 2{,}048$), individual SAE
-features can afford to be sparse --- activating only for a narrow, specific input
-distribution --- and are therefore more likely to be monosemantic.
-
-\subsection{Feature Steering}
-
-Once interpretable features have been identified, the columns of the SAE decoder
-matrix $W_{\text{dec}}$ provide a natural set of ``steering vectors'' that can be
-added to the model's residual stream at inference time to amplify or suppress the
-corresponding feature~\cite{turner2023activation,templeton2024scaling}. The steering
-operation at layer $\ell$ is:
-
-\begin{equation}
-    \mathbf{h}^{(\ell)}_{\text{steered}}
-    = \mathbf{h}^{(\ell)} + \alpha \cdot \mathbf{d}_i
-    \label{eq:steering}
-\end{equation}
-
-where $\mathbf{d}_i = W_{\text{dec}}[:, i]$ is the decoder column for feature $i$
-and $\alpha$ is a scalar steering strength. This intervention does not require
-gradient computation or model retraining; it is applied at inference time via a
-forward hook registered on the target layer. The technique was introduced in the
-context of language models~\cite{turner2023activation} and has since been applied
-to bias, safety, and persona-related
-features~\cite{templeton2024scaling,anthropic2023core}. The present work extends
-feature steering to the domain of \emph{embodied AI}, where the steered features
-influence physical robot action outputs rather than text generation.
-
-\subsection{Mechanistic Interpretability in Language Models}
-
-The broader field of mechanistic interpretability seeks to reverse-engineer the
-computations performed by neural networks at the level of individual components.
-Foundational work by Elhage et al.~\cite{elhage2021mathematical} provided a
-mathematical framework for understanding transformers in terms of residual streams,
-attention heads, and MLP sublayers. Subsequent work identified induction
-heads~\cite{olsson2022context}, which implement in-context learning, and circuits
-for factual recall~\cite{meng2022rome} and indirect object
-identification~\cite{wang2022interpretability}. Bricken et al.~\cite{bricken2023monosemanticity}
-applied sparse autoencoders to a one-layer MLP and demonstrated that individual SAE
-features corresponded to highly specific, interpretable input patterns. Templeton
-et al.~\cite{templeton2024scaling} scaled this analysis to Claude Sonnet, identifying
-millions of human-interpretable features. The present work applies the SAE methodology
-to an embodied AI context, examining features in the robot action planning layer of a
-fine-tuned VLM.
+In practice, many systems use structured or mixed forms to balance robustness and
+expressiveness. For real-time control, action validity and execution safety are as
+important as semantic correctness.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{DATASET GENERATION FOR ROBOT LEARNING}
+\section{VISION-LANGUAGE-ACTION INTEGRATION}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Open Robot Demonstration Datasets}
+\subsection{VLA Systems in Prior Work}
 
-Large-scale robot demonstration datasets have become a key driver of progress in
-robot learning. Open X-Embodiment~\cite{openx2023} aggregated demonstrations from
-22 robot platforms across more than 500 tasks, demonstrating that co-training on
-heterogeneous datasets improves generalisation. DROID~\cite{khazatsky2024droid}
-collected 76,000 demonstrations across diverse environments, while
-BridgeData~\cite{walke2023bridgedata} provided 60,000 tabletop manipulation
-trajectories across a wide range of objects and instructions. These datasets provide
-pre-training corpora for VLA models but do not inherently produce the structured
-tool-call instruction format required by the present system.
+Research on Vision-Language-Action integration has shown that combining multimodal
+reasoning with action prediction can improve robotic adaptability.
+RT-2~\cite{brohan2023rt2} demonstrated language-conditioned action generation,
+PaLM-E~\cite{driess2023palme} highlighted embodied multimodal context integration,
+and OpenVLA~\cite{kim2024openvla} provided an open framework for scalable VLA
+training and evaluation.
 
-\subsection{Synthetic Dataset Generation with Large Language Models}
+These systems indicate that end-to-end multimodal-action learning can outperform
+strictly task-specific pipelines. At the same time, deployment still faces constraints
+in compute, latency, data scale, and module coordination.
 
-A growing body of work explores the use of large language models to generate
-synthetic training data for downstream tasks~\cite{wang2022self,gunasekar2023textbooks}.
-In the robot domain, Brohan et al.~\cite{brohan2023rt2} used internet-scale data
-to augment physical demonstrations, while more recent work has employed LLMs to
-generate task descriptions, scene annotations, and reward functions for robot
-learning pipelines~\cite{liang2023code,ahn2022saycan}. The present work contributes
-a fully automated multi-threaded dataset generation pipeline that uses Gemini
-(gemma-3-27b-it) to produce 10{,}000 structured \texttt{call\_robot()} conversation
-records from EO-Data1.5M scene images, including single-turn commands and multi-turn
-task-planning dialogues with visual verification steps.
+\subsection{Need for Modular Integration}
 
-\subsection{Instruction Tuning and Tool-Call Fine-Tuning}
+A practical VLA system must synchronize three capabilities:
+\begin{enumerate}[label=\arabic*)]
+    \item language grounding and task understanding,
+    \item visual feature extraction under scene variation,
+    \item robust generation of executable manipulation actions.
+\end{enumerate}
 
-Instruction tuning~\cite{wei2021finetuned,ouyang2022instructgpt} adapts pre-trained
-language models to follow human instructions by fine-tuning on curated
-instruction-response pairs. Tool-call fine-tuning is a specialised form of
-instruction tuning that teaches models to produce structured function-call outputs
-that can be parsed and executed programmatically~\cite{schick2024toolformer,
-patil2023gorilla}. The \texttt{call\_robot()} format used in this work is directly
-analogous to the tool-call format of function-calling APIs, framing robot commands
-as structured JSON-like function calls that can be parsed reliably by a downstream
-execution module.
+This motivates the modular design used in this thesis: VLM core, Vision Expert, and
+Action Expert connected by explicit intermediate representations.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{RELATED EMBODIED AI SYSTEMS}
+\section{GENERALIZATION IN ROBOT LEARNING}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{SayCan}
+Generalization remains a central challenge in embodied AI. Training performance on
+seen tasks does not guarantee transfer to unseen objects, compositions, and
+instruction phrasings. Dataset limitations amplify this gap because robot
+demonstrations are expensive to collect at scale.
 
-SayCan~\cite{ahn2022saycan} was an early demonstration of grounding a large language
-model in robotic capabilities by combining the model's semantic knowledge with
-value functions that estimate the feasibility of each skill in the current state.
-The LLM proposes candidate actions in natural language; the value functions score
-each action's physical plausibility; and the highest-scoring action is executed.
-SayCan demonstrated that language models could enable long-horizon task planning
-for robots, but it required pre-specified skill libraries and could not adapt to
-novel manipulation scenarios.
+Current literature suggests several factors that improve transfer:
+\begin{itemize}
+    \item broader task diversity during training,
+    \item stronger language variation in instruction data,
+    \item robust visual representations across domain shifts,
+    \item stable action interfaces that reduce execution ambiguity.
+\end{itemize}
 
-\subsection{Code as Policies}
+These findings directly inform the design constraints and evaluation protocol of this
+thesis, where unseen-task performance is treated as a primary metric rather than a
+secondary result.
 
-Liang et al.~\cite{liang2023code} proposed using LLMs to generate robot control
-code directly from natural-language instructions, with the generated code invoking
-a library of perception and motor primitives. This approach leverages the code
-generation capabilities of large language models and produces interpretable,
-executable robot programs. The \texttt{call\_robot()} format adopted in the present
-work shares this philosophy: the VLM generates a structured function call that is
-parsed and dispatched to the robot's hardware abstraction layer.
 
-\subsection{OpenVLA}
+%─────────────────────────────────────────────────────────────────────────────
+\section{CHAPTER SUMMARY}
+%─────────────────────────────────────────────────────────────────────────────
 
-OpenVLA~\cite{kim2024openvla} is an open-source VLA model that established
-widely-adopted conventions for combining a VLM backbone with robot action prediction.
-It employs a dual-encoder vision backbone (SigLIP + DINOv2) and produces robot
-actions as discrete token sequences via next-token prediction. OpenVLA demonstrated
-that fine-tuning a general-purpose VLM on robot demonstrations yields substantially
-better generalisation than task-specific baselines. However, it does not expose any
-interpretability mechanisms, and its action tokenisation targets continuous 6-DOF
-manipulation rather than the discrete locomotion-mode commands addressed in the
-present work.
-
-\subsection{Summary and Research Gaps}
-
-Table~\ref{tab:related_comparison} summarises the key characteristics of the
-surveyed systems in relation to the proposed architecture.
-
-\begin{table}[ht]
-\centering
-\caption{Comparison of related embodied AI systems against the proposed approach.
-         NL = Natural-Language interface; Interp. = Interpretability mechanism;
-         Hybrid = Hybrid morphology support.}
-\label{tab:related_comparison}
-\begin{tabular}{lccccc}
-\hline
-\textbf{System} & \textbf{VLM Backbone} & \textbf{NL Interface}
-                & \textbf{Interp.} & \textbf{Hybrid} & \textbf{On-Device} \\
-\hline
-SayCan          & PaLM         & \cmark & \xmark & \xmark & \xmark \\
-Code as Policies & Codex        & \cmark & Partial & \xmark & \xmark \\
-RT-2            & PaLI-X       & \cmark & \xmark & \xmark & \xmark \\
-OpenVLA         & Prismatic-7B & \cmark & \xmark & \xmark & \xmark \\
-\textbf{Ours}   & Qwen3-VL-2B  & \cmark & SAE    & \cmark & \cmark \\
-\hline
-\end{tabular}
-\end{table}
-
-The comparison reveals a consistent gap: no existing system simultaneously provides a
-natural-language interface, an interpretability mechanism based on sparse feature
-decomposition, support for a hybrid locomotion morphology, and an on-device inference
-budget compatible with embedded GPU hardware. The proposed architecture is designed
-to occupy this gap.
+This chapter established the theoretical and empirical basis for the proposed
+Vision-Language-Action approach. Prior work confirms the potential of multimodal
+robot learning but also highlights unresolved issues in flexibility, natural-language
+interaction, and generalization. These gaps motivate the VLA architecture developed in
+Chapter~\ref{chap:methodology}, where a VLM, Vision Expert, and Action Expert are
+integrated for practical robot manipulation under real-world constraints.

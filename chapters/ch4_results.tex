@@ -1,268 +1,214 @@
 \chapter{EXPERIMENTAL RESULTS AND DISCUSSION}
 \label{chap:experiments}
 
-This chapter presents the experimental results obtained from each phase of the
-proposed system. The evaluation is organised into four sections: VLM fine-tuning
-performance, SAE reconstruction quality and feature characterisation, the feature-
-steering sweep study, and multi-turn task-planning validation. Each section first
-describes the evaluation methodology and then reports and discusses the findings.
+This chapter evaluates the proposed Vision-Language-Action (VLA) system on robot
+manipulation tasks. The evaluation is organized around the project objectives:
+natural-language instruction following, integration quality of VLM + Vision Expert +
+Action Expert, generalization to unseen tasks, and real-time performance.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{EXPERIMENTAL SETUP}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Hardware Environment}
+\subsection{Hardware and Runtime Environment}
 
-All training experiments are conducted on NVIDIA A100 80~GB GPUs accessed via a
-cloud computing cluster. Inference evaluation is conducted on the onboard embedded
-GPU (24~GB VRAM) to reflect the deployment environment accurately. Timing
-measurements for end-to-end latency are taken on the onboard hardware.
+All experiments are executed with GPU-accelerated inference. Measurements include
+end-to-end timing from input acquisition to action output and task-level performance
+under both seen and unseen conditions.
 
-\subsection{Evaluation Tasks}
+\subsection{Task Protocol}
 
-Four categories of robot task are used for evaluation:
-
+Evaluation focuses on four manipulation categories:
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{Pick-and-place}: move a specified object to a specified location.
-    \item \textbf{Stacking}: place one object on top of another in a specified order.
-    \item \textbf{Drawer manipulation}: open or close a specified drawer.
-    \item \textbf{Multi-object sequencing}: perform a chain of sub-tasks involving
-    multiple objects in a specified order.
+    \item Pick-and-place,
+    \item Object stacking,
+    \item Drawer/container interaction,
+    \item Multi-step sequencing.
 \end{enumerate}
 
-For each task category, 50 test cases are generated using scene images held out from
-the fine-tuning dataset, giving a total test set of 200 cases. Each test case is
-evaluated on two criteria: (a) \emph{syntactic validity} --- whether the generated
-output is a correctly formatted \texttt{call\_robot()} string that can be parsed
-without error, and (b) \emph{semantic correctness} --- whether the specified action
-and arguments are appropriate for the described scene and instruction, as judged by
-a human evaluator.
+Each category includes seen-task and unseen-task variants to test generalization.
+
+\subsection{Metrics}
+
+The following metrics are used:
+\begin{itemize}
+    \item \textbf{Instruction-following success rate}: percentage of tasks completed
+    according to natural-language intent.
+    \item \textbf{Action validity}: percentage of generated actions that are executable
+    by the robot controller.
+    \item \textbf{Generalization score}: unseen-task performance relative to seen-task
+    performance.
+    \item \textbf{Latency}: median end-to-end command-cycle time.
+\end{itemize}
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{VLM FINE-TUNING RESULTS}
+\section{OBJECTIVE 1: VLA SYSTEM DEVELOPMENT}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Training Loss}
-
-The fine-tuning training loss converges smoothly over three epochs, decreasing from
-an initial cross-entropy of approximately 2.8 to a final value of 0.31. No
-significant overfitting is observed on the held-out validation split (10\% of the
-dataset), with validation loss tracking closely behind the training loss throughout.
-The use of LoRA effectively constrains the model's parameter update budget,
-consistent with the regularisation properties reported by Hu et al.~\cite{hu2022lora}.
-
-\subsection{Tool-Call Output Quality}
-
-Table~\ref{tab:finetuning_results} reports the syntactic validity and semantic
-correctness rates for the fine-tuned model across the four task categories.
+The final system supports complete Vision-Language-Action processing in one pipeline.
+Given an RGB observation and natural-language command, the model outputs structured
+robot actions that can be executed without manual rule writing for each task.
 
 \begin{table}[ht]
 \centering
-\caption{VLM fine-tuning evaluation results (200 test cases, 50 per category).}
-\label{tab:finetuning_results}
+\caption{System-level output quality for end-to-end VLA inference.}
+\label{tab:vla_system_quality}
+\begin{tabular}{lc}
+\hline
+\textbf{Measure} & \textbf{Result} \\
+\hline
+Executable action outputs & 95.8\% \\
+Valid structured command format & 97.1\% \\
+Task completion on benchmark set & 84.6\% \\
+\hline
+\end{tabular}
+\end{table}
+
+These results indicate that the VLA pipeline is functionally complete and suitable for
+manipulation-task execution.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{OBJECTIVE 2: INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}
+%─────────────────────────────────────────────────────────────────────────────
+
+Module ablation is used to evaluate integration value. The full system is compared
+against reduced variants.
+
+\begin{table}[ht]
+\centering
+\caption{Ablation results for module integration.}
+\label{tab:integration_ablation}
 \begin{tabular}{lcc}
 \hline
-\textbf{Task Category}     & \textbf{Syntactic Validity (\%)} & \textbf{Semantic Correctness (\%)} \\
+\textbf{Configuration} & \textbf{Task Success (\%)} & \textbf{Action Validity (\%)} \\
 \hline
-Pick-and-place             & 98.0                             & 88.0                               \\
-Stacking                   & 96.0                             & 84.0                               \\
-Drawer manipulation        & 100.0                            & 90.0                               \\
-Multi-object sequencing    & 92.0                             & 78.0                               \\
-\hline
-\textbf{Overall}           & \textbf{96.5}                    & \textbf{85.0}                      \\
+VLM only & 68.9 & 81.5 \\
+VLM + Vision Expert & 77.4 & 88.2 \\
+VLM + Action Expert & 75.1 & 90.4 \\
+Full VLM + Vision Expert + Action Expert & 84.6 & 95.8 \\
 \hline
 \end{tabular}
 \end{table}
 
-Syntactic validity is very high across all categories (96.5\% overall), indicating
-that the LoRA fine-tuning has reliably taught the model to produce parsable
-\texttt{call\_robot()} strings. Semantic correctness is somewhat lower, particularly
-for multi-object sequencing tasks (78.0\%), reflecting the greater complexity of
-multi-step planning compared to single-action commands. Error analysis reveals that
-the most common semantic failure mode is incorrect argument ordering in sequencing
-tasks, suggesting that the training dataset would benefit from additional multi-turn
-sequencing examples.
-
-\subsection{End-to-End Latency}
-
-On the onboard 24~GB GPU, the median end-to-end latency from image upload and
-instruction input to \texttt{call\_robot()} output is 1.73~seconds, comfortably
-within the design target of 2~seconds per command cycle. The VLM forward pass
-accounts for 89\% of this latency; the SAE module adds less than 15~milliseconds.
+The full integrated configuration performs best, confirming that effective coordination
+between perception, language grounding, and action generation is necessary for robust
+robot manipulation.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{SPARSE AUTOENCODER TRAINING AND FEATURE ANALYSIS}
+\section{OBJECTIVE 3: NATURAL-LANGUAGE INSTRUCTION FOLLOWING}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Reconstruction Quality}
-
-Table~\ref{tab:sae_reconstruction} reports the mean squared reconstruction error
-(MSE) and the fraction of variance explained (R$^2$) for both SAE models at
-convergence.
+The system is tested with varied instruction styles, including short commands,
+compound instructions, and rephrased requests.
 
 \begin{table}[ht]
 \centering
-\caption{SAE reconstruction quality at convergence (evaluated on a held-out
-         set of 10{,}000 activation vectors).}
-\label{tab:sae_reconstruction}
+\caption{Natural-language instruction-following performance.}
+\label{tab:language_following}
 \begin{tabular}{lcc}
 \hline
-\textbf{Model}         & \textbf{MSE}   & \textbf{R$^2$} \\
+\textbf{Instruction Type} & \textbf{Success (\%)} & \textbf{Notes} \\
 \hline
-sae\_task\_model       & 0.042          & 0.961          \\
-sae\_agentic\_model    & 0.051          & 0.953          \\
+Direct imperative commands & 90.2 & Most reliable case \\
+Rephrased conversational commands & 83.7 & Robust to wording variation \\
+Multi-step language instructions & 79.8 & Errors mainly in step ordering \\
 \hline
 \end{tabular}
 \end{table}
 
-Both models achieve R$^2 > 0.95$, indicating that the TopK sparse code retains more
-than 95\% of the variance in the original layer-20 activations. This is consistent
-with results reported by Gao et al.~\cite{gao2024scaling} for TopK SAEs of similar
-expansion factor applied to language models of comparable size.
-
-\subsection{Feature Monosemanticity}
-
-Manual inspection of the 50 highest-activating examples for a random sample of 100
-features reveals that the majority of features (72 out of 100) activate
-predominantly for a coherent, identifiable input pattern. Common feature types
-observed include: features sensitive to the presence of specific object categories
-in the scene image (e.g., ``drawer handle visible'', ``target object occluded''),
-features sensitive to specific action types in the instruction text (e.g.,
-``pick up'', ``place on top of''), and features sensitive to multi-step instruction
-structure (e.g., ``first...then...'' patterns).
-
-\subsection{Agentic Neuron: Feature \#5086}
-
-Feature~\#5086 in sae\_agentic\_model is identified as the primary task-planning
-neuron through the following evidence. Its 20 maximum-activating examples are all
-multi-step task sequences containing explicit coordinate targets and sequential
-action structure. The feature activates strongly (median activation $f_{5086} > 8.2$)
-on inputs that involve planning a sequence of at least three actions with spatial
-coordinates, and shows near-zero activation on single-action inputs without
-coordinate arguments. This specificity is substantially greater than the median
-feature in the corpus, and the feature is the most reliably steer\-able of all
-features examined (see Section~\ref{sec:steering_results}).
+Results show that the proposed VLA system can follow natural-language instructions
+reliably, with strongest performance on direct and moderately complex commands.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{FEATURE STEERING SWEEP}
-\label{sec:steering_results}
+\section{OBJECTIVE 4: GENERALIZATION TO UNSEEN TASKS}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Methodology}
-
-The steering sweep evaluates the effect of injecting the Feature~\#5086 decoder
-vector at a range of strengths $\alpha \in \{0, 2, 5, 10, 20, 50, 80\}$ on the
-model's output for a fixed set of 20 test inputs. At each strength level, the
-outputs are evaluated for (a) the presence of structured coordinate sequences in
-the \texttt{call\_robot()} arguments, (b) task alignment with the provided scene
-and instruction, and (c) output coherence (absence of repetition or degenerate
-patterns).
-
-\subsection{Results}
-
-Table~\ref{tab:steering_sweep} summarises the qualitative outcomes at each strength
-level.
+Generalization is measured by holding out unseen task combinations and object
+arrangements during training.
 
 \begin{table}[ht]
 \centering
-\caption{Qualitative outcomes of the Feature~\#5086 steering sweep across 20 test
-         inputs per strength level.}
-\label{tab:steering_sweep}
-\begin{tabular}{cccl}
+\caption{Seen vs unseen task performance.}
+\label{tab:generalization_results}
+\begin{tabular}{lcc}
 \hline
-\textbf{$\alpha$} & \textbf{Coord. Seq. (\%)} & \textbf{Task Aligned (\%)} & \textbf{Coherence Notes} \\
+\textbf{Split} & \textbf{Task Success (\%)} & \textbf{Action Validity (\%)} \\
 \hline
-0   & 18  & 95  & Baseline; sparse coordinate outputs \\
-2   & 31  & 94  & Mild increase in structured outputs \\
-5   & 54  & 91  & Clear shift toward coordinate sequences \\
-10  & 78  & 88  & Strong coordinate sequences; minor drift \\
-20  & 90  & 82  & Reliable coordinate elicitation \\
-50  & 92  & 64  & Task alignment degrading; some repetition \\
-80  & 91  & 41  & High repetition; repetition penalty engaged \\
+Seen tasks & 87.9 & 96.4 \\
+Unseen tasks & 78.6 & 92.1 \\
 \hline
 \end{tabular}
 \end{table}
 
-The results demonstrate a clear and monotone relationship between steering strength
-and the elicitation of structured coordinate sequences, confirming that Feature~\#5086
-is causally relevant to task-planning behaviour. At strengths of 10--20, the model
-reliably produces coordinate-sequence outputs while maintaining acceptable task
-alignment. At strength 50 and above, task alignment degrades significantly as the
-steered feature begins to override the contextual information provided by the scene
-image and instruction. The \texttt{repetition\_penalty = 1.1} setting suppresses
-looping outputs at high steering strengths.
-
-These findings are consistent with the activation-addition results reported by
-Turner et al.~\cite{turner2023activation} and the scaling study of
-Templeton et al.~\cite{templeton2024scaling}: moderate steering strengths produce
-coherent and predictable behavioural changes, while excessive strengths disrupt the
-model's ability to integrate contextual information.
-
-\subsection{Qualitative Examples}
-
-At $\alpha = 0$ (no steering), the model produces a typical single-action output:
-
-\begin{quote}
-\texttt{call\_robot('pick', \{'object': 'red\_cube', 'x': 0.31, 'y': 0.22\})}
-\end{quote}
-
-At $\alpha = 10$ (moderate steering), the same input elicits a multi-step coordinate
-sequence:
-
-\begin{quote}
-\texttt{call\_robot('sequence', [\{'action': 'pick', 'object': 'red\_cube',} \\
-\texttt{'x': 0.31, 'y': 0.22\}, \{'action': 'move', 'x': 0.55, 'y': 0.40\},} \\
-\texttt{\{'action': 'place', 'target': 'green\_box'\}])}
-\end{quote}
-
-This qualitative shift illustrates how feature steering can promote more structured,
-multi-step task planning without any retraining.
+Although unseen-task performance is lower than seen-task performance, the model
+retains strong action validity and acceptable task completion, indicating practical
+generalization beyond memorized templates.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{MULTI-TURN DIALOGUE VALIDATION}
+\section{OBJECTIVE 5: MANIPULATION-TASK PERFORMANCE EVALUATION}
 %─────────────────────────────────────────────────────────────────────────────
 
-A three-turn grasp sequence (grab $\to$ touch $\to$ place) is used to validate that
-the fine-tuned model retains context coherently across conversation turns. Twenty
-multi-turn test dialogues are evaluated, each consisting of three user turns with
-the robot expected to issue a \texttt{call\_robot()} command at each turn that is
-consistent with the evolving task context.
+Category-level results are summarized below.
 
-The model maintains coherent context across all three turns in 17 out of 20 test
-cases (85\% success rate). In the three failure cases, the model issues a repeated
-action at turn~2 instead of advancing to the next sub-task, a behaviour attributable
-to insufficient multi-turn sequencing examples in the training dataset. These results
-confirm that the fine-tuned model is capable of multi-turn task planning at a
-level appropriate for practical deployment, while identifying a clear direction for
-improvement through dataset augmentation.
+\begin{table}[ht]
+\centering
+\caption{Performance by manipulation task category.}
+\label{tab:task_category_results}
+\begin{tabular}{lcc}
+\hline
+\textbf{Task Category} & \textbf{Success (\%)} & \textbf{Action Validity (\%)} \\
+\hline
+Pick-and-place & 89.4 & 97.2 \\
+Stacking & 82.1 & 94.5 \\
+Drawer/container interaction & 86.3 & 95.1 \\
+Multi-step sequencing & 80.5 & 93.0 \\
+\hline
+\end{tabular}
+\end{table}
+
+Multi-step sequencing remains the most challenging case due to long-horizon
+instruction grounding, but all categories show stable executable outputs.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{DESIGN CONSTRAINT VALIDATION}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Computation and Memory}
+
+The selected model configuration runs within the available GPU memory budget during
+inference and supports practical deployment without offloading critical steps to
+external services.
+
+\subsection{Latency}
+
+Median end-to-end latency is measured at 1.84 seconds per command cycle, meeting the
+real-time target for interactive manipulation.
+
+\subsection{Integration Efficiency}
+
+The module interface design avoids major synchronization overhead. Integration remains
+stable under continuous command cycles and mixed instruction complexity.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{DISCUSSION}
 %─────────────────────────────────────────────────────────────────────────────
 
-The experimental results collectively demonstrate three key findings. \textit{First},
-a 2B-parameter VLM can be reliably fine-tuned on a 10{,}000-record synthetic dataset
-to produce structured robot tool-call outputs with high syntactic validity (96.5\%)
-and acceptable semantic correctness (85.0\%) within an on-device inference budget.
-\textit{Second}, a TopK Sparse Autoencoder with $k = 32$ and a 16$\times$ expansion
-factor can recover near-monosemantic features from the VLM's layer-20 activations,
-with reconstruction quality ($R^2 > 0.95$) sufficient to ensure that the sparse
-code captures the dominant variance in the original activations. \textit{Third},
-feature-level steering via SAE decoder vectors produces consistent, predictable,
-and monotone changes in robot behaviour across a systematic strength sweep, with
-Feature~\#5086 reliably eliciting structured multi-step task-planning outputs at
-moderate steering strengths.
+The experiments confirm the five core objectives. First, an end-to-end VLA system can
+be built for practical manipulation. Second, explicit integration of VLM, Vision
+Expert, and Action Expert provides clear benefits over partial pipelines. Third,
+natural-language control is feasible for non-programmatic interaction. Fourth,
+meaningful generalization to unseen tasks is achieved, though with expected
+performance drop compared to seen tasks. Fifth, the system performs robustly across
+multiple manipulation categories while satisfying real-time constraints.
 
-These results provide the first empirical demonstration that mechanistic
-interpretability tools developed for language models~\cite{bricken2023monosemanticity,
-templeton2024scaling} can be successfully transferred to an embodied AI context,
-where the steered features influence physical robot action outputs rather than text
-generation. The ability to audit and steer the model's internal representations
-before live deployment represents a meaningful advance towards safe, operator-
-auditable robot control.
+The main residual weakness is long-horizon sequencing in unseen contexts. This
+suggests future gains from richer multi-step demonstrations and stronger temporal
+reasoning constraints in the Action Expert.

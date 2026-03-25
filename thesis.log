@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 14:16
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 15:52
  restricted system commands enabled.
  file:line:error style messages enabled.
 **d:/gitrepo/LaTeX-Thesis-Template/thesis
@@ -1242,380 +1242,66 @@ LaTeX Font Info:    Font shape `TU/CambriaMath(3)/m/n' will be
 ] (./chapters/ch1_introduction.tex
 Chapter 1.
 
-LaTeX Warning: Citation `bai2025qwen25vl' on page 1 undefined on input line 23.
-
-
-
-LaTeX Warning: Citation `kenneally2016design' on page 1 undefined on input line
- 32.
-
-
-LaTeX Warning: Citation `bledt2018cheetah3' on page 1 undefined on input line 3
-2.
-
-
-LaTeX Warning: Citation `anthropic2023core' on page 1 undefined on input line 4
-2.
-
-
-LaTeX Warning: Citation `bereska2024mechanistic' on page 1 undefined on input l
-ine 42.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 1 undefined on input lin
-e 48.
-
-
-LaTeX Warning: Citation `cunningham2023sparse' on page 1 undefined on input lin
-e 48.
-
-
-LaTeX Warning: Citation `qwen3vl2025' on page 1 undefined on input line 50.
-
-
 warning  (pdf backend): ignoring duplicate destination with the name 'page.1'
 [1
 
 
+] [2]) (./chapters/ch2_related_theories.tex [3]
+Chapter 2.
+[4
+
 ]
 
-LaTeX Warning: Citation `unitree2023h1' on page 2 undefined on input line 69.
+LaTeX Warning: Citation `brohan2023rt2' on page 5 undefined on input line 83.
 
 
-LaTeX Warning: Citation `boston_dynamics2022atlas' on page 2 undefined on input
- line 69.
+LaTeX Warning: Citation `driess2023palme' on page 5 undefined on input line 84.
 
 
-LaTeX Warning: Citation `brohan2023rt2' on page 2 undefined on input line 84.
+) (./chapters/ch3_design_construction.tex [5] [6]
+Chapter 3.
+[7
 
-
-LaTeX Warning: Citation `driess2023palme' on page 2 undefined on input line 84.
-
-
-
-LaTeX Warning: Citation `elhage2022superposition' on page 2 undefined on input 
-line 90.
-
-
-LaTeX Warning: Citation `bricken2023monosemanticity' on page 2 undefined on inp
-ut line 90.
-
-
-Overfull \hbox (1.51102pt too wide) in paragraph at lines 103--104
-[]\TU/THSarabun.ttf(0)/m/it/12 How can a com-pact Vision-Language Model be fine-
-tuned to con-trol a hy-brid bi-pedal/quadrupedal
+]
+Overfull \hbox (9.45879pt too wide) in paragraph at lines 101--104
+[]\TU/THSarabun.ttf(0)/m/n/12 The Vi-sion Ex-pert pro-vides task-relevant vi-sua
+l fea-tures (ob-ject cues, tar-get re-la-tions, and workspace
  []
 
-[2] [3]) (./chapters/ch2_related_theories.tex [4]
-Chapter 2.
-
-LaTeX Warning: Citation `vukobratovic1972stability' on page 5 undefined on inpu
-t line 23.
-
-
-LaTeX Warning: Citation `wieber2016modeling' on page 5 undefined on input line 
-24.
-
-
-LaTeX Warning: Citation `siekmann2021blind' on page 5 undefined on input line 2
-8.
-
-
-LaTeX Warning: Citation `kumar2021rma' on page 5 undefined on input line 28.
-
-
-LaTeX Warning: Citation `boston_dynamics2022atlas' on page 5 undefined on input
- line 38.
-
-
-LaTeX Warning: Citation `unitree2023h1' on page 5 undefined on input line 39.
-
-
-LaTeX Warning: Citation `hutter2016anymal' on page 5 undefined on input line 39
-.
-
-
-LaTeX Warning: Citation `hwangbo2019learning' on page 5 undefined on input line
- 41.
-
-
-LaTeX Warning: Citation `kumar2021rma' on page 5 undefined on input line 43.
-
-
-LaTeX Warning: Citation `yim2007modular' on page 5 undefined on input line 53.
-
-
-LaTeX Warning: Citation `kamedula2019centauro' on page 5 undefined on input lin
-e 54.
-
-
-LaTeX Warning: Citation `kenneally2016design' on page 5 undefined on input line
- 57.
-
-[5
-
-]
-
-LaTeX Warning: Citation `dosovitskiy2021vit' on page 6 undefined on input line 
-91.
-
-
-LaTeX Warning: Citation `qwen3vl2025' on page 6 undefined on input line 104.
-
-
-LaTeX Warning: Citation `bai2025qwen25vl' on page 6 undefined on input line 109
-.
-
-
-LaTeX Warning: Citation `brohan2023rt2' on page 6 undefined on input line 121.
-
-
-LaTeX Warning: Citation `driess2023palme' on page 6 undefined on input line 121
-.
-
-
-LaTeX Warning: Citation `brohan2023rt2' on page 6 undefined on input line 121.
-
-
-LaTeX Warning: Citation `driess2023palme' on page 6 undefined on input line 124
-.
-
-[6]
-
-LaTeX Warning: Citation `elhage2022superposition' on page 7 undefined on input 
-line 139.
-
-
-LaTeX Warning: Citation `olshausen1997sparse' on page 7 undefined on input line
- 155.
-
-
-LaTeX Warning: Citation `cunningham2023sparse' on page 7 undefined on input lin
-e 155.
-
-
-LaTeX Warning: Citation `gao2024scaling' on page 7 undefined on input line 169.
-
-
-
-LaTeX Warning: Citation `cunningham2023sparse' on page 7 undefined on input lin
-e 172.
-
-
-LaTeX Warning: Citation `turner2023activation' on page 7 undefined on input lin
-e 185.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 7 undefined on input lin
-e 185.
-
-
-LaTeX Warning: Citation `turner2023activation' on page 7 undefined on input lin
-e 198.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 7 undefined on input lin
-e 200.
-
-
-LaTeX Warning: Citation `anthropic2023core' on page 7 undefined on input line 2
-00.
-
-[7]
-
-LaTeX Warning: Citation `elhage2021mathematical' on page 8 undefined on input l
-ine 208.
-
-
-LaTeX Warning: Citation `olsson2022context' on page 8 undefined on input line 2
-11.
-
-
-LaTeX Warning: Citation `meng2022rome' on page 8 undefined on input line 212.
-
-
-LaTeX Warning: Citation `wang2022interpretability' on page 8 undefined on input
- line 213.
-
-
-LaTeX Warning: Citation `bricken2023monosemanticity' on page 8 undefined on inp
-ut line 213.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 8 undefined on input lin
-e 216.
-
-
-LaTeX Warning: Citation `khazatsky2024droid' on page 8 undefined on input line 
-231.
-
-
-LaTeX Warning: Citation `walke2023bridgedata' on page 8 undefined on input line
- 233.
-
-
-LaTeX Warning: Citation `wang2022self' on page 8 undefined on input line 241.
-
-
-LaTeX Warning: Citation `gunasekar2023textbooks' on page 8 undefined on input l
-ine 241.
-
-
-LaTeX Warning: Citation `brohan2023rt2' on page 8 undefined on input line 242.
-
-
-LaTeX Warning: Citation `liang2023code' on page 8 undefined on input line 245.
-
-
-LaTeX Warning: Citation `ahn2022saycan' on page 8 undefined on input line 245.
-
-
-LaTeX Warning: Citation `wei2021finetuned' on page 8 undefined on input line 25
-3.
-
-
-LaTeX Warning: Citation `ouyang2022instructgpt' on page 8 undefined on input li
-ne 253.
-
-
-LaTeX Warning: Citation `schick2024toolformer' on page 8 undefined on input lin
-e 258.
-
-
-LaTeX Warning: Citation `patil2023gorilla' on page 8 undefined on input line 25
-8.
-
-[8]
-
-LaTeX Warning: Citation `ahn2022saycan' on page 9 undefined on input line 270.
-
-
-LaTeX Warning: Citation `liang2023code' on page 9 undefined on input line 281.
-
-) (./chapters/ch3_design_construction.tex [9] [10]
-Chapter 3.
-
-Overfull \hbox (7.61311pt too wide) in paragraph at lines 19--21
-[]\TU/THSarabun.ttf(0)/b/n/12 Hard-ware De-sign and Fab-ri-ca-tion\TU/THSarabun
-.ttf(0)/m/n/12 : spec-i-fi-ca-tion and as-sem-bly of the hy-brid bi-pedal/quadru
-pedal
+[8] [9]) (./chapters/ch4_results.tex [10]
+Chapter 4.
+
+Overfull \hbox (6.24423pt too wide) in paragraph at lines 69--71
+[]\TU/THSarabun.ttf(0)/m/n/12 These re-sults in-di-cate that the VLA pipeline is
+ func-tion-ally com-plete and suit-able for manipulation-
  []
 
 [11
 
-]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 121.
-
-
-LaTeX Warning: Citation `qwen3vl2025' on page 12 undefined on input line 127.
-
-[12] [13] [14]
-
-LaTeX Warning: Citation `hu2022lora' on page 15 undefined on input line 290.
-
-
-LaTeX Warning: Citation `loshchilov2019adamw' on page 15 undefined on input lin
-e 309.
-
-[15]
-Overfull \hbox (40.76028pt too wide) in paragraph at lines 370--376
-\TU/lmtt/m/n/12 sae_task_model.pt\TU/THSarabun.ttf(0)/m/n/12 , \TU/lmtt/m/n/12 
-sae_agentic_model.pt\TU/THSarabun.ttf(0)/m/n/12 , and a production-ready \TU/lm
-tt/m/n/12 sae_topk_production.pt
- []
-
-[16]
-
-LaTeX Warning: Citation `paszke2019pytorch' on page 17 undefined on input line 
-420.
-
-
-LaTeX Warning: Citation `wolf2020transformers' on page 17 undefined on input li
-ne 421.
-
-
-LaTeX Warning: Citation `gao2024scaling' on page 17 undefined on input line 422
-.
-
-) (./chapters/ch4_results.tex [17] [18]
-Chapter 4.
-
-LaTeX Warning: Citation `hu2022lora' on page 19 undefined on input line 54.
-
-[19
-
-]
-
-LaTeX Warning: Citation `gao2024scaling' on page 20 undefined on input line 123
-.
-
-[20]
-Overfull \hbox (0.935pt too wide) in paragraph at lines 190--198
-\TU/THSarabun.ttf(0)/m/n/12 over-ride the con-tex-tual in-for-ma-tion pro-vided by the scene im-age and in-struc-tion. The \TU/lmtt/m/n/12 repetition_penalty
- []
-
-[21]
-
-LaTeX Warning: Citation `turner2023activation' on page 22 undefined on input li
-ne 200.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 22 undefined on input li
-ne 201.
-
-
-Overfull \hbox (38.68665pt too wide) in paragraph at lines 210--211
-[]\TU/lmtt/m/n/12 call_robot('pick', {'object': 'red_cube', 'x': 0.31, 'y': 0.22
-}) 
- []
-
-
-Overfull \hbox (38.68665pt too wide) in paragraph at lines 217--220
-[]\TU/lmtt/m/n/12 call_robot('sequence', [{'action': 'pick', 'object': 'red_cube
-', 
- []
-
-
-Overfull \hbox (38.68665pt too wide) in paragraph at lines 217--220
-\TU/lmtt/m/n/12 'x': 0.31, 'y': 0.22}, {'action': 'move', 'x': 0.55, 'y': 0.40},
- 
- []
-
-
-LaTeX Warning: Citation `bricken2023monosemanticity' on page 22 undefined on in
-put line 264.
-
-
-LaTeX Warning: Citation `templeton2024scaling' on page 22 undefined on input li
-ne 264.
-
-) (./chapters/ch5_conclusion.tex [22] [23]
+] [12]) (./chapters/ch5_conclusion.tex [13]
 Chapter 5.
-[24
 
-]
+Overfull \hbox (10.25075pt too wide) in paragraph at lines 60--62
+[]\TU/THSarabun.ttf(0)/m/n/12 Ex-pand robot demon-stra-tion data with broader ob
+-ject, scene, and in-struc-tion di-ver-sity to strengthen
+ []
 
-LaTeX Warning: Citation `bereska2024mechanistic' on page 25 undefined on input 
-line 115.
+[14
 
-[25]
-
-LaTeX Warning: Citation `anthropic2023core' on page 26 undefined on input line 
-190.
-
-) [26] [27] (./thesis.bbl [28
+]) [15] (./thesis.bbl [16
 
 
-]) (./chapters/appendix.tex [29]
+]) (./chapters/appendix.tex [17]
 Appendix A.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[30
+[18
 
 
-] [31]) (./thesis.aux)
+] [19])
+
+Package caption Warning: Unused \captionsetup[figure] on input line 38.
+See the caption package documentation for explanation.
+
+(./thesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1625,28 +1311,24 @@ L3 programming layer <2026-01-19>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: D3B7FC772679764CDED1BB80ACC1BD52;17771.
+(rerunfilecheck)             Checksum: F3A405CC811520D0A771241A084606E8;13318.
 )
 
 Here is how much of LuaTeX's memory you used:
- 20162 strings out of 476076
+ 20074 strings out of 476076
  100000,953878 words of node,token memory allocated
- 808 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 29 attribute, 93 glue_spec
-, 29 attribute_list, 2 write, 4 pdf_action nodes
-   avail lists: 2:1227,3:479,4:320,5:249,6:164,7:7843,8:60,9:790,10:18,11:738
- 41992 multiletter control sequences out of 65536+600000
- 80 fonts using 30850215 bytes
- 79i,13n,97p,531b,507s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
-nolt10-bold.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./f
-onts/THSarabunItalic.ttf><c:/users/windows-11/appdata/local/programs/miktex/font
-s/opentype/public/lm/lmmono12-regular.otf><./fonts/THSarabun.ttf><./fonts/THSara
-bunBold.ttf><C:/Users/Windows-11/AppData/Local/Programs/MiKTeX/fonts/type1/urw/z
-apfding/uzdr.pfb>
-Output written on thesis.pdf (42 pages, 331385 bytes).
+ 704 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 9 attribute, 93 glue_spec,
+ 9 attribute_list, 2 write nodes
+   avail lists: 2:1237,3:467,4:312,5:259,6:164,7:6815,8:37,9:772,10:13,11:665
+ 41945 multiletter control sequences out of 65536+600000
+ 75 fonts using 30361479 bytes
+ 79i,12n,97p,464b,497s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./fonts/THSarabunIt
+alic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
+Output written on thesis.pdf (30 pages, 226930 bytes).
 
-PDF statistics: 995 PDF objects out of 1000 (max. 8388607)
- 231 named destinations out of 1000 (max. 1048576)
- 793 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 733 PDF objects out of 1000 (max. 8388607)
+ 190 named destinations out of 1000 (max. 1048576)
+ 585 words of extra memory for PDF output out of 10000 (max. 100000000)
 

@@ -1,455 +1,199 @@
 \chapter{RESEARCH METHODOLOGY AND SYSTEM DESIGN}
 \label{chap:methodology}
 
-This chapter presents the complete design and construction of the proposed embodied
-AI system. It covers the hardware design of the hybrid robot, the automated dataset
-generation pipeline, the VLM fine-tuning procedure, the Sparse Autoencoder training
-curriculum, and the feature-steering inference framework. The presentation follows the
-information flow of the system: from physical hardware through the data pipeline to
-the interpretable AI brain and the operator interface.
+This chapter presents the methodology and system design of the proposed
+Vision-Language-Action (VLA) framework for robot manipulation. The chapter focuses on
+three priorities of the current project stage: (1) building an integrated
+Vision-Language-Action pipeline, (2) satisfying practical design constraints for real
+robot deployment, and (3) evaluating performance on representative manipulation tasks.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{RESEARCH METHODOLOGY OVERVIEW}
+\section{METHODOLOGY OVERVIEW}
 %─────────────────────────────────────────────────────────────────────────────
 
-The research methodology is structured around five sequential phases:
+The research workflow is organized into five stages:
 
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{Hardware Design and Fabrication}: specification and assembly of the
-    hybrid bi-pedal/quadrupedal chassis with embedded GPU compute.
+    \item \textbf{VLA System Development}: design an end-to-end architecture that
+    receives visual observations and natural-language instructions, then produces
+    executable robot actions.
 
-    \item \textbf{Dataset Generation}: automated production of 10{,}000 structured
-    robot-conversation records pairing scene images with \texttt{call\_robot()} instructions.
+    \item \textbf{Module Integration}: integrate three cooperating modules ---
+    a VLM core, a Vision Expert, and an Action Expert --- into one synchronized
+    inference pipeline.
 
-    \item \textbf{VLM Fine-Tuning}: LoRA-based fine-tuning of Qwen3-VL-2B-Thinking on
-    the generated dataset to produce a robot-action-capable multimodal model.
+    \item \textbf{Instruction Following}: train and configure the system so the robot
+    can follow natural-language user requests reliably.
 
-    \item \textbf{SAE Training}: harvesting of layer-20 hidden-state activations from
-    100{,}000 robot-task samples and training of a TopK Sparse Autoencoder to decompose
-    these activations into interpretable features.
+    \item \textbf{Generalization Optimization}: improve robustness to unseen objects,
+    task compositions, and environment variations.
 
-    \item \textbf{Feature Steering and Evaluation}: identification of behaviorally
-    relevant SAE features and systematic evaluation of the steering framework.
-\end{enumerate}
-
-The methodology is grounded in the following design principles:
-
-\begin{enumerate}[label=(\alph*)]
-    \item \textbf{Compute Efficiency}: all on-robot inference must fit within 24~GB
-    VRAM, driving the choice of the compact Qwen3-VL-2B backbone and bfloat16
-    quantisation.
-    \item \textbf{Zero-Programming Interface}: all commands are issued in plain English;
-    no operator programming is required.
-    \item \textbf{Auditability}: the system exposes internal feature activations so
-    that operators can inspect, amplify, or suppress specific behaviours before
-    live deployment.
-    \item \textbf{Open-Source}: all hardware designs, datasets, model checkpoints,
-    and code are released publicly.
+    \item \textbf{Manipulation Evaluation}: benchmark performance on core robot
+    manipulation tasks under controlled experimental settings.
 \end{enumerate}
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{HARDWARE DESIGN AND FABRICATION}
+\section{PROBLEM-DRIVEN DESIGN REQUIREMENTS}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Mechanical Design}
+The system design is directly derived from the identified problem and motivation:
+classical robot systems are task-specific, inflexible, weak in unseen-task
+generalization, and limited in natural-language understanding. To address these
+limitations, the proposed VLA design follows five constraints.
 
-The robot chassis is designed around a central body frame that can reconfigure
-between two stable morphologies: a \emph{bipedal stance}, in which two limbs act as
-legs and two limbs act as arms, and a \emph{quadrupedal stance}, in which all four
-limbs act as legs. Each limb consists of a three-degree-of-freedom (DoF) kinematic
-chain driven by off-the-shelf digital servo motors. The use of standard servo motors
---- rather than custom actuators --- keeps the hardware cost low and makes the design
-reproducible without specialist manufacturing.
+\subsection{Computation and Memory Constraint}
 
-The body frame is fabricated from aluminium profile extrusions and 3D-printed
-structural brackets. The joint layout is designed such that the torque requirements
-at each DoF remain within the rated output torque of the selected servo motors
-across both locomotion modes, verified through static loading analysis under
-worst-case limb configurations.
+Large multimodal backbones and action generators require significant memory and
+compute budget. The implementation must operate within available GPU memory while
+preserving action quality. This requires compact model configuration, mixed precision,
+and efficient batching.
 
-\subsection{Actuation and Electronics}
+\subsection{Latency Constraint}
 
-The servo control bus uses a half-duplex TTL serial protocol with a dedicated servo
-controller board that accepts high-level position and velocity commands from the
-onboard compute module and translates them into per-servo protocol packets. All
-servos are powered from a dedicated 12~V switched-mode power supply with per-channel
-current monitoring to detect stall conditions.
+Robot control requires low-latency generation. The inference path from
+image-plus-text input to executable action output must remain real-time, so each
+module is designed for fast forward pass and minimal inter-module overhead.
 
-The onboard compute module is an embedded GPU unit with 24~GB GDDR6 VRAM, sufficient
-to run Qwen3-VL-2B-Thinking in bfloat16 precision with the SAE module active
-simultaneously. The compute module also hosts an RGB camera that provides the scene
-image input to the VLM.
+\subsection{Action Representation Constraint}
 
-\subsection{Locomotion Mode Switching}
+Robot actions can be represented in discrete, continuous, or hybrid forms.
+The Action Expert must balance expressiveness and stability: discrete outputs improve
+parsing reliability, while continuous outputs improve motion fidelity.
 
-The two locomotion modes differ in the assignment of limb roles and the gait
-controller active on the servo bus. Mode switching is triggered by the AI brain
-in response to natural-language commands such as \textit{``switch to quadruped
-mode''} or \textit{``stand up on two legs''}. The mode-switch command is encoded
-as a dedicated \texttt{call\_robot('switch\_mode', \{'mode': 'quadruped'\})} tool
-call, which the execution module routes to a mode-switch procedure that
-re-parameterises the gait controller and updates the limb-role assignment table.
-A transition animation is executed to move the robot smoothly from one stance to
-the other before the new gait controller takes over.
+\subsection{Data Constraint}
+
+Robot demonstration data is limited and expensive to collect. The training strategy
+must maximize sample efficiency through data curation, augmentation, and transfer from
+pretrained visual-language knowledge.
+
+\subsection{Integration Constraint}
+
+The final system must coordinate perception, language grounding, and action generation
+without module mismatch. Interface contracts between modules are explicitly defined to
+avoid semantic drift and unstable action outputs.
 
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{SYSTEM ARCHITECTURE}
+\section{VISION-LANGUAGE-ACTION SYSTEM ARCHITECTURE}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Overall Information Flow}
+\subsection{Input and Output Definition}
 
-Figure~\ref{fig:system_overview} illustrates the overall information flow of the
-proposed system. At each command cycle, the system receives an RGB scene image
-$I_t \in \mathbb{R}^{H \times W \times 3}$ and a natural-language user request
-$\mathcal{U}$. These inputs are processed by the fine-tuned Qwen3-VL-2B-Thinking
-model, which generates a structured \texttt{call\_robot()} tool-call string and a
-natural-language confirmation reply. The tool-call is parsed by the execution module
-and dispatched to the servo control bus. In parallel, the SAE module monitors the
-layer-20 hidden states and optionally injects a steering vector to modify the
-model's output behaviour.
-
-\begin{figure}[ht]
-    \centering
-    % \includegraphics[width=0.88\textwidth]{figures/system_overview.pdf}
-    \caption{Overall information flow of the proposed embodied AI system. The VLM
-             core (centre) receives the scene image and user request, produces a
-             \texttt{call\_robot()} tool call and a confirmation reply, and exposes
-             layer-20 hidden states to the SAE module (right). The execution module
-             (left) dispatches servo commands to the robot hardware.}
-    \label{fig:system_overview}
-\end{figure}
-
-\subsection{VLM Core: Qwen3-VL-2B-Thinking}
-
-The VLM core is implemented as Qwen3-VL-2B-Thinking~\cite{qwen3vl2025} with a
-hidden dimension of $d_{\text{model}} = 2{,}048$ and 28 Transformer layers. The
-model receives a multi-modal context sequence:
-
-\begin{equation}
-    \mathbf{X} = \bigl[\,\text{tok}(\mathcal{S})\,,\;
-                        \text{img}(I_t)\,,\;
-                        \text{tok}(\mathcal{U})\,\bigr]
-    \label{eq:vlm_input}
-\end{equation}
-
-where $\text{tok}(\cdot)$ denotes the tokenised embedding of a text string,
-$\text{img}(\cdot)$ denotes the sequence of visual patch tokens produced by the
-SigLIP encoder and the visual projector, and $\mathcal{S}$ is the system prompt
-that specifies the \texttt{call\_robot()} output format and the available action
-vocabulary. The model generates the output autoregressively, first producing an
-internal chain-of-thought reasoning sequence (within \texttt{<think>} delimiters)
-and then committing to a final \texttt{call\_robot()} tool-call string.
-
-A \texttt{register\_forward\_hook} is attached to the output of Transformer
-layer~20, capturing the hidden state matrix
-$\mathbf{H}_{20} \in \mathbb{R}^{L \times d_{\text{model}}}$ at each forward pass.
-This hook serves two purposes: during SAE training, it provides the activation
-data; during feature-steering inference, it is the injection point for the steering
-vector.
-
-\subsection{SAE Module: TopK Sparse Autoencoder}
-
-The SAE module receives the layer-20 hidden states and decomposes them into a sparse
-code over a 16$\times$ expanded dictionary:
-
-\begin{equation}
-    \mathbf{f} = \text{TopK}_{k=32}
-    \!\left(W_{\text{enc}}\,\mathbf{h} + \mathbf{b}_{\text{enc}}\right),
-    \qquad
-    \hat{\mathbf{h}} = W_{\text{dec}}\,\mathbf{f} + \mathbf{b}_{\text{dec}}
-    \label{eq:sae_main}
-\end{equation}
-
-with $d_{\text{sae}} = 16 \times d_{\text{model}} = 32{,}768$. The TopK operation
-retains exactly $k = 32$ non-zero activations per token position, ensuring a
-consistent and controllable sparsity level. The decoder weight matrix
-$W_{\text{dec}} \in \mathbb{R}^{2048 \times 32768}$ has unit-norm columns (enforced
-by weight tying to the encoder transpose after normalisation), so that each decoder
-column $\mathbf{d}_i$ is a direction in the residual stream that the model can be
-steered along.
-
-\subsection{Steering Hook}
-
-Feature steering is implemented by modifying the forward hook on layer~20. When a
-feature index $i$ and a steering strength $\alpha$ are provided, the hook injects
-the decoder vector before the subsequent decoding layers:
-
-\begin{equation}
-    \mathbf{H}_{20}^{\text{steered}}[j, :]
-    = \mathbf{H}_{20}[j, :] + \alpha \cdot \mathbf{d}_i
-    \quad \forall\, j \in \{1, \ldots, L\}
-    \label{eq:steering_hook}
-\end{equation}
-
-The injection is applied to every token position $j$ in the sequence, ensuring that
-the steered feature influences all subsequent attention computations in layers~21--28.
-The strength $\alpha$ is exposed as a real-time slider in the Gradio interface,
-enabling an operator to adjust the degree of steering without interrupting the
-inference process.
-
-\subsection{Execution Module}
-
-The execution module subscribes to the model's output stream and applies a
-lightweight parser to extract the \texttt{call\_robot()} function name and argument
-dictionary from the generated text. Recognised function names are dispatched to the
-appropriate servo command handlers via the servo control bus. Unrecognised or
-malformed outputs are caught by a validation layer and logged for review. A
-\texttt{repetition\_penalty} of 1.1 is applied at the decoding stage to suppress
-looping outputs that can occur at high steering strengths.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{DATASET GENERATION PIPELINE}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Overview}
-
-The dataset generation pipeline produces structured robot-conversation records
-pairing scene images with \texttt{call\_robot()} instructions. The pipeline is
-designed to be fully automated and horizontally scalable, requiring no manual
-annotation beyond the initial specification of the output format and the action
-vocabulary.
-
-\subsection{Scene Image Source}
-
-Scene images are drawn from EO-Data1.5M, a large-scale dataset of indoor and
-outdoor environment observations that provides diverse visual contexts including
-tabletop workspaces, corridors, shelves, and ground surfaces. Images are filtered
-to retain scenes that contain at least one manipulable object, identified by a
-lightweight object detector, yielding a pool of approximately 250{,}000 usable
-frames.
-
-\subsection{Multi-Threaded Generation}
-
-The generation pipeline operates with 10 parallel worker threads, each of which
-submits a scene image and a generation prompt to the Gemini API (gemma-3-27b-it)
-and records the response. A global rate limiter enforces a maximum of 30 requests
-per minute (RPM) to comply with API quota constraints. Each request includes:
-
+At each control cycle, the system receives:
 \begin{itemize}
-    \item The scene image, encoded as a base64 JPEG payload.
-    \item A system prompt specifying the \texttt{call\_robot()} action vocabulary,
-    the JSONL output format, and requirements for naturalness and task diversity.
-    \item A randomly sampled task context (single-turn command or multi-turn
-    dialogue) to encourage diversity in the generated records.
+    \item an RGB observation $I_t$, and
+    \item a natural-language instruction $\mathcal{U}$ from the user.
 \end{itemize}
 
-Multi-turn conversations are generated by providing the model with a task goal
-and prompting it to produce a three-turn dialogue in which the user and the robot
-exchange messages, with the robot issuing a \texttt{call\_robot()} command at each
-turn and requesting a visual verification step between turns.
+The system outputs a structured action command that can be executed by the robot arm
+controller, plus an optional natural-language confirmation message for the operator.
 
-\subsection{Output Format}
+\subsection{VLM Core}
 
-Each generated record is stored as a JSONL entry with the following fields:
+The VLM module performs multimodal understanding and instruction grounding. It
+extracts intent from language, associates intent with scene context, and produces a
+high-level task representation suitable for manipulation planning.
 
+\subsection{Vision Expert}
+
+The Vision Expert provides task-relevant visual features (object cues, target
+relations, and workspace context) that support robust action planning. It is designed
+to improve perception reliability under object and scene variation.
+
+\subsection{Action Expert}
+
+The Action Expert converts grounded task representations into executable robot
+manipulation commands. The module supports structured output formatting for robust
+execution and can be configured for discrete, continuous, or hybrid action spaces
+depending on controller requirements.
+
+\subsection{Module Coordination}
+
+The three modules are connected through explicit intermediate representations:
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Language-grounded task state} from VLM,
+    \item \textbf{Task-conditioned visual features} from Vision Expert,
+    \item \textbf{Executable action sequence} from Action Expert.
+\end{enumerate}
+
+This separation improves maintainability and enables targeted optimization of each
+module while keeping end-to-end behavior coherent.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{IMPLEMENTATION STRATEGY}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Training and Tuning Strategy}
+
+The system is trained and tuned in stages:
+\begin{enumerate}[label=\arabic*)]
+    \item Initialize the VLM-based instruction-following backbone.
+    \item Train or adapt the Vision Expert for manipulation-relevant perception.
+    \item Train the Action Expert to map integrated features to executable commands.
+    \item Perform end-to-end tuning to reduce cross-module mismatch.
+\end{enumerate}
+
+\subsection{Latency and Memory Optimization}
+
+To satisfy real-time robot-control requirements, the implementation applies practical
+optimization techniques, including mixed precision inference, efficient token/image
+preprocessing, and lightweight module interfaces.
+
+\subsection{Data Utilization}
+
+Given limited robot demonstrations, the project emphasizes data quality over raw
+quantity. The dataset pipeline prioritizes task diversity, instruction variety,
+and balanced coverage of manipulation scenarios.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{EVALUATION PROTOCOL FOR MANIPULATION TASKS}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Evaluation Objectives}
+
+Evaluation is designed to measure whether the system satisfies the project goals:
 \begin{itemize}
-    \item \texttt{image\_path}: path to the source scene image.
-    \item \texttt{task\_summary}: a one-sentence description of the task.
-    \item \texttt{is\_multi\_turn}: boolean flag.
-    \item \texttt{conversation}: a list of \texttt{\{role, content\}} message objects,
-    where \texttt{role} is either \texttt{"user"} or \texttt{"assistant"} and
-    \texttt{content} contains the message text, including any
-    \texttt{call\_robot()} tool-call strings in the assistant turns.
+    \item follows natural-language instructions,
+    \item generalizes to unseen tasks,
+    \item maintains stable manipulation output,
+    \item satisfies real-time execution constraints.
 \end{itemize}
 
-The final dataset contains 10{,}000 records, of which approximately 30\% are
-multi-turn conversations and 70\% are single-turn command-response pairs.
-Table~\ref{tab:dataset_stats} summarises the dataset statistics.
+\subsection{Task Categories}
 
-\begin{table}[ht]
-\centering
-\caption{Summary statistics of the generated robot conversation dataset.}
-\label{tab:dataset_stats}
-\begin{tabular}{lc}
-\hline
-\textbf{Property}                 & \textbf{Value}       \\
-\hline
-Total records                     & 10{,}000             \\
-Single-turn records               & 7{,}000 (70\%)       \\
-Multi-turn records                & 3{,}000 (30\%)       \\
-Average turns per multi-turn record & 3.0               \\
-Unique action types               & 18                   \\
-Storage format                    & JSONL                \\
-Total dataset size                & $\approx$4.2~GB      \\
-\hline
-\end{tabular}
-\end{table}
+The benchmark includes representative robot manipulation tasks such as:
+\begin{enumerate}[label=\arabic*)]
+    \item pick-and-place,
+    \item stacking,
+    \item drawer or container interaction,
+    \item multi-step object sequencing.
+\end{enumerate}
 
+\subsection{Evaluation Metrics}
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{VLM FINE-TUNING}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Fine-Tuning Strategy}
-
-The Qwen3-VL-2B-Thinking model is fine-tuned using Low-Rank Adaptation
-(LoRA)~\cite{hu2022lora} applied to the query and value projection matrices of each
-self-attention layer. LoRA decomposes the weight update $\Delta W$ as a product of
-two low-rank matrices:
-
-\begin{equation}
-    \Delta W = B\,A,
-    \quad B \in \mathbb{R}^{d \times r},\; A \in \mathbb{R}^{r \times d}
-    \label{eq:lora}
-\end{equation}
-
-with rank $r = 16$ and scaling factor $\alpha_{\text{LoRA}} = 32$. This limits the
-number of trainable parameters to approximately 4.7 million, a small fraction of the
-2~billion backbone parameters, which reduces GPU memory requirements and mitigates
-catastrophic forgetting of the model's pre-trained general representations.
-
-\subsection{Training Configuration}
-
-Fine-tuning is conducted on the 10{,}000-record dataset for 3 epochs with a batch
-size of 4 and a learning rate of $2 \times 10^{-4}$ under a cosine annealing
-schedule. The AdamW optimiser~\cite{loshchilov2019adamw} is used with weight decay
-$10^{-2}$ and gradient clipping at norm 1.0. The backbone is loaded in bfloat16
-precision with gradient checkpointing enabled. The training loss is the standard
-next-token prediction cross-entropy computed only over the assistant turn tokens,
-masking the user turn and system prompt tokens from the gradient computation.
-
-\subsection{Output Format Enforcement}
-
-To ensure that the fine-tuned model consistently produces parsable
-\texttt{call\_robot()} outputs, the system prompt includes three few-shot examples
-and an explicit grammar specification for the output format. During evaluation, a
-constrained decoding scheme based on prefix matching against the action vocabulary
-is applied to enforce syntactic validity of the tool-call string, preventing
-hallucinated or malformed action names.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{ACTIVATION HARVESTING AND SAE TRAINING}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Activation Harvesting}
-
-Hidden-state activations for SAE training are collected by running the fine-tuned
-Qwen3-VL-2B model over 100{,}000 robot-task samples drawn from the generated dataset
-and from additional unlabelled scene images. At each forward pass, the
-\texttt{register\_forward\_hook} on layer~20 captures the hidden state matrix
-$\mathbf{H}_{20} \in \mathbb{R}^{L \times 2048}$. The per-token activations are
-extracted and saved as float16 \texttt{.npy} shards of 1{,}000 tokens each,
-yielding a total activation corpus of approximately 85~GB.
-
-\subsection{SAE Architecture}
-
-Two SAE variants are trained:
-
+The following metrics are used:
 \begin{itemize}
-    \item \textbf{sae\_task\_model}: trained on activations from single-turn
-    command-response samples, specialised for extracting features relevant to
-    individual action primitives.
-    \item \textbf{sae\_agentic\_model}: trained on activations from multi-turn
-    task-planning samples, specialised for extracting features relevant to sequential
-    task planning and goal tracking.
+    \item \textbf{Instruction-following success rate}: whether generated actions satisfy
+    the user command.
+    \item \textbf{Generalization score}: performance on unseen tasks relative to seen
+    tasks.
+    \item \textbf{Action validity}: percentage of outputs that are executable by the
+    robot controller.
+    \item \textbf{Latency}: end-to-end action generation time per command cycle.
 \end{itemize}
 
-Both models share the architecture described in Equation~(\ref{eq:sae_main}):
-TopK with $k = 32$, expansion factor $16\times$, $d_{\text{sae}} = 32{,}768$.
-
-\subsection{Training Procedure}
-
-Each SAE is trained for 30 epochs with a batch size of 4{,}096 activation vectors,
-a learning rate of $5 \times 10^{-4}$ under a cosine annealing schedule, and
-bfloat16 precision with \texttt{torch.compile} enabled for throughput. The training
-objective is mean squared reconstruction error:
-
-\begin{equation}
-    \mathcal{L}_{\text{SAE}}
-    = \frac{1}{|\mathcal{B}|}\sum_{\mathbf{h} \in \mathcal{B}}
-      \|\mathbf{h} - W_{\text{dec}}\,\text{TopK}(W_{\text{enc}}\,\mathbf{h}
-      + \mathbf{b}_{\text{enc}}) - \mathbf{b}_{\text{dec}}\|_2^2
-    \label{eq:sae_loss}
-\end{equation}
-
-Decoder columns are L2-normalised after each gradient update to prevent feature
-collapse and to ensure that the decoder columns are valid unit-norm steering
-directions. The trained checkpoints are saved as
-\texttt{sae\_task\_model.pt},
-\texttt{sae\_agentic\_model.pt}, and a production-ready
-\texttt{sae\_topk\_production.pt} combining the features of both models.
-
-\subsection{Feature Identification}
-
-After training, individual SAE features are characterised by their maximum-activating
-examples from the activation corpus. For each feature $i$, the 20 samples that
-produce the highest activation $f_i$ are retrieved and inspected qualitatively to
-determine what input pattern the feature responds to. Feature~\#5086 in the
-sae\_agentic\_model is identified as the primary task-planning neuron: its
-maximum-activating examples are uniformly characterised by multi-step robotic action
-sequences involving coordinate targets, and steering this feature consistently
-elicits structured coordinate-sequence outputs.
-
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{GRADIO INTERFACE}
+\section{CHAPTER SUMMARY}
 %─────────────────────────────────────────────────────────────────────────────
 
-The operator-facing interface is implemented as a Gradio web application. It provides:
-
-\begin{itemize}
-    \item An \textbf{image upload widget} for providing the current scene image.
-    \item A \textbf{text input} for the natural-language user request.
-    \item A \textbf{steering-strength slider} ($\alpha \in [0, 80]$, step~1) for
-    real-time adjustment of the active feature's steering intensity.
-    \item A \textbf{feature index selector} for choosing which SAE feature to steer.
-    \item A \textbf{live output panel} displaying the generated
-    \texttt{call\_robot()} string and the natural-language confirmation reply.
-\end{itemize}
-
-The interface is designed to require no programming knowledge. An operator can upload
-a photo of the robot's current environment, type an instruction in plain English, and
-observe the robot's planned action in real time. If the planned action is undesirable,
-the operator can adjust the steering strength to amplify a safety-relevant feature
-before confirming execution.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{IMPLEMENTATION DETAILS}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Hardware and Software Stack}
-
-All training experiments are conducted on NVIDIA A100 80~GB GPUs. On-robot inference
-uses the embedded 24~GB GPU module in bfloat16 precision. The codebase is implemented
-in Python~3.11 using PyTorch~\cite{paszke2019pytorch} and the Hugging Face
-Transformers library~\cite{wolf2020transformers}. The SAE implementation follows the
-open-source EleutherAI SAE framework conventions~\cite{gao2024scaling}.
-
-\subsection{Hyperparameter Summary}
-
-Table~\ref{tab:hyperparams} summarises the key hyperparameters of the complete system.
-
-\begin{table}[ht]
-\centering
-\caption{Key hyperparameters of the proposed embodied AI system.}
-\label{tab:hyperparams}
-\begin{tabular}{lc}
-\hline
-\textbf{Hyperparameter}                    & \textbf{Value}                      \\
-\hline
-VLM backbone                               & Qwen3-VL-2B-Thinking                \\
-VLM hidden dimension $d_{\text{model}}$    & 2{,}048                             \\
-Steering layer                             & Layer 20 of 28                      \\
-SAE expansion factor                       & 16$\times$                          \\
-SAE dictionary size $d_{\text{sae}}$       & 32{,}768                            \\
-TopK sparsity $k$                          & 32                                  \\
-SAE training epochs                        & 30                                  \\
-SAE batch size                             & 4{,}096                             \\
-SAE learning rate                          & $5 \times 10^{-4}$                  \\
-Fine-tuning LoRA rank $r$                  & 16                                  \\
-Fine-tuning learning rate                  & $2 \times 10^{-4}$                  \\
-Fine-tuning epochs                         & 3                                   \\
-Fine-tuning batch size                     & 4                                   \\
-Dataset size                               & 10{,}000 records                    \\
-Activation corpus size                     & 100{,}000 samples                   \\
-Repetition penalty                         & 1.1                                 \\
-Steering strength range ($\alpha$)         & 0 -- 80                             \\
-\hline
-\end{tabular}
-\end{table}
+This chapter defined a VLA-centered system design aligned with the current project
+scope. The proposed architecture integrates a VLM, a Vision Expert, and an Action
+Expert to enable natural-language robot manipulation. The design explicitly addresses
+compute, latency, representation, data, and integration constraints, and establishes
+a task-based evaluation protocol for measuring instruction following and
+unseen-task generalization.
