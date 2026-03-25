@@ -1,636 +1,455 @@
 \chapter{RESEARCH METHODOLOGY AND SYSTEM DESIGN}
 \label{chap:methodology}
 
-This chapter presents the complete design and construction of the proposed
-Vision-Language-Action architecture. It details the rationale for each
-architectural component, the mathematical formulation of the training objectives,
-the pre-training curriculum, and the implementation specifications. The presentation
-follows the sequence of the system's information flow: from raw sensor inputs through
-the foundation model and vision expert, to the action expert and the final continuous
-trajectory output.
+This chapter presents the complete design and construction of the proposed embodied
+AI system. It covers the hardware design of the hybrid robot, the automated dataset
+generation pipeline, the VLM fine-tuning procedure, the Sparse Autoencoder training
+curriculum, and the feature-steering inference framework. The presentation follows the
+information flow of the system: from physical hardware through the data pipeline to
+the interpretable AI brain and the operator interface.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{RESEARCH METHODOLOGY OVERVIEW}
 %─────────────────────────────────────────────────────────────────────────────
 
-The research methodology adopted in this thesis is structured around three
-sequential phases: architecture design, pre-training, and empirical evaluation.
-In the design phase, the system components are specified and their interactions
-formalised. In the pre-training phase, the foundation model and action expert are
-trained on large-scale robot demonstration datasets using the multi-task objectives
-described in Section~\ref{sec:pretraining}. In the evaluation phase, the trained
-system is assessed on a suite of manipulation tasks under controlled conditions,
-with systematic ablation experiments isolating the contribution of each architectural
-and training choice. This chapter covers the first two phases; the evaluation phase
-is detailed in Chapter~\ref{chap:experiments}.
-
-The methodology is grounded in the following core design principles:
+The research methodology is structured around five sequential phases:
 
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{Frozen Backbone.} The VLM backbone is kept frozen throughout
-    training to preserve the broadly generalisable visual and linguistic representations
-    acquired during foundation model pre-training, in accordance with the findings
-    of~\cite{pertsch2025kilovla}.
+    \item \textbf{Hardware Design and Fabrication}: specification and assembly of the
+    hybrid bi-pedal/quadrupedal chassis with embedded GPU compute.
 
-    \item \textbf{Separation of Scales.} Overview-level semantic understanding
-    and end-effector-level spatial precision are processed through separate,
-    specialised encoders rather than a single shared encoder, enabling each module
-    to be optimised for its respective representational requirement.
+    \item \textbf{Dataset Generation}: automated production of 10{,}000 structured
+    robot-conversation records pairing scene images with \texttt{call\_robot()} instructions.
 
-    \item \textbf{Discrete-Continuous Hybrid Conditioning.} The action expert
-    receives conditioning signals from both the discrete FAST+ action token pathway
-    and the continuous hidden state pathway of the VLM backbone, combining the
-    complementary strengths of both representations.
+    \item \textbf{VLM Fine-Tuning}: LoRA-based fine-tuning of Qwen3-VL-2B-Thinking on
+    the generated dataset to produce a robot-action-capable multimodal model.
 
-    \item \textbf{Multi-Task Pre-Training.} The foundation model is trained on a
-    curriculum that jointly optimises for object localisation, state description
-    generation, and action token prediction, promoting spatial reasoning alongside
-    action grounding.
+    \item \textbf{SAE Training}: harvesting of layer-20 hidden-state activations from
+    100{,}000 robot-task samples and training of a TopK Sparse Autoencoder to decompose
+    these activations into interpretable features.
+
+    \item \textbf{Feature Steering and Evaluation}: identification of behaviorally
+    relevant SAE features and systematic evaluation of the steering framework.
 \end{enumerate}
+
+The methodology is grounded in the following design principles:
+
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Compute Efficiency}: all on-robot inference must fit within 24~GB
+    VRAM, driving the choice of the compact Qwen3-VL-2B backbone and bfloat16
+    quantisation.
+    \item \textbf{Zero-Programming Interface}: all commands are issued in plain English;
+    no operator programming is required.
+    \item \textbf{Auditability}: the system exposes internal feature activations so
+    that operators can inspect, amplify, or suppress specific behaviours before
+    live deployment.
+    \item \textbf{Open-Source}: all hardware designs, datasets, model checkpoints,
+    and code are released publicly.
+\end{enumerate}
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{HARDWARE DESIGN AND FABRICATION}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Mechanical Design}
+
+The robot chassis is designed around a central body frame that can reconfigure
+between two stable morphologies: a \emph{bipedal stance}, in which two limbs act as
+legs and two limbs act as arms, and a \emph{quadrupedal stance}, in which all four
+limbs act as legs. Each limb consists of a three-degree-of-freedom (DoF) kinematic
+chain driven by off-the-shelf digital servo motors. The use of standard servo motors
+--- rather than custom actuators --- keeps the hardware cost low and makes the design
+reproducible without specialist manufacturing.
+
+The body frame is fabricated from aluminium profile extrusions and 3D-printed
+structural brackets. The joint layout is designed such that the torque requirements
+at each DoF remain within the rated output torque of the selected servo motors
+across both locomotion modes, verified through static loading analysis under
+worst-case limb configurations.
+
+\subsection{Actuation and Electronics}
+
+The servo control bus uses a half-duplex TTL serial protocol with a dedicated servo
+controller board that accepts high-level position and velocity commands from the
+onboard compute module and translates them into per-servo protocol packets. All
+servos are powered from a dedicated 12~V switched-mode power supply with per-channel
+current monitoring to detect stall conditions.
+
+The onboard compute module is an embedded GPU unit with 24~GB GDDR6 VRAM, sufficient
+to run Qwen3-VL-2B-Thinking in bfloat16 precision with the SAE module active
+simultaneously. The compute module also hosts an RGB camera that provides the scene
+image input to the VLM.
+
+\subsection{Locomotion Mode Switching}
+
+The two locomotion modes differ in the assignment of limb roles and the gait
+controller active on the servo bus. Mode switching is triggered by the AI brain
+in response to natural-language commands such as \textit{``switch to quadruped
+mode''} or \textit{``stand up on two legs''}. The mode-switch command is encoded
+as a dedicated \texttt{call\_robot('switch\_mode', \{'mode': 'quadruped'\})} tool
+call, which the execution module routes to a mode-switch procedure that
+re-parameterises the gait controller and updates the limb-role assignment table.
+A transition animation is executed to move the robot smoothly from one stance to
+the other before the new gait controller takes over.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{SYSTEM ARCHITECTURE}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Overall Architecture}
+\subsection{Overall Information Flow}
 
-The proposed system comprises three principal components: (1) a frozen VLM backbone
-responsible for high-level scene understanding and discrete action token prediction,
-(2) a trainable DINOv3-based Vision Expert that extracts fine-grained spatial features
-from the end-effector camera stream, and (3) a trainable Diffusion Transformer (DiT)
-Action Expert that generates continuous kinematic trajectories conditioned on the
-outputs of the two preceding modules. Figure~\ref{fig:overall_arch} illustrates the
-overall architecture and the information flow between components at inference timestep
-$t$.
+Figure~\ref{fig:system_overview} illustrates the overall information flow of the
+proposed system. At each command cycle, the system receives an RGB scene image
+$I_t \in \mathbb{R}^{H \times W \times 3}$ and a natural-language user request
+$\mathcal{U}$. These inputs are processed by the fine-tuned Qwen3-VL-2B-Thinking
+model, which generates a structured \texttt{call\_robot()} tool-call string and a
+natural-language confirmation reply. The tool-call is parsed by the execution module
+and dispatched to the servo control bus. In parallel, the SAE module monitors the
+layer-20 hidden states and optionally injects a steering vector to modify the
+model's output behaviour.
 
 \begin{figure}[ht]
     \centering
-    % Replace the line below with \includegraphics once figures are ready
-    % \includegraphics[width=0.85\textwidth]{figures/architecture.pdf}
-    \caption{Overall architecture of the proposed VLA system at a single inference
-             timestep $t$. The frozen VLM backbone (cyan) processes the instruction
-             and overview image; the Vision Expert (blue) processes the end-effector
-             image; the Action Expert (purple) generates the continuous trajectory
-             conditioned on both upstream modules.}
-    \label{fig:overall_arch}
+    % \includegraphics[width=0.88\textwidth]{figures/system_overview.pdf}
+    \caption{Overall information flow of the proposed embodied AI system. The VLM
+             core (centre) receives the scene image and user request, produces a
+             \texttt{call\_robot()} tool call and a confirmation reply, and exposes
+             layer-20 hidden states to the SAE module (right). The execution module
+             (left) dispatches servo commands to the robot hardware.}
+    \label{fig:system_overview}
 \end{figure}
 
-Formally, at each timestep $t$, the system receives the following inputs:
+\subsection{VLM Core: Qwen3-VL-2B-Thinking}
 
-\begin{itemize}
-    \item A natural language instruction $\mathcal{I}$
-          (e.g., \textit{``put the banana in the green box''})
-    \item An overview RGB image $I^{\text{ov}}_t \in \mathbb{R}^{H \times W \times 3}$
-          of the workspace
-    \item An end-effector RGB image $I^{\text{ef}}_t \in \mathbb{R}^{H' \times W' \times 3}$
-    \item A textual state description $s_t$
-          (e.g., \textit{``move to the banana on the bottom right of the table''})
-\end{itemize}
-
-and produces as output a continuous trajectory chunk
-$\hat{\tau}_t \in \mathbb{R}^{N \times A}$, where $N$ is the number of prediction
-timesteps in the chunk and $A$ is the dimensionality of the robot's action space.
-
-\subsection{VLM Backbone}
-\label{sec:vlm}
-
-The VLM backbone is implemented as a Qwen3 autoregressive language model augmented
-with a SigLIP vision encoder, with a combined parameter count of approximately
-2~billion. The SigLIP encoder maps the overview image $I^{\text{ov}}_t$ into a sequence
-of patch embeddings $\mathbf{V}^{\text{ov}} \in \mathbb{R}^{L_v \times d_v}$, where
-$L_v$ is the number of patches and $d_v$ is the visual embedding dimension. A learned
-linear projector $W_{\text{proj}} \in \mathbb{R}^{d_v \times d_m}$ maps these embeddings
-into the language model's token embedding space of dimension $d_m$.
-
-The language model then processes the concatenated token sequence:
+The VLM core is implemented as Qwen3-VL-2B-Thinking~\cite{qwen3vl2025} with a
+hidden dimension of $d_{\text{model}} = 2{,}048$ and 28 Transformer layers. The
+model receives a multi-modal context sequence:
 
 \begin{equation}
-    \mathbf{X}_t =
-    \bigl[\,\text{tok}(\mathcal{I})\,,\;
-           W_{\text{proj}}\,\mathbf{V}^{\text{ov}}\,,\;
-           \text{tok}(s_t)\,,\;
-           \mathbf{a}^{1:k-1}_t\,\bigr]
+    \mathbf{X} = \bigl[\,\text{tok}(\mathcal{S})\,,\;
+                        \text{img}(I_t)\,,\;
+                        \text{tok}(\mathcal{U})\,\bigr]
     \label{eq:vlm_input}
 \end{equation}
 
-where $\text{tok}(\cdot)$ denotes the tokenised embedding of a text string and
-$\mathbf{a}^{1:k-1}_t$ are the previously predicted FAST+ action tokens at the
-current timestep. The backbone produces two outputs that are consumed by downstream
-modules:
+where $\text{tok}(\cdot)$ denotes the tokenised embedding of a text string,
+$\text{img}(\cdot)$ denotes the sequence of visual patch tokens produced by the
+SigLIP encoder and the visual projector, and $\mathcal{S}$ is the system prompt
+that specifies the \texttt{call\_robot()} output format and the available action
+vocabulary. The model generates the output autoregressively, first producing an
+internal chain-of-thought reasoning sequence (within \texttt{<think>} delimiters)
+and then committing to a final \texttt{call\_robot()} tool-call string.
 
-\begin{enumerate}[label=(\alph*)]
-    \item \textbf{Discrete Action Tokens} $\hat{\mathbf{a}}_t \in \mathcal{V}^K$:
-    the next FAST+ token is predicted autoregressively at each decoding step via a
-    softmax output head over the action vocabulary $\mathcal{V}$.
+A \texttt{register\_forward\_hook} is attached to the output of Transformer
+layer~20, capturing the hidden state matrix
+$\mathbf{H}_{20} \in \mathbb{R}^{L \times d_{\text{model}}}$ at each forward pass.
+This hook serves two purposes: during SAE training, it provides the activation
+data; during feature-steering inference, it is the injection point for the steering
+vector.
 
-    \item \textbf{Hidden States} $\mathbf{H}_t \in \mathbb{R}^{L_x \times d_m}$:
-    the sequence of hidden state vectors from the final Transformer layer, encoding
-    the model's joint contextual representation of the instruction, visual scene,
-    and current state.
-\end{enumerate}
+\subsection{SAE Module: TopK Sparse Autoencoder}
 
-The backbone weights are frozen throughout all training stages. A lightweight
-LoRA adapter~\cite{hu2022lora} may optionally be applied to the final self-attention
-layers corresponding to the \texttt{<start-of-action>} and \texttt{<end-of-action>}
-special tokens, enabling the backbone to learn task-specific action boundary
-representations without perturbing its general representations.
-
-\subsection{Vision Expert}
-\label{sec:vision_expert}
-
-The Vision Expert is implemented as a DINOv3 vision Transformer of approximately
-86~million parameters. It receives the end-effector image $I^{\text{ef}}_t$ and
-produces a sequence of patch-level feature embeddings:
+The SAE module receives the layer-20 hidden states and decomposes them into a sparse
+code over a 16$\times$ expanded dictionary:
 
 \begin{equation}
-    \mathbf{F}^{\text{ef}}_t = \text{DINOv3}(I^{\text{ef}}_t)
-    \in \mathbb{R}^{L_p \times d_p}
-    \label{eq:dino_features}
+    \mathbf{f} = \text{TopK}_{k=32}
+    \!\left(W_{\text{enc}}\,\mathbf{h} + \mathbf{b}_{\text{enc}}\right),
+    \qquad
+    \hat{\mathbf{h}} = W_{\text{dec}}\,\mathbf{f} + \mathbf{b}_{\text{dec}}
+    \label{eq:sae_main}
 \end{equation}
 
-where $L_p$ is the number of patches and $d_p$ is the DINOv3 feature dimension.
-Because DINOv3 is pre-trained via self-supervised patch-level distillation without
-semantic label supervision, its patch features encode dense spatial geometry and
-texture information at fine resolution, providing the action expert with precise
-positional cues about the immediate manipulation environment that are absent from
-the VLM backbone's higher-level semantic representations. The Vision Expert is
-trainable and is optimised jointly with the Action Expert during pre-training.
+with $d_{\text{sae}} = 16 \times d_{\text{model}} = 32{,}768$. The TopK operation
+retains exactly $k = 32$ non-zero activations per token position, ensuring a
+consistent and controllable sparsity level. The decoder weight matrix
+$W_{\text{dec}} \in \mathbb{R}^{2048 \times 32768}$ has unit-norm columns (enforced
+by weight tying to the encoder transpose after normalisation), so that each decoder
+column $\mathbf{d}_i$ is a direction in the residual stream that the model can be
+steered along.
 
-\subsection{Action Expert}
-\label{sec:action_expert}
+\subsection{Steering Hook}
 
-The Action Expert is a Diffusion Transformer (DiT) of approximately 300~million
-parameters that generates continuous trajectory chunks via a flow-matching objective.
-At each denoising step $i$ of the generation process, the DiT receives:
+Feature steering is implemented by modifying the forward hook on layer~20. When a
+feature index $i$ and a steering strength $\alpha$ are provided, the hook injects
+the decoder vector before the subsequent decoding layers:
+
+\begin{equation}
+    \mathbf{H}_{20}^{\text{steered}}[j, :]
+    = \mathbf{H}_{20}[j, :] + \alpha \cdot \mathbf{d}_i
+    \quad \forall\, j \in \{1, \ldots, L\}
+    \label{eq:steering_hook}
+\end{equation}
+
+The injection is applied to every token position $j$ in the sequence, ensuring that
+the steered feature influences all subsequent attention computations in layers~21--28.
+The strength $\alpha$ is exposed as a real-time slider in the Gradio interface,
+enabling an operator to adjust the degree of steering without interrupting the
+inference process.
+
+\subsection{Execution Module}
+
+The execution module subscribes to the model's output stream and applies a
+lightweight parser to extract the \texttt{call\_robot()} function name and argument
+dictionary from the generated text. Recognised function names are dispatched to the
+appropriate servo command handlers via the servo control bus. Unrecognised or
+malformed outputs are caught by a validation layer and logged for review. A
+\texttt{repetition\_penalty} of 1.1 is applied at the decoding stage to suppress
+looping outputs that can occur at high steering strengths.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{DATASET GENERATION PIPELINE}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Overview}
+
+The dataset generation pipeline produces structured robot-conversation records
+pairing scene images with \texttt{call\_robot()} instructions. The pipeline is
+designed to be fully automated and horizontally scalable, requiring no manual
+annotation beyond the initial specification of the output format and the action
+vocabulary.
+
+\subsection{Scene Image Source}
+
+Scene images are drawn from EO-Data1.5M, a large-scale dataset of indoor and
+outdoor environment observations that provides diverse visual contexts including
+tabletop workspaces, corridors, shelves, and ground surfaces. Images are filtered
+to retain scenes that contain at least one manipulable object, identified by a
+lightweight object detector, yielding a pool of approximately 250{,}000 usable
+frames.
+
+\subsection{Multi-Threaded Generation}
+
+The generation pipeline operates with 10 parallel worker threads, each of which
+submits a scene image and a generation prompt to the Gemini API (gemma-3-27b-it)
+and records the response. A global rate limiter enforces a maximum of 30 requests
+per minute (RPM) to comply with API quota constraints. Each request includes:
 
 \begin{itemize}
-    \item Noisy trajectory $\tilde{\tau}^{(i)}_t \in \mathbb{R}^{N \times A}$
-          sampled from the current noise schedule
-    \item Hidden states $\mathbf{H}_t$ from the VLM backbone, incorporated via
-          cross-attention layers
-    \item End-effector features $\mathbf{F}^{\text{ef}}_t$ from the Vision Expert,
-          also incorporated via cross-attention layers
-    \item Denoising timestep embedding $\phi(i)$
+    \item The scene image, encoded as a base64 JPEG payload.
+    \item A system prompt specifying the \texttt{call\_robot()} action vocabulary,
+    the JSONL output format, and requirements for naturalness and task diversity.
+    \item A randomly sampled task context (single-turn command or multi-turn
+    dialogue) to encourage diversity in the generated records.
 \end{itemize}
 
-The DiT predicts the vector field $v_\theta(\tilde{\tau}^{(i)}_t, i)$ that transports
-the noisy sample toward the clean trajectory distribution:
+Multi-turn conversations are generated by providing the model with a task goal
+and prompting it to produce a three-turn dialogue in which the user and the robot
+exchange messages, with the robot issuing a \texttt{call\_robot()} command at each
+turn and requesting a visual verification step between turns.
 
-\begin{equation}
-    \hat{\tau}_t = \tilde{\tau}^{(0)}_t +
-    \int_0^1 v_\theta\!\left(\tilde{\tau}^{(i)}_t,\, i\right) di
-    \label{eq:flow_trajectory}
-\end{equation}
+\subsection{Output Format}
 
-where the integral is approximated using an ODE solver with a fixed number of
-function evaluations. The cross-attention over $\mathbf{H}_t$ provides the primary
-semantic conditioning signal, while the cross-attention over $\mathbf{F}^{\text{ef}}_t$
-provides the spatial precision signal. These two conditioning streams are processed
-through separate cross-attention sublayers within each DiT block, with their outputs
-summed before the subsequent feed-forward sublayer.
-
-\subsection{State Representation}
-\label{sec:state}
-
-Following the best practice identified in the literature review, the robot state
-$s_t$ is represented as a \textbf{Text State}: a natural language description of the
-current manipulation sub-goal (e.g., \textit{``move to a banana on the bottom right
-of the table''}). This representation is incorporated into the VLM input
-sequence~(\ref{eq:vlm_input}) as a standard text token sequence, processed by the
-frozen backbone without any architectural modification. This contrasts with the
-Continuous State representation employed by GR00T N1~\cite{nvidia2024groot}, which
-requires a dedicated FiLM injection pathway and additional trainable parameters at
-the backbone interface. The Text State is preferred here because it is natively
-compatible with the backbone's pre-trained token processing mechanism and imposes
-no structural modification on the frozen model.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{ACTION TOKENISATION}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{FAST+ Discrete Tokenisation}
-
-Continuous trajectory chunks $\tau_t \in \mathbb{R}^{N \times A}$ are tokenised
-into a sequence of discrete tokens $\mathbf{a}_t \in \mathcal{V}^K$ using the
-FAST+ tokeniser~\cite{pertsch2025fast}. The tokenisation proceeds in three stages:
-
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Frequency Transformation.} A Discrete Cosine Transform (DCT)
-    is applied along the temporal dimension of the trajectory chunk, yielding
-    a frequency-domain representation $\hat{\tau}_t = \text{DCT}(\tau_t)$.
-    The energy of smooth robot trajectories is concentrated in the low-frequency
-    DCT coefficients, enabling the trajectory to be compactly represented by
-    retaining only the dominant $K'$ coefficients.
-
-    \item \textbf{Scalar Quantisation.} Each retained DCT coefficient is
-    independently quantised to the nearest centroid in a learned scalar codebook
-    $\mathcal{C} \subset \mathbb{R}$, producing a sequence of $K' \times A$
-    discrete indices that are flattened and mapped to the action vocabulary
-    $\mathcal{V}$ via a bijective mapping.
-
-    \item \textbf{Detokenisation.} At inference, the predicted discrete token
-    sequence is decoded back to DCT coefficients, the discarded high-frequency
-    components are set to zero, and an inverse DCT is applied to recover the
-    continuous trajectory $\hat{\tau}_t$.
-\end{enumerate}
-
-The FAST+ tokeniser is pre-fitted on the training dataset before any model
-training begins, and its parameters are held fixed throughout all subsequent
-training stages.
-
-\subsection{Special Action Boundary Tokens}
-
-Two special tokens, \texttt{<start-of-action>} and \texttt{<end-of-action>},
-are added to the VLM vocabulary to demarcate the boundary of the action token
-sequence within the autoregressive generation process. The optional LoRA adapter
-is applied exclusively to the attention layers that process these boundary tokens,
-ensuring that the backbone learns appropriate action-transition representations
-while its general representations remain unperturbed.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{PRE-TRAINING CURRICULUM}
-\label{sec:pretraining}
-%─────────────────────────────────────────────────────────────────────────────
-
-The pre-training stage trains the two trainable components---the Vision Expert and
-the Action Expert---using a two-track curriculum applied to the same demonstration
-dataset. The frozen VLM backbone participates in the forward pass but receives no
-gradient updates.
-
-\subsection{Foundation Model Track: Next-Token Prediction}
-
-The VLM backbone processes sequences of the following multi-task form:
-
-\begin{equation}
-    \underbrace{\mathcal{I}}_{\text{instruction}}
-    \;\rightarrow\;
-    \underbrace{\texttt{banana \;<loc12>\;<loc25>\;...}}_{\text{[1]\;object localisation}}
-    \;\rightarrow\;
-    \underbrace{s_t}_{\text{[2]\;state description}}
-    \;\rightarrow\;
-    \underbrace{\mathbf{a}_t \in \mathcal{V}^K}_{\text{[3]\;FAST+ action tokens}}
-    \label{eq:ntp_sequence}
-\end{equation}
-
-This multi-task sequence trains the backbone to jointly predict three categories
-of output tokens at each timestep:
-
-\begin{enumerate}[label={[\arabic*]}]
-    \item \textbf{Object Localisation.} The backbone is trained to predict the
-    bounding box coordinates of task-relevant objects encoded as \texttt{<loc>}
-    tokens indexing a discretised coordinate grid. This auxiliary task is motivated
-    by the finding of~\cite{chen2024localization} that spatial grounding training
-    measurably improves downstream spatial reasoning capacity.
-
-    \item \textbf{State Description.} The backbone is trained to generate the
-    current natural language state $s_t$, grounding the language model in the
-    temporal progression of the manipulation task across successive timesteps.
-
-    \item \textbf{FAST+ Action Tokens.} The backbone is trained to predict the
-    FAST+ discrete action token sequence $\mathbf{a}_t$ corresponding to the
-    current trajectory chunk.
-\end{enumerate}
-
-The training objective for this track is the standard cross-entropy loss:
-
-\begin{equation}
-    \mathcal{L}_{\text{NTP}} =
-    -\sum_{j} \log p_\theta\!\left(y_j \;\big|\; y_{<j},\, \mathbf{X}_t\right)
-    \label{eq:ntp_loss}
-\end{equation}
-
-where $y_j$ denotes the $j$-th target token in sequence~(\ref{eq:ntp_sequence}).
-
-\subsection{Action Expert Track: Reconstruction and Masked Autoencoding}
-
-In parallel, the Action Expert and Vision Expert are trained on a trajectory
-reconstruction objective. Given the ground-truth trajectory $\tau_t$, a noisy
-version is constructed by interpolating linearly between the trajectory and a
-Gaussian noise sample at a random noise level $i \sim \mathcal{U}[0,1]$:
-
-\begin{equation}
-    \tilde{\tau}^{(i)}_t = (1 - i)\,\tau_t + i\,\varepsilon,
-    \quad \varepsilon \sim \mathcal{N}(0, I)
-    \label{eq:flow_interpolation}
-\end{equation}
-
-The Action Expert is trained to predict the conditional vector field that
-transports the noisy sample back toward the clean trajectory:
-
-\begin{equation}
-    \mathcal{L}_{\text{FM}} =
-    \mathbb{E}_{\tau_t,\,\varepsilon,\,i}\!\left[
-        \left\| v_\theta\!\left(\tilde{\tau}^{(i)}_t,\, i
-        \;\Big|\; \mathbf{H}_t,\, \mathbf{F}^{\text{ef}}_t\right)
-        - (\tau_t - \varepsilon) \right\|^2
-    \right]
-    \label{eq:flow_loss}
-\end{equation}
-
-An additional Masked Autoencoding (MAE) loss is applied to the FAST+ discrete
-action token sequence, wherein a random subset $\mathcal{M}$ of action tokens is
-masked and the Action Expert must reconstruct the masked tokens from the remaining
-context and the conditioning signals:
-
-\begin{equation}
-    \mathcal{L}_{\text{MAE}} =
-    -\sum_{k \in \mathcal{M}}
-    \log p_\theta\!\left(a_k \;\big|\;
-    \mathbf{a}_{\setminus\mathcal{M}},\,
-    \mathbf{H}_t,\,
-    \mathbf{F}^{\text{ef}}_t\right)
-    \label{eq:mae_loss}
-\end{equation}
-
-The MAE objective encourages the Action Expert to develop a richer internal
-representation of action sequence structure, improving robustness to partial
-or noisy action token conditioning at inference time.
-
-The total training objective is the weighted sum of the three losses:
-
-\begin{equation}
-    \mathcal{L}_{\text{total}} =
-    \mathcal{L}_{\text{NTP}}
-    + \lambda_{\text{FM}}\,\mathcal{L}_{\text{FM}}
-    + \lambda_{\text{MAE}}\,\mathcal{L}_{\text{MAE}}
-    \label{eq:total_loss}
-\end{equation}
-
-where $\lambda_{\text{FM}}$ and $\lambda_{\text{MAE}}$ are scalar weighting
-hyperparameters determined by grid search on the validation split.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{DATASET COLLECTION PIPELINE}
-\label{sec:dataset}
-%─────────────────────────────────────────────────────────────────────────────
-
-The training dataset used in this thesis is collected entirely in-house using a
-purpose-built data collection toolchain developed for the Dobot robotic
-arm~\cite{falightsk2025dobot}. This toolchain eliminates the dependency on
-third-party demonstration datasets and ensures that the collected data precisely
-matches the dual-camera input format and the 7-dimensional action space of the
-proposed architecture. The pipeline consists of four sequential stages:
-trajectory recording, trajectory post-processing, multimodal dataset creation,
-and data formatting.
-
-\subsection{Hardware Setup}
-
-The physical data collection platform comprises the following components:
+Each generated record is stored as a JSONL entry with the following fields:
 
 \begin{itemize}
-    \item \textbf{Dobot robot arm} with a 6-DOF joint configuration and a
-    tool digital output (DO) channel for gripper control, connected to the host
-    workstation via TCP over a local Ethernet network. The dashboard command
-    interface is accessed on port~29999; real-time joint state feedback is
-    received on port~30004 at the native feedback rate.
-
-    \item \textbf{Overview camera}: a USB RGB camera (OpenCV index~1) mounted
-    above and behind the workspace to provide a global, scene-level view of
-    the tabletop environment and the task objects.
-
-    \item \textbf{End-effector camera}: an IP camera accessed via an HTTP
-    MJPEG stream (\texttt{http://192.168.137.21:81/stream}), mounted at the
-    wrist of the robot arm to provide close-range, proximity-level visual context
-    of the gripper and the immediate manipulation target.
+    \item \texttt{image\_path}: path to the source scene image.
+    \item \texttt{task\_summary}: a one-sentence description of the task.
+    \item \texttt{is\_multi\_turn}: boolean flag.
+    \item \texttt{conversation}: a list of \texttt{\{role, content\}} message objects,
+    where \texttt{role} is either \texttt{"user"} or \texttt{"assistant"} and
+    \texttt{content} contains the message text, including any
+    \texttt{call\_robot()} tool-call strings in the assistant turns.
 \end{itemize}
 
-This dual-camera configuration corresponds directly to the two visual input
-streams consumed by the proposed VLA architecture: the overview image
-$I^{\text{ov}}_t$ and the end-effector image $I^{\text{ef}}_t$, as defined in
-Section~\ref{sec:vlm}.
-
-\subsection{Stage 1: Trajectory Recording}
-
-Human demonstrations are recorded using the \texttt{record\_trajectory()} method
-of the \texttt{DobotController} class. At the onset of recording, the robot is
-placed in drag (gravity-compensation) mode via the \texttt{StartDrag()} command,
-allowing the operator to guide the robot arm by hand through the desired
-manipulation motion. Joint states are sampled from the real-time feedback thread
-at a configurable rate (default: 50~Hz) for a configurable duration (default:
-10~seconds), yielding a raw trajectory array of shape $(T, 7)$ where $T$ is the
-total number of recorded frames.
-
-Each row of the trajectory array encodes:
-
-\begin{equation}
-    \mathbf{r}_t =
-    \bigl[\,\Delta q_1,\; \Delta q_2,\; \Delta q_3,\; \Delta q_4,\;
-            \Delta q_5,\; \Delta q_6,\; d_t\,\bigr]
-    \label{eq:raw_traj}
-\end{equation}
-
-where $\Delta q_j \in \mathbb{R}$ denotes the relative joint delta (in degrees)
-of the $j$-th joint with respect to the previous timestep, and $d_t \in \{0, 1\}$
-is the binary state of the tool digital output channel, representing the
-open/closed state of the gripper. A deadband filter with threshold
-$\delta = 0.01$\,degrees is applied during recording: if the maximum absolute
-delta across all joints falls below $\delta$, the delta is set to zero, preventing
-sensor noise from being recorded as spurious motion.
-
-\subsection{Stage 2: Trajectory Post-Processing}
-
-The raw recorded trajectory is post-processed by the
-\texttt{post\_process\_trajectory()} method to remove redundant frames that would
-otherwise artificially inflate the dataset size and degrade training efficiency.
-Three criteria are jointly evaluated for each frame:
-
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Duplicate detection}: a frame is flagged as a duplicate if
-    its maximum absolute difference from the preceding frame across all seven
-    channels falls below $10^{-6}$.
-
-    \item \textbf{Static movement detection}: a frame is flagged as static if
-    the maximum absolute joint delta across the first six channels falls below
-    $10^{-6}$, indicating that no joint motion occurred.
-
-    \item \textbf{IO stability}: a frame is flagged as IO-stable if the tool
-    digital output value is unchanged from the preceding frame.
-\end{enumerate}
-
-A frame is removed if and only if all three conditions are simultaneously
-satisfied---a design choice that ensures frames in which the gripper state changes
-are always retained, even during otherwise static pauses in the demonstration.
-Additionally, all frames following the last retained movement frame are
-unconditionally preserved to maintain the natural termination behaviour of each
-demonstration. The post-processed trajectory is saved as a \texttt{.npy} file.
-
-\subsection{Stage 3: Multimodal Dataset Creation}
-
-The post-processed trajectory is replayed on the physical robot by the
-\texttt{dataset\_creation.py} script to generate the multimodal dataset. The
-replay-and-capture procedure iterates through the trajectory in non-overlapping
-segments of fixed length $N_\text{seg} = 40$ timesteps. Before executing each
-segment, the following data are captured and saved:
-
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Robot state} $\mathbf{s}_t \in \mathbb{R}^7$: the current
-    absolute joint angles $[q_1, \ldots, q_6]$ concatenated with the current
-    digital output state, read directly from the feedback thread. Saved as a
-    \texttt{.npy} file at \texttt{dataset/state/<task>/<index>.npy}.
-
-    \item \textbf{Overview image}: a single RGB frame captured from the overhead
-    USB camera. Saved as a PNG file at
-    \texttt{dataset/image/<task>/<index>.png}.
-
-    \item \textbf{End-effector image}: a single RGB frame captured from the
-    wrist IP camera. The camera buffer is flushed by reading three consecutive
-    frames before saving to avoid stale frames from internal buffering. Saved as
-    a PNG file at \texttt{dataset/image/<task>/<index>\_end.png}.
-\end{enumerate}
-
-After saving the three data modalities, the corresponding trajectory segment---
-augmented with a look-ahead buffer of $N_\text{buf} = N_\text{seg}/2 = 20$
-additional timesteps---is saved as a \texttt{.npy} file at
-\texttt{dataset/trajectory/<task>/<index>.npy}. The robot then executes the
-segment (without the buffer) using the \texttt{move\_trajectory\_smooth()} method
-at a control frequency of 80~Hz and a speed scale of 0.5, before advancing to the
-next segment.
-
-\subsection{Stage 4: Smooth Trajectory Execution}
-
-The \texttt{move\_trajectory\_smooth()} method implements a virtual governor
-controller for precise, low-latency trajectory replay. Rather than commanding the
-robot directly to each waypoint in the recorded trajectory, the method maintains a
-\emph{virtual joint state} $\tilde{q}_t$ that moves from the robot's current
-position toward each successive waypoint at a controlled velocity, updated at the
-specified control frequency. The velocity profile follows a trapezoidal scheme:
-
-\begin{equation}
-    v_{t+1} = \text{clip}\!\left(v_t \pm \alpha,\; v_{\min},\; V_{\max}\right)
-    \label{eq:vel_profile}
-\end{equation}
-
-where $\alpha = 0.05$\,deg/step is the acceleration increment, $V_{\max} = 1.0
-\times \eta$\,deg/step is the speed-scaled maximum velocity (with $\eta \in [0,1]$
-the speed scale factor), and $v_{\min} = 0.05$\,deg/step is a minimum creep
-velocity enforced at the final waypoint to ensure arrival. The robot is commanded
-to the virtual joint state at each control step via \texttt{ServoJ()}, which
-bypasses trajectory planning and applies the command directly to the joint
-servos, enabling smooth motion at 80~Hz without introducing planning latency.
-For the final waypoint only, a braking profile is applied:
-
-\begin{equation}
-    v_{\text{brake}} = \sqrt{2\,\alpha\,\|\tilde{q}_t - q_{\text{final}}\|_\infty}
-    \label{eq:brake}
-\end{equation}
-
-ensuring that the robot decelerates smoothly to rest at the terminal position
-rather than abruptly stopping. A post-execution settling loop holds the final
-commanded position for up to 0.5~seconds until the physical joint error falls
-below a configurable threshold $\varepsilon = 0.5$\,degrees.
-
-The method additionally supports preemptive interruption via a \texttt{Queue}
-object: if a new trajectory signal arrives in the queue during execution, the
-current trajectory is immediately interrupted and the starting index of the
-interrupted segment is returned, enabling trajectory blending in the
-\texttt{inference()} method for real-time VLA deployment.
-
-\subsection{Dataset Summary and Formatting}
-
-The resulting dataset for each task episode consists of temporally aligned
-triplets of (overview image, end-effector image, robot state) paired with a
-corresponding trajectory fragment. Table~\ref{tab:dataset_format} summarises the
-data format for a single recorded episode.
+The final dataset contains 10{,}000 records, of which approximately 30\% are
+multi-turn conversations and 70\% are single-turn command-response pairs.
+Table~\ref{tab:dataset_stats} summarises the dataset statistics.
 
 \begin{table}[ht]
 \centering
-\caption{Data format of a single episode in the collected dataset.
-         $N_\text{seg}$ = 40, $N_\text{buf}$ = 20.}
-\label{tab:dataset_format}
-\begin{tabular}{llll}
+\caption{Summary statistics of the generated robot conversation dataset.}
+\label{tab:dataset_stats}
+\begin{tabular}{lc}
 \hline
-\textbf{Modality}        & \textbf{Format}   & \textbf{Shape / Size}  & \textbf{Description} \\
+\textbf{Property}                 & \textbf{Value}       \\
 \hline
-Overview image           & PNG               & $H \times W \times 3$  & Workspace scene view \\
-End-effector image       & PNG               & $H' \times W' \times 3$ & Wrist-camera view \\
-Robot state              & \texttt{.npy}     & $(7,)$                 & Joint angles + DO \\
-Trajectory fragment      & \texttt{.npy}     & $(N_\text{seg} + N_\text{buf},\; 7)$ & Relative deltas + DO \\
+Total records                     & 10{,}000             \\
+Single-turn records               & 7{,}000 (70\%)       \\
+Multi-turn records                & 3{,}000 (30\%)       \\
+Average turns per multi-turn record & 3.0               \\
+Unique action types               & 18                   \\
+Storage format                    & JSONL                \\
+Total dataset size                & $\approx$4.2~GB      \\
 \hline
 \end{tabular}
 \end{table}
 
-The trajectory fragments are stored in relative delta format as per
-equation~(\ref{eq:raw_traj}). Before being passed to the FAST+ tokeniser and
-the training pipeline, they are converted to absolute joint coordinates by
-cumulatively summing the deltas from the initial robot state, yielding absolute
-trajectory arrays of shape $(N_\text{seg} + N_\text{buf},\; 7)$ that are
-subsequently chunked into overlapping windows of length $N = 16$ timesteps
-with stride 8 for training.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{VLM FINE-TUNING}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Fine-Tuning Strategy}
+
+The Qwen3-VL-2B-Thinking model is fine-tuned using Low-Rank Adaptation
+(LoRA)~\cite{hu2022lora} applied to the query and value projection matrices of each
+self-attention layer. LoRA decomposes the weight update $\Delta W$ as a product of
+two low-rank matrices:
+
+\begin{equation}
+    \Delta W = B\,A,
+    \quad B \in \mathbb{R}^{d \times r},\; A \in \mathbb{R}^{r \times d}
+    \label{eq:lora}
+\end{equation}
+
+with rank $r = 16$ and scaling factor $\alpha_{\text{LoRA}} = 32$. This limits the
+number of trainable parameters to approximately 4.7 million, a small fraction of the
+2~billion backbone parameters, which reduces GPU memory requirements and mitigates
+catastrophic forgetting of the model's pre-trained general representations.
+
+\subsection{Training Configuration}
+
+Fine-tuning is conducted on the 10{,}000-record dataset for 3 epochs with a batch
+size of 4 and a learning rate of $2 \times 10^{-4}$ under a cosine annealing
+schedule. The AdamW optimiser~\cite{loshchilov2019adamw} is used with weight decay
+$10^{-2}$ and gradient clipping at norm 1.0. The backbone is loaded in bfloat16
+precision with gradient checkpointing enabled. The training loss is the standard
+next-token prediction cross-entropy computed only over the assistant turn tokens,
+masking the user turn and system prompt tokens from the gradient computation.
+
+\subsection{Output Format Enforcement}
+
+To ensure that the fine-tuned model consistently produces parsable
+\texttt{call\_robot()} outputs, the system prompt includes three few-shot examples
+and an explicit grammar specification for the output format. During evaluation, a
+constrained decoding scheme based on prefix matching against the action vocabulary
+is applied to enforce syntactic validity of the tool-call string, preventing
+hallucinated or malformed action names.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{ACTIVATION HARVESTING AND SAE TRAINING}
+%─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Activation Harvesting}
+
+Hidden-state activations for SAE training are collected by running the fine-tuned
+Qwen3-VL-2B model over 100{,}000 robot-task samples drawn from the generated dataset
+and from additional unlabelled scene images. At each forward pass, the
+\texttt{register\_forward\_hook} on layer~20 captures the hidden state matrix
+$\mathbf{H}_{20} \in \mathbb{R}^{L \times 2048}$. The per-token activations are
+extracted and saved as float16 \texttt{.npy} shards of 1{,}000 tokens each,
+yielding a total activation corpus of approximately 85~GB.
+
+\subsection{SAE Architecture}
+
+Two SAE variants are trained:
+
+\begin{itemize}
+    \item \textbf{sae\_task\_model}: trained on activations from single-turn
+    command-response samples, specialised for extracting features relevant to
+    individual action primitives.
+    \item \textbf{sae\_agentic\_model}: trained on activations from multi-turn
+    task-planning samples, specialised for extracting features relevant to sequential
+    task planning and goal tracking.
+\end{itemize}
+
+Both models share the architecture described in Equation~(\ref{eq:sae_main}):
+TopK with $k = 32$, expansion factor $16\times$, $d_{\text{sae}} = 32{,}768$.
+
+\subsection{Training Procedure}
+
+Each SAE is trained for 30 epochs with a batch size of 4{,}096 activation vectors,
+a learning rate of $5 \times 10^{-4}$ under a cosine annealing schedule, and
+bfloat16 precision with \texttt{torch.compile} enabled for throughput. The training
+objective is mean squared reconstruction error:
+
+\begin{equation}
+    \mathcal{L}_{\text{SAE}}
+    = \frac{1}{|\mathcal{B}|}\sum_{\mathbf{h} \in \mathcal{B}}
+      \|\mathbf{h} - W_{\text{dec}}\,\text{TopK}(W_{\text{enc}}\,\mathbf{h}
+      + \mathbf{b}_{\text{enc}}) - \mathbf{b}_{\text{dec}}\|_2^2
+    \label{eq:sae_loss}
+\end{equation}
+
+Decoder columns are L2-normalised after each gradient update to prevent feature
+collapse and to ensure that the decoder columns are valid unit-norm steering
+directions. The trained checkpoints are saved as
+\texttt{sae\_task\_model.pt},
+\texttt{sae\_agentic\_model.pt}, and a production-ready
+\texttt{sae\_topk\_production.pt} combining the features of both models.
+
+\subsection{Feature Identification}
+
+After training, individual SAE features are characterised by their maximum-activating
+examples from the activation corpus. For each feature $i$, the 20 samples that
+produce the highest activation $f_i$ are retrieved and inspected qualitatively to
+determine what input pattern the feature responds to. Feature~\#5086 in the
+sae\_agentic\_model is identified as the primary task-planning neuron: its
+maximum-activating examples are uniformly characterised by multi-step robotic action
+sequences involving coordinate targets, and steering this feature consistently
+elicits structured coordinate-sequence outputs.
+
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{GRADIO INTERFACE}
+%─────────────────────────────────────────────────────────────────────────────
+
+The operator-facing interface is implemented as a Gradio web application. It provides:
+
+\begin{itemize}
+    \item An \textbf{image upload widget} for providing the current scene image.
+    \item A \textbf{text input} for the natural-language user request.
+    \item A \textbf{steering-strength slider} ($\alpha \in [0, 80]$, step~1) for
+    real-time adjustment of the active feature's steering intensity.
+    \item A \textbf{feature index selector} for choosing which SAE feature to steer.
+    \item A \textbf{live output panel} displaying the generated
+    \texttt{call\_robot()} string and the natural-language confirmation reply.
+\end{itemize}
+
+The interface is designed to require no programming knowledge. An operator can upload
+a photo of the robot's current environment, type an instruction in plain English, and
+observe the robot's planned action in real time. If the planned action is undesirable,
+the operator can adjust the steering strength to amplify a safety-relevant feature
+before confirming execution.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{IMPLEMENTATION DETAILS}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Hardware and Software}
+\subsection{Hardware and Software Stack}
 
-All training experiments are conducted on NVIDIA A100 80~GB GPUs. The VLM backbone
-is loaded in \texttt{bfloat16} precision with gradient checkpointing enabled to
-reduce memory overhead. The Vision Expert and Action Expert are trained in
-\texttt{float32} precision. The codebase is implemented in Python using the
-PyTorch~\cite{paszke2019pytorch} deep learning framework, with the Hugging Face
-Transformers library~\cite{wolf2020transformers} used for backbone weight management.
-
-\subsection{Optimiser and Learning Rate Schedule}
-
-Trainable parameters are optimised using AdamW~\cite{loshchilov2019adamw} with a
-peak learning rate of $3 \times 10^{-4}$, weight decay of $10^{-2}$, and gradient
-clipping at norm 1.0. A cosine annealing schedule with a linear warmup over the
-first 2\% of training steps is applied. The optional LoRA adapter uses a separate
-learning rate of $10^{-4}$ and rank $r = 16$.
+All training experiments are conducted on NVIDIA A100 80~GB GPUs. On-robot inference
+uses the embedded 24~GB GPU module in bfloat16 precision. The codebase is implemented
+in Python~3.11 using PyTorch~\cite{paszke2019pytorch} and the Hugging Face
+Transformers library~\cite{wolf2020transformers}. The SAE implementation follows the
+open-source EleutherAI SAE framework conventions~\cite{gao2024scaling}.
 
 \subsection{Hyperparameter Summary}
 
-The key hyperparameters of the proposed system are summarised in
-Table~\ref{tab:hyperparams}.
+Table~\ref{tab:hyperparams} summarises the key hyperparameters of the complete system.
 
 \begin{table}[ht]
 \centering
-\caption{Key hyperparameters of the proposed VLA architecture.}
+\caption{Key hyperparameters of the proposed embodied AI system.}
 \label{tab:hyperparams}
 \begin{tabular}{lc}
 \hline
-\textbf{Hyperparameter}                       & \textbf{Value}                        \\
+\textbf{Hyperparameter}                    & \textbf{Value}                      \\
 \hline
-VLM backbone                                  & Qwen3 + SigLIP ($\approx$2B params)   \\
-Vision Expert                                 & DINOv3 ($\approx$86M params)          \\
-Action Expert                                 & DiT ($\approx$300M params)            \\
-Trajectory chunk length $N$                   & 16 timesteps                          \\
-Action space dimension $A$                    & 7 (6-DOF + gripper)                   \\
-FAST+ vocabulary size $|\mathcal{V}|$         & 1{,}024                               \\
-DCT frequency truncation $K'$                 & 10 per action dimension               \\
-Flow matching steps (inference)               & 10                                    \\
-MAE masking ratio                             & 0.4                                   \\
-Loss weight $\lambda_{\text{FM}}$             & 1.0                                   \\
-Loss weight $\lambda_{\text{MAE}}$            & 0.1                                   \\
-Batch size                                    & 256                                   \\
-Training steps                                & 200{,}000                             \\
-Peak learning rate                            & $3 \times 10^{-4}$                    \\
-LoRA rank $r$ (optional)                      & 16                                    \\
+VLM backbone                               & Qwen3-VL-2B-Thinking                \\
+VLM hidden dimension $d_{\text{model}}$    & 2{,}048                             \\
+Steering layer                             & Layer 20 of 28                      \\
+SAE expansion factor                       & 16$\times$                          \\
+SAE dictionary size $d_{\text{sae}}$       & 32{,}768                            \\
+TopK sparsity $k$                          & 32                                  \\
+SAE training epochs                        & 30                                  \\
+SAE batch size                             & 4{,}096                             \\
+SAE learning rate                          & $5 \times 10^{-4}$                  \\
+Fine-tuning LoRA rank $r$                  & 16                                  \\
+Fine-tuning learning rate                  & $2 \times 10^{-4}$                  \\
+Fine-tuning epochs                         & 3                                   \\
+Fine-tuning batch size                     & 4                                   \\
+Dataset size                               & 10{,}000 records                    \\
+Activation corpus size                     & 100{,}000 samples                   \\
+Repetition penalty                         & 1.1                                 \\
+Steering strength range ($\alpha$)         & 0 -- 80                             \\
 \hline
 \end{tabular}
 \end{table}
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{INFERENCE PROCEDURE}
-%─────────────────────────────────────────────────────────────────────────────
-
-At inference time, the system operates in a receding-horizon fashion. At each
-control timestep $t$, the VLM backbone performs a single autoregressive forward
-pass over the input context~(\ref{eq:vlm_input}), producing hidden states
-$\mathbf{H}_t$ and the discrete action token sequence $\hat{\mathbf{a}}_t$.
-Simultaneously, the Vision Expert processes the current end-effector image to
-produce $\mathbf{F}^{\text{ef}}_t$. The Action Expert then denoises a Gaussian
-noise sample $\varepsilon \sim \mathcal{N}(0, I^{N \times A})$ conditioned on
-$\mathbf{H}_t$ and $\mathbf{F}^{\text{ef}}_t$ over 10 ODE integration steps,
-yielding the predicted trajectory chunk $\hat{\tau}_t$. The first $N/2$ steps
-of $\hat{\tau}_t$ are executed on the robot; the remaining steps are discarded,
-and the process repeats at the next timestep with updated observations. This
-receding-horizon execution strategy balances trajectory smoothness with
-reactivity to environmental changes.

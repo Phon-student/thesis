@@ -1,109 +1,112 @@
 \vspace {-.5\baselineskip }\noindent \makebox [\textwidth ][r]{\bfseries Page}\par \vspace {.5\baselineskip }
 \contentsline {chapter}{Abstract}{ii}{Doc-Start}%
 \contentsline {chapter}{ACKNOWLEDGEMENT}{iii}{chapter*.1}%
-\contentsline {chapter}{TABLE OF CONTENTS}{vii}{chapter*.1}%
-\contentsline {chapter}{LIST OF TABLES}{viii}{chapter*.2}%
-\contentsline {chapter}{LIST OF FIGURES}{ix}{chapter*.3}%
-\contentsline {chapter}{LIST OF ABBREVIATIONS AND SYMBOLS}{x}{chapter*.4}%
+\contentsline {chapter}{TABLE OF CONTENTS}{vi}{chapter*.1}%
+\contentsline {chapter}{LIST OF TABLES}{vii}{chapter*.2}%
+\contentsline {chapter}{LIST OF FIGURES}{viii}{chapter*.3}%
+\contentsline {chapter}{LIST OF ABBREVIATIONS AND SYMBOLS}{ix}{chapter*.4}%
 \contentsline {chapter}{\numberline {1}INTRODUCTION}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Background and Motivation}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Problem Identification}{2}{section.1.2}%
-\contentsline {paragraph}{Gap 1: Suboptimal Action Representation in Hybrid Architectures.}{2}{paragraph*.5}%
-\contentsline {paragraph}{Gap 2: Inadequate Exploitation of End-Effector Visual Context.}{2}{paragraph*.6}%
-\contentsline {paragraph}{Gap 3: Unclear Pre-Training Curriculum for Unified VLA Systems.}{2}{paragraph*.7}%
-\contentsline {section}{\numberline {1.3}Objectives}{3}{section.1.3}%
+\contentsline {paragraph}{Gap 1: Morphological Rigidity in Legged Robots.}{2}{paragraph*.5}%
+\contentsline {paragraph}{Gap 2: Inaccessibility of Natural-Language Robot Control.}{2}{paragraph*.6}%
+\contentsline {paragraph}{Gap 3: Opacity of VLM-Based Robot Controllers.}{2}{paragraph*.7}%
+\contentsline {section}{\numberline {1.3}Objectives}{2}{section.1.3}%
 \contentsline {section}{\numberline {1.4}Scope and Limitations}{3}{section.1.4}%
-\contentsline {section}{\numberline {1.5}Contributions}{4}{section.1.5}%
+\contentsline {section}{\numberline {1.5}Contributions}{3}{section.1.5}%
 \contentsline {section}{\numberline {1.6}Thesis Organisation}{4}{section.1.6}%
 \contentsline {chapter}{\numberline {2}RELATED THEORIES AND LITERATURE REVIEW}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}ROBOTIC MANIPULATION AND LEARNING-BASED CONTROL}{5}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Classical Approaches to Robot Control}{5}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Imitation Learning and Behaviour Cloning}{5}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}End-to-End Visuomotor Policies}{5}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.1}LEGGED ROBOT LOCOMOTION AND HYBRID MORPHOLOGIES}{5}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Bipedal Locomotion}{5}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Quadrupedal Locomotion}{5}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Hybrid and Reconfigurable Morphologies}{5}{subsection.2.1.3}%
 \contentsline {section}{\numberline {2.2}VISION-LANGUAGE MODELS}{6}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Transformer Architecture}{6}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Vision Encoders: SigLIP and DINOv2}{6}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Multimodal Language Models and Instruction Following}{7}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}Object Localisation as Spatial Grounding}{7}{subsection.2.2.4}%
-\contentsline {section}{\numberline {2.3}DIFFUSION MODELS AND FLOW MATCHING}{7}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Denoising Diffusion Probabilistic Models}{7}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Flow Matching}{8}{subsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.3.3}Diffusion Transformer (DiT)}{8}{subsection.2.3.3}%
-\contentsline {section}{\numberline {2.4}ACTION TOKENISATION}{8}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Discrete Action Representations}{8}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}FAST+ Tokeniser}{8}{subsection.2.4.2}%
-\contentsline {subsection}{\numberline {2.4.3}Continuous State Representations}{9}{subsection.2.4.3}%
-\contentsline {section}{\numberline {2.5}RELATED VISION-LANGUAGE-ACTION ARCHITECTURES}{9}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}OpenVLA}{9}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}GR00T N1}{9}{subsection.2.5.2}%
-\contentsline {subsection}{\numberline {2.5.3}Diffusion-VLA}{10}{subsection.2.5.3}%
-\contentsline {subsection}{\numberline {2.5.4}Knowledge Insulating VLA}{10}{subsection.2.5.4}%
-\contentsline {subsection}{\numberline {2.5.5}Summary and Research Gap}{10}{subsection.2.5.5}%
+\contentsline {subsection}{\numberline {2.2.2}Multimodal Extension and Instruction Tuning}{6}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Qwen3-VL-2B-Thinking}{6}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}VLMs for Robot Control}{6}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}MECHANISTIC INTERPRETABILITY AND SPARSE AUTOENCODERS}{7}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}The Superposition Hypothesis}{7}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Sparse Dictionary Learning and Sparse Autoencoders}{7}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Feature Steering}{7}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}Mechanistic Interpretability in Language Models}{8}{subsection.2.3.4}%
+\contentsline {section}{\numberline {2.4}DATASET GENERATION FOR ROBOT LEARNING}{8}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Open Robot Demonstration Datasets}{8}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Synthetic Dataset Generation with Large Language Models}{8}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Instruction Tuning and Tool-Call Fine-Tuning}{8}{subsection.2.4.3}%
+\contentsline {section}{\numberline {2.5}RELATED EMBODIED AI SYSTEMS}{9}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}SayCan}{9}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Code as Policies}{9}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}OpenVLA}{9}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}Summary and Research Gaps}{9}{subsection.2.5.4}%
 \contentsline {chapter}{\numberline {3}RESEARCH METHODOLOGY AND SYSTEM DESIGN}{11}{chapter.3}%
 \contentsline {section}{\numberline {3.1}RESEARCH METHODOLOGY OVERVIEW}{11}{section.3.1}%
-\contentsline {section}{\numberline {3.2}SYSTEM ARCHITECTURE}{11}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Overall Architecture}{11}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}VLM Backbone}{12}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Vision Expert}{13}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Action Expert}{13}{subsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.2.5}State Representation}{13}{subsection.3.2.5}%
-\contentsline {section}{\numberline {3.3}ACTION TOKENISATION}{14}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}FAST+ Discrete Tokenisation}{14}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Special Action Boundary Tokens}{14}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}PRE-TRAINING CURRICULUM}{14}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Foundation Model Track: Next-Token Prediction}{14}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Action Expert Track: Reconstruction and Masked Autoencoding}{15}{subsection.3.4.2}%
-\contentsline {section}{\numberline {3.5}DATASET COLLECTION PIPELINE}{16}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Hardware Setup}{16}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}Stage 1: Trajectory Recording}{16}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}Stage 2: Trajectory Post-Processing}{17}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3.5.4}Stage 3: Multimodal Dataset Creation}{17}{subsection.3.5.4}%
-\contentsline {subsection}{\numberline {3.5.5}Stage 4: Smooth Trajectory Execution}{17}{subsection.3.5.5}%
-\contentsline {subsection}{\numberline {3.5.6}Dataset Summary and Formatting}{18}{subsection.3.5.6}%
-\contentsline {section}{\numberline {3.6}IMPLEMENTATION DETAILS}{18}{section.3.6}%
-\contentsline {subsection}{\numberline {3.6.1}Hardware and Software}{18}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}Optimiser and Learning Rate Schedule}{19}{subsection.3.6.2}%
-\contentsline {subsection}{\numberline {3.6.3}Hyperparameter Summary}{19}{subsection.3.6.3}%
-\contentsline {section}{\numberline {3.7}INFERENCE PROCEDURE}{19}{section.3.7}%
-\contentsline {chapter}{\numberline {4}REFERENCE AND CITATION}{20}{chapter.4}%
-\contentsline {section}{\numberline {4.1}IN-TEXT CITATION IN THE NAME-YEAR SYSTEM}{20}{section.4.1}%
-\contentsline {section}{\numberline {4.2}IN-TEXT CITATION IN THE NUMERICAL SEQUENCE SYSTEM}{21}{section.4.2}%
-\contentsline {chapter}{\numberline {5}BIBLIOGRAPHY AND REFERENCES}{23}{chapter.5}%
-\contentsline {section}{\numberline {5.1}GUIDELINES FOR WRITING BIBLIOGRAPHY}{23}{section.5.1}%
-\contentsline {section}{\numberline {5.2}GUIDELINES FOR WRITING REFERENCES}{23}{section.5.2}%
-\contentsline {section}{\numberline {5.3}METHOD OF LISTING BIBLIOGRAPHY}{23}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Authors}{23}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Article Titles}{24}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Book or Journal Titles}{24}{subsection.5.3.3}%
-\contentsline {subsection}{\numberline {5.3.4}Editions}{24}{subsection.5.3.4}%
-\contentsline {subsection}{\numberline {5.3.5}Place of Publication and Publisher}{24}{subsection.5.3.5}%
-\contentsline {subsection}{\numberline {5.3.6}Year of Publication}{25}{subsection.5.3.6}%
-\contentsline {subsection}{\numberline {5.3.7}Example of Bibliography Format}{25}{subsection.5.3.7}%
-\contentsline {subsubsection}{\numberline {5.3.7.1}Book}{25}{subsubsection.5.3.7.1}%
-\contentsline {subsubsection}{\numberline {5.3.7.2}Translated Books}{26}{subsubsection.5.3.7.2}%
-\contentsline {subsubsection}{\numberline {5.3.7.3}Translated Books with Unspecified Original Author in the Original Language}{26}{subsubsection.5.3.7.3}%
-\contentsline {subsubsection}{\numberline {5.3.7.4}Books Authored by Organizations}{26}{subsubsection.5.3.7.4}%
-\contentsline {subsubsection}{\numberline {5.3.7.5}Editors or Compilers}{26}{subsubsection.5.3.7.5}%
-\contentsline {subsubsection}{\numberline {5.3.7.6}Conference Proceeding or Articles from Books}{27}{subsubsection.5.3.7.6}%
-\contentsline {subsubsection}{\numberline {5.3.7.7}Journal Articles}{27}{subsubsection.5.3.7.7}%
-\contentsline {subsubsection}{\numberline {5.3.7.8}Thesis and Dissertation}{27}{subsubsection.5.3.7.8}%
-\contentsline {subsubsection}{\numberline {5.3.7.9}Reviews}{27}{subsubsection.5.3.7.9}%
-\contentsline {subsubsection}{\numberline {5.3.7.10}Articles in Encyclopedias or Dictionaries}{28}{subsubsection.5.3.7.10}%
-\contentsline {subsubsection}{\numberline {5.3.7.11}Newspaper Articles}{28}{subsubsection.5.3.7.11}%
-\contentsline {subsubsection}{\numberline {5.3.7.12}News Monitoring and Facts Checking in Newspapers Over a Period}{28}{subsubsection.5.3.7.12}%
-\contentsline {subsubsection}{\numberline {5.3.7.13}Newsletters, Photocopies, and Unpublished Documents}{28}{subsubsection.5.3.7.13}%
-\contentsline {subsubsection}{\numberline {5.3.7.14}Government Publications and Other Official Documents}{28}{subsubsection.5.3.7.14}%
-\contentsline {subsubsection}{\numberline {5.3.7.15}Interviews}{29}{subsubsection.5.3.7.15}%
-\contentsline {subsubsection}{\numberline {5.3.7.16}Audiovisual Materials}{29}{subsubsection.5.3.7.16}%
-\contentsline {subsubsection}{\numberline {5.3.7.17}Patents}{29}{subsubsection.5.3.7.17}%
-\contentsline {subsubsection}{\numberline {5.3.7.18}Electronic Media}{29}{subsubsection.5.3.7.18}%
-\contentsline {subsection}{\numberline {5.3.8}Example Formats for References Citation}{30}{subsection.5.3.8}%
-\contentsline {subsubsection}{\numberline {5.3.8.1}Book}{30}{subsubsection.5.3.8.1}%
-\contentsline {subsubsection}{\numberline {5.3.8.2}Articles from Journals, Books, or Conference Proceedings}{30}{subsubsection.5.3.8.2}%
-\contentsline {subsubsection}{\numberline {5.3.8.3}Thesis and Dissertation}{31}{subsubsection.5.3.8.3}%
-\contentsline {subsubsection}{\numberline {5.3.8.4}Patents}{31}{subsubsection.5.3.8.4}%
-\contentsline {subsubsection}{\numberline {5.3.8.5}Visual Materials and Other Media}{31}{subsubsection.5.3.8.5}%
-\contentsline {subsubsection}{\numberline {5.3.8.6}Electronic Media}{31}{subsubsection.5.3.8.6}%
-\contentsline {chapter}{BIBLIOGRAPHY}{32}{subsubsection.5.3.8.6}%
-\contentsline {chapter}{Appendix A Guidelines and Procedures For Thesis Writing}{34}{chapter*.12}%
-\contentsline {chapter}{AUTHOR BIOGRAPHY}{37}{appendix*.13}%
+\contentsline {section}{\numberline {3.2}HARDWARE DESIGN AND FABRICATION}{11}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Mechanical Design}{11}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Actuation and Electronics}{12}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Locomotion Mode Switching}{12}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}SYSTEM ARCHITECTURE}{12}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Overall Information Flow}{12}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}VLM Core: Qwen3-VL-2B-Thinking}{13}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}SAE Module: TopK Sparse Autoencoder}{13}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Steering Hook}{13}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Execution Module}{13}{subsection.3.3.5}%
+\contentsline {section}{\numberline {3.4}DATASET GENERATION PIPELINE}{14}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Overview}{14}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Scene Image Source}{14}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Multi-Threaded Generation}{14}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Output Format}{14}{subsection.3.4.4}%
+\contentsline {section}{\numberline {3.5}VLM FINE-TUNING}{15}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Fine-Tuning Strategy}{15}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Training Configuration}{15}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Output Format Enforcement}{15}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}ACTIVATION HARVESTING AND SAE TRAINING}{16}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Activation Harvesting}{16}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}SAE Architecture}{16}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.3}Training Procedure}{16}{subsection.3.6.3}%
+\contentsline {subsection}{\numberline {3.6.4}Feature Identification}{16}{subsection.3.6.4}%
+\contentsline {section}{\numberline {3.7}GRADIO INTERFACE}{16}{section.3.7}%
+\contentsline {section}{\numberline {3.8}IMPLEMENTATION DETAILS}{17}{section.3.8}%
+\contentsline {subsection}{\numberline {3.8.1}Hardware and Software Stack}{17}{subsection.3.8.1}%
+\contentsline {subsection}{\numberline {3.8.2}Hyperparameter Summary}{17}{subsection.3.8.2}%
+\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{19}{chapter.4}%
+\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{19}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Hardware Environment}{19}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Evaluation Tasks}{19}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}VLM FINE-TUNING RESULTS}{19}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Training Loss}{19}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Tool-Call Output Quality}{20}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}End-to-End Latency}{20}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}SPARSE AUTOENCODER TRAINING AND FEATURE ANALYSIS}{20}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Reconstruction Quality}{20}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Feature Monosemanticity}{21}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Agentic Neuron: Feature \#5086}{21}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}FEATURE STEERING SWEEP}{21}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Methodology}{21}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Results}{21}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Qualitative Examples}{22}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}MULTI-TURN DIALOGUE VALIDATION}{22}{section.4.5}%
+\contentsline {section}{\numberline {4.6}DISCUSSION}{22}{section.4.6}%
+\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{24}{chapter.5}%
+\contentsline {section}{\numberline {5.1}SUMMARY OF FINDINGS}{24}{section.5.1}%
+\contentsline {section}{\numberline {5.2}ANSWERS TO RESEARCH QUESTIONS}{24}{section.5.2}%
+\contentsline {paragraph}{Primary Question.}{24}{paragraph*.15}%
+\contentsline {paragraph}{Secondary Question 1.}{24}{paragraph*.16}%
+\contentsline {paragraph}{Secondary Question 2.}{25}{paragraph*.17}%
+\contentsline {paragraph}{Secondary Question 3.}{25}{paragraph*.18}%
+\contentsline {section}{\numberline {5.3}BROADER IMPACT}{25}{section.5.3}%
+\contentsline {section}{\numberline {5.4}LIMITATIONS}{25}{section.5.4}%
+\contentsline {section}{\numberline {5.5}FUTURE WORK}{26}{section.5.5}%
+\contentsline {paragraph}{Physical Closed-Loop Deployment.}{26}{paragraph*.19}%
+\contentsline {paragraph}{Locomotion Planning with Feature Steering.}{26}{paragraph*.20}%
+\contentsline {paragraph}{Dataset Scale-Up.}{26}{paragraph*.21}%
+\contentsline {paragraph}{Harmful Feature Suppression as an Online Safety Filter.}{26}{paragraph*.22}%
+\contentsline {paragraph}{Multi-Layer SAE Analysis.}{27}{paragraph*.23}%
+\contentsline {chapter}{BIBLIOGRAPHY}{28}{paragraph*.23}%
+\contentsline {chapter}{\numberline {A}Supplementary Materials}{30}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Team Members}{30}{section.A.1}%
+\contentsline {section}{\numberline {A.2}System Configuration Summary}{30}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Additional Experimental Settings}{30}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Extended Results}{31}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Implementation Notes}{31}{section.A.5}%
+\contentsline {section}{\numberline {A.6}Usage Instructions for Reproduction}{31}{section.A.6}%

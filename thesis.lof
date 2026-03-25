@@ -1,6 +1,7 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Overall architecture of the proposed VLA system at a single inference timestep $t$. The frozen VLM backbone (cyan) processes the instruction and overview image; the Vision Expert (blue) processes the end-effector image; the Action Expert (purple) generates the continuous trajectory conditioned on both upstream modules.}}{12}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Overall information flow of the proposed embodied AI system. The VLM core (centre) receives the scene image and user request, produces a \texttt {call\_robot()} tool call and a confirmation reply, and exposes layer-20 hidden states to the SAE module (right). The execution module (left) dispatches servo commands to the robot hardware.}}{12}{figure.caption.9}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

@@ -1,127 +1,117 @@
 \chapter{INTRODUCTION}
+\label{chap:introduction}
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{Background and Motivation}
 %─────────────────────────────────────────────────────────────────────────────
 
-The aspiration to endow robotic systems with the capacity for autonomous, general-purpose
-manipulation has been a defining pursuit of artificial intelligence research for several
-decades. Classical approaches to robot control, grounded in handcrafted heuristics,
-explicit geometric planning, and task-specific programming pipelines, have achieved
-considerable success within narrowly constrained environments. However, these paradigms
-exhibit a fundamental brittleness: they demand exhaustive engineering effort for each new
-task, fail to gracefully accommodate distributional shifts in the visual environment, and
-cannot leverage the rich semantic knowledge embedded in natural language instructions.
-Consequently, deploying robotic agents in unstructured, real-world settings---where objects,
-lighting conditions, and task goals vary continuously---remains an open and formidable
-challenge.
+The aspiration to create robots capable of operating autonomously in unstructured
+human environments has been a defining goal of artificial intelligence and robotics
+research for several decades. Early robotic systems relied on handcrafted control
+programmes, explicit geometric models, and task-specific heuristics that yielded
+reliable performance within narrowly defined operational envelopes. However, these
+classical paradigms share a fundamental weakness: they are brittle in the face of
+change. Introducing a previously unseen object, altering the lighting conditions of a
+workspace, or issuing a novel instruction typically demands substantial re-engineering
+effort~\cite{lavalle2006planning}. This brittleness has motivated the shift towards
+data-driven, learning-based approaches to robot control.
 
-The transformative advances in large-scale deep learning over the past decade have opened
-a compelling alternative trajectory. The emergence of Vision-Language Models
-(VLMs)~\cite{openai2023gpt4v, liu2023llava}, trained on internet-scale multimodal corpora,
-has demonstrated that neural networks can acquire remarkably robust visual understanding,
-spatial reasoning, and natural language grounding without task-specific supervision. These
-models encode not merely perceptual features, but higher-order semantic relationships---an
-ability that maps intuitively onto the requirements of instruction-following robotic
-manipulation, where an agent must interpret a command such as
-\textit{``put the banana in the green box''}, locate the relevant objects in the scene,
-and execute a coordinated sequence of physical motions to accomplish the goal.
+Two parallel trends have recently converged to offer a compelling new direction. On
+one side, the emergence of large-scale Vision-Language Models (VLMs) trained on
+internet-scale multimodal corpora has demonstrated that neural networks can acquire
+remarkably robust visual understanding, spatial reasoning, and natural-language
+grounding without task-specific supervision~\cite{openai2023gpt4v,liu2023llava,bai2025qwen25vl}.
+These models encode not merely perceptual features, but higher-order semantic
+relationships that map intuitively onto the requirements of instruction-following robot
+control. On the other side, advances in legged robotics have produced platforms
+capable of operating across varied terrain, yet each morphology --- bipedal or
+quadrupedal --- carries inherent trade-offs. Bipedal designs handle human-scale
+environments and vertical obstacles naturally, but become dynamically unstable at low
+speeds and during precise manipulation. Quadrupedal platforms provide superior static
+stability and payload capacity, but struggle with steps, ladders, and fine-grained
+manipulation tasks~\cite{kenneally2016design,bledt2018cheetah3}.
 
-This convergence of insights from natural language processing and robotic control has
-catalysed the emergence of Vision-Language-Action (VLA) models---a class of architectures
-that unify visual perception, language comprehension, and continuous motor action
-generation within a single, end-to-end trainable framework. VLA models have shown
-early but encouraging results in generalising manipulation policies to novel objects,
-instructions, and scene configurations, suggesting that scaling the paradigms of
-foundation model research to the action domain may represent a productive path toward
-general-purpose robotic intelligence~\cite{openx2023, oquab2023dinov2}.
+This thesis addresses both of these challenges simultaneously. The first challenge is
+\emph{morphological}: designing a hybrid robot chassis that can switch between
+bi-pedal and quadrupedal locomotion on demand, combining the advantages of both
+configurations within a single affordable hardware platform. The second challenge is
+\emph{interpretability}: despite the impressive capabilities of state-of-the-art VLMs,
+their internal computations remain largely opaque. These models follow commands, yet
+we cannot readily identify which latent features drive which robot actions --- a
+fundamental barrier to trusted, safety-critical deployment~\cite{anthropic2023core,
+bereska2024mechanistic}. An operator who cannot inspect the model's reasoning cannot
+confidently suppress unsafe behaviours before live deployment in hospitals, care homes,
+or disaster zones.
 
-Nevertheless, the design of effective VLA architectures presents a set of non-trivial
-technical challenges that the existing literature has only partially resolved. Three
-interrelated problems are of particular relevance to this thesis. \textit{First}, the
-choice of action representation---specifically, how continuous robot trajectories are
-encoded into a form that a language backbone can process---critically influences both
-the fidelity and the computational tractability of the resulting policy. Discrete
-tokenisation strategies, such as the FAST+ tokeniser~\cite{pertsch2025fast}, have emerged
-as a strong baseline, yet the design space of customised tokenisation remains
-incompletely explored. \textit{Second}, the architectural coupling between the language
-backbone and the action generation module---whether through discrete token prediction,
-hidden state conditioning, or feature modulation mechanisms such as Feature-wise Linear
-Modulation (FiLM)~\cite{perez2018film}---introduces significant tradeoffs between
-interpretability, latency, and generalisation capacity. \textit{Third}, the training
-methodology, including the formulation of pre-training objectives, the choice of
-auxiliary tasks such as object localisation, and the role of masked autoencoding for
-action token reconstruction, remains an active area of investigation with no established
-consensus on best practice.
-
-These challenges motivate the present work. This thesis proposes and evaluates a novel
-VLA architecture designed to address the aforementioned limitations through a principled
-synthesis of current best practices and targeted architectural innovations.
+This project proposes a unified solution: a hybrid bi-pedal/quadrupedal robot paired
+with an interpretable embodied-AI brain that uses Sparse Autoencoders
+(SAEs)~\cite{templeton2024scaling,cunningham2023sparse} to discover and steer the
+latent features governing the model's action selection. The AI brain is implemented
+as a fine-tuned Qwen3-VL-2B-Thinking model~\cite{qwen3vl2025}, chosen for its
+balance between multimodal capability and on-device inference efficiency (fitting
+within a 24~GB VRAM budget). The interpretability layer decomposes the model's
+internal activations into near-monosemantic features that can be audited, suppressed,
+or amplified by operators at inference time without any model retraining.
 
 
 %─────────────────────────────────────────────────────────────────────────────
 \section{Problem Identification}
 %─────────────────────────────────────────────────────────────────────────────
 
-The central problem addressed in this thesis concerns the effective integration of a
-frozen Vision-Language Model backbone with a learned action generation module for
-instruction-following robotic manipulation. More specifically, the following
-research gaps have been identified through a systematic review of the relevant literature.
+Based on a review of the existing literature, the following research gaps are
+identified.
 
-\paragraph{Gap 1: Suboptimal Action Representation in Hybrid Architectures.}
-Existing VLA frameworks predominantly adopt one of two representational strategies:
-purely discrete action tokenisation, wherein trajectory chunks are mapped to a finite
-vocabulary and predicted autoregressively, or purely continuous conditioning, wherein
-the action model is conditioned on dense hidden states extracted from the language
-backbone. Each strategy entails distinct limitations. Discrete tokenisation introduces
-quantisation error and constrains temporal resolution, while continuous conditioning
-requires maintaining full differentiability through the backbone, imposing substantial
-memory overhead and complicating frozen-backbone deployment. A hybrid approach that
-selectively combines discrete token prediction with hidden state conditioning based on
-the action phase has not been rigorously studied.
+\paragraph{Gap 1: Morphological Rigidity in Legged Robots.}
+Most commercially available and research-grade legged robots are committed to a
+single morphology. Bipedal robots such as Boston Dynamics Atlas and Unitree H1 are
+optimised for upright, human-scale locomotion but are energetically costly to stabilise
+at low speeds and are poorly suited for tasks requiring a stable base during
+manipulation~\cite{unitree2023h1,boston_dynamics2022atlas}. Quadrupedal robots such as
+Unitree Go2 offer excellent stability and terrain adaptability but cannot easily
+ascend stairs designed for humans or reach objects at human workspace heights.
+Hybrid morphologies that switch dynamically between gaits are technically feasible
+but have received limited attention in the context of affordable, open-source
+platforms.
 
-\paragraph{Gap 2: Inadequate Exploitation of End-Effector Visual Context.}
-Most existing VLA models process visual context through a single shared encoder that
-receives a global overview image of the workspace. This design conflates information
-at markedly different spatial scales: the coarse, scene-level context necessary for
-goal identification and obstacle avoidance, and the fine-grained, proximity-level context
-necessary for precise grasping and manipulation. The role of a dedicated end-effector
-camera stream, processed through a specialised vision encoder such as
-DINOv3~\cite{oquab2023dinov2}, as a complementary input to the action generation module
-has received insufficient attention in prior architectural studies.
+\paragraph{Gap 2: Inaccessibility of Natural-Language Robot Control.}
+Deploying current robot systems still requires substantial domain expertise. Most
+interfaces demand structured command sets, programmatic APIs, or professionally
+designed user interfaces. Non-technical users --- caregivers, elderly users, field
+workers --- are effectively excluded from operating robotic assistants. While VLMs
+offer a natural-language interface in principle, integrating a VLM with a robot's
+physical actuation layer in a lightweight, real-time manner remains a non-trivial
+engineering challenge with few open-source solutions~\cite{brohan2023rt2,
+driess2023palme}.
 
-\paragraph{Gap 3: Unclear Pre-Training Curriculum for Unified VLA Systems.}
-The pre-training stage of VLA models typically optimises a next-token prediction
-objective over instruction-state-action sequences. However, the optimal composition of
-auxiliary objectives---including object localisation prediction, state description
-generation, and action token reconstruction via masked autoencoding---and the scheduling
-of these objectives across training stages remain poorly understood. In particular, the
-extent to which spatial grounding tasks, such as predicting bounding box coordinates
-for task-relevant objects, improve downstream manipulation performance through improved
-spatial reasoning in the language backbone has not been systematically ablated.
+\paragraph{Gap 3: Opacity of VLM-Based Robot Controllers.}
+VLMs deployed as robot controllers produce actions but do not expose their internal
+reasoning in a form that human operators can inspect or intervene upon. Mechanistic
+interpretability research has begun to address this gap for language-only
+models~\cite{elhage2022superposition,bricken2023monosemanticity}, but applications
+to \emph{embodied} AI systems --- where the model's outputs directly drive physical
+actuators --- remain scarce. The inability to identify and suppress specific
+behavioural features before deployment creates unacceptable risk in safety-critical
+environments.
 
-Building upon these identified gaps, this thesis poses the following primary research
+Building on these identified gaps, this thesis poses the following primary research
 question:
 
 \begin{quote}
-\textit{How can a frozen Vision-Language Model backbone be effectively coupled with
-a diffusion-based action expert and a dedicated visual feature extractor to produce
-a VLA system that is computationally efficient, data-effective, and capable of
-generalising instruction-following manipulation policies to novel objects and
-scene configurations?}
+\textit{How can a compact Vision-Language Model be fine-tuned to control a hybrid
+bi-pedal/quadrupedal robot through natural-language commands, and how can Sparse
+Autoencoders be applied to its internal activations to produce an interpretable,
+operator-auditable embodied AI system?}
 \end{quote}
 
 The following secondary questions are also addressed:
 \begin{enumerate}[label=\arabic*)]
-    \item What is the relative contribution of discrete action token conditioning
-    versus hidden state conditioning on the quality and consistency of generated
-    trajectories?
-    \item Does incorporating end-effector image features through a specialised encoder
-    yield measurable improvements in manipulation precision compared to overview-only
-    visual input?
-    \item To what extent does including object localisation as an auxiliary pre-training
-    task improve the spatial reasoning capacity and downstream task performance of
-    the language backbone?
+    \item What dataset composition and generation strategy is most effective for
+    teaching a compact VLM to produce structured robot tool-call outputs?
+    \item Can a TopK Sparse Autoencoder reliably identify monosemantic features
+    within VLM hidden states that correspond to interpretable robotic behaviours?
+    \item Does feature-level steering via SAE decoder vectors produce consistent,
+    predictable changes in robot action outputs across a range of task types and
+    steering strengths?
 \end{enumerate}
 
 
@@ -129,33 +119,30 @@ The following secondary questions are also addressed:
 \section{Objectives}
 %─────────────────────────────────────────────────────────────────────────────
 
-The overarching objective of this research is to design, implement, and empirically
-evaluate a novel VLA architecture that effectively addresses the research gaps
-identified in the preceding section. To this end, the following specific objectives
-are pursued:
+The overarching objective of this research is to design, implement, and validate an
+end-to-end embodied AI pipeline that addresses the research gaps identified above.
+The specific objectives are as follows:
 
 \begin{enumerate}[label=\arabic*)]
-    \item To propose a dual-encoder VLA architecture comprising a frozen
-    VLM backbone (Qwen3 with SigLIP vision encoder, approximately 2~billion parameters),
-    a dedicated end-effector vision expert (DINOv3, approximately 86~million parameters),
-    and a Diffusion Transformer (DiT) action expert (approximately 300~million parameters),
-    conditioned jointly on hidden states from the VLM and visual features from the
-    vision expert.
+    \item To design and fabricate a hybrid bi-pedal/quadrupedal robot chassis capable
+    of switching locomotion modes, constructed from off-the-shelf servo motors and an
+    embedded GPU compute module.
 
-    \item To design and implement a two-stage pre-training curriculum in which the
-    foundation model is trained via next-token prediction over a multi-task sequence
-    comprising object localisation coordinates, natural language state descriptions,
-    and FAST+ discrete action tokens, while the action expert is trained via
-    trajectory reconstruction and masked autoencoding loss.
+    \item To build a 10{,}000-record robot conversation dataset via an automated
+    multi-threaded generation pipeline that pairs scene images with structured
+    \texttt{call\_robot()} instructions, including multi-turn dialogue sequences.
 
-    \item To conduct ablation studies systematically evaluating the impact of (a)
-    discrete versus hidden state action conditioning, (b) end-effector visual feature
-    inclusion, and (c) object localisation as an auxiliary pre-training task on
-    downstream manipulation performance.
+    \item To fine-tune Qwen3-VL-2B-Thinking on the generated dataset so that the
+    model reliably maps RGB scene images and free-form natural-language requests to
+    valid \texttt{call\_robot()} tool-call strings.
 
-    \item To benchmark the proposed architecture against established VLA baselines,
-    including OpenVLA~\cite{kim2024openvla} and GR00T N1~\cite{nvidia2024groot}, across
-    a suite of simulated and physical manipulation tasks.
+    \item To train a TopK Sparse Autoencoder on layer-20 hidden-state activations
+    harvested from the fine-tuned VLM, producing 32{,}768 interpretable, near-mono\-semantic
+    feature dimensions.
+
+    \item To demonstrate feature-level steering by injecting SAE decoder column
+    vectors at layer~20 and evaluating the resulting changes in robot behaviour across
+    a systematic strength sweep.
 \end{enumerate}
 
 
@@ -163,19 +150,20 @@ are pursued:
 \section{Scope and Limitations}
 %─────────────────────────────────────────────────────────────────────────────
 
-To maintain clarity of focus, the scope of this research is delimited as follows.
-The proposed architecture targets table-top robotic manipulation tasks involving
-a single robotic arm with a parallel-jaw or compliant gripper. The study does not
-address bi-manual manipulation, mobile locomotion, or multi-agent coordination.
-Visual observations are assumed to be provided by two calibrated RGB cameras: one
-providing an overview of the workspace and one mounted at or near the end-effector.
-Depth sensing and proprioceptive state estimation are considered supplementary inputs
-and are not the primary focus of the architectural investigation. Pre-training data
-are drawn from publicly available robot demonstration datasets; data collection
-procedures and the construction of novel datasets fall outside the scope of this work.
-Furthermore, while inference latency and model compression are acknowledged as
-important practical considerations, they are treated as secondary metrics relative
-to task success rate and generalisation performance in the evaluation framework.
+The scope of this research is delimited as follows. The physical robot targets
+indoor tabletop and ground-level manipulation tasks; it is not designed for
+outdoor terrain navigation or load-bearing applications. Visual observations consist
+of a single RGB camera stream; depth sensing and stereo vision fall outside the scope
+of this work. The VLM backbone is fine-tuned using LoRA adapters rather than full
+parameter updates, which constrains the degree of task-specific adaptation but
+preserves generalisation capacity and reduces compute requirements. The SAE analysis
+is confined to layer~20 of the VLM; a comprehensive multi-layer analysis of the full
+residual stream is left for future work. All experiments are conducted with the
+robot either stationary or executing pre-planned servo trajectories; closed-loop
+visual feedback during trajectory execution is not implemented in the current system.
+Furthermore, the safety properties of the feature-steering mechanism are evaluated
+qualitatively through controlled demonstrations; formal verification of safety
+constraints is beyond the scope of this thesis.
 
 
 %─────────────────────────────────────────────────────────────────────────────
@@ -185,28 +173,34 @@ to task success rate and generalisation performance in the evaluation framework.
 The principal contributions of this thesis are as follows:
 
 \begin{enumerate}[label=\arabic*)]
-    \item \textbf{A novel dual-encoder VLA architecture} that decouples the processing
-    of overview and end-effector visual streams through a frozen VLM backbone and a
-    trainable DINOv3-based vision expert respectively, and conditions a DiT-based
-    action expert jointly on VLM hidden states and vision expert features.
-    This architectural decomposition is demonstrated to improve manipulation precision
-    without incurring proportional increases in computational cost.
+    \item \textbf{A hybrid bi-pedal/quadrupedal robot prototype} constructed from
+    off-the-shelf components and an embedded GPU, capable of switching locomotion
+    mode in response to natural-language commands. The hardware design, bill of
+    materials, and control code are fully open-sourced.
 
-    \item \textbf{A structured two-stage pre-training curriculum} incorporating
-    object localisation, state description generation, and FAST+ action token
-    prediction as complementary next-token prediction tasks for the foundation model,
-    together with a reconstruction and masked autoencoding objective for the action
-    expert. The curriculum is shown empirically to accelerate convergence and improve
-    generalisation relative to single-objective training baselines.
+    \item \textbf{An automated robot conversation dataset} of 10{,}000 JSONL records
+    pairing EO-Data1.5M scene images with structured \texttt{call\_robot()} instructions,
+    generated via a multi-threaded Gemini pipeline. The dataset covers single-turn
+    commands and multi-turn task-planning dialogues, and is released publicly to
+    support further research.
 
-    \item \textbf{A systematic ablation study} characterising the relative
-    contributions of the discrete action token pathway and the hidden state
-    conditioning pathway to trajectory quality, as well as the incremental benefit
-    of end-effector visual features and spatial grounding auxiliary tasks.
+    \item \textbf{A fine-tuned Qwen3-VL-2B-Thinking model} that maps scene images and
+    free-form user requests to structured robot tool-call outputs with end-to-end
+    latency below two seconds per command cycle on a 24~GB VRAM device.
 
-    \item \textbf{Open-source release} of the proposed architecture implementation,
-    pre-training pipeline, and evaluation benchmarks to facilitate reproducibility
-    and further community research.
+    \item \textbf{Trained TopK Sparse Autoencoder checkpoints} (sae\_task\_model.pt,
+    sae\_agentic\_model.pt, sae\_topk\_production.pt) that decompose VLM layer-20
+    activations into 32{,}768 interpretable feature dimensions, with Feature~\#5086
+    identified as the primary task-planning neuron in the agentic model.
+
+    \item \textbf{A feature-steering inference framework} that injects SAE decoder
+    vectors at layer~20 via a \texttt{register\_forward\_hook}, enabling operators
+    to amplify or suppress specific robot behaviours at inference time without
+    retraining the model.
+
+    \item \textbf{A Gradio web application} integrating image upload, natural-language
+    instruction input, and a real-time steering-strength slider, making interpretable
+    robot control accessible to non-technical users.
 \end{enumerate}
 
 
@@ -214,18 +208,18 @@ The principal contributions of this thesis are as follows:
 \section{Thesis Organisation}
 %─────────────────────────────────────────────────────────────────────────────
 
-The remainder of this thesis is structured as follows. Chapter~\ref{chap:litreview}
-provides a comprehensive review of the relevant literature, tracing the development of
-VLA models from their foundational precursors in imitation learning and multimodal
-language modelling, and critically examining the architectural and training choices
-made in seminal works including OpenVLA, GR00T N1, and Diffusion-VLA.
-Chapter~\ref{chap:methodology} presents the proposed architecture in detail, covering
-the design rationale for each component, the mathematical formulation of the training
-objectives, and the implementation specifics of the pre-training and fine-tuning
-pipelines. Chapter~\ref{chap:experiments} describes the experimental setup, datasets,
-evaluation metrics, and baseline comparisons employed in this study, followed by a
-thorough presentation and discussion of the empirical results and ablation findings.
-Chapter~\ref{chap:conclusion} synthesises the conclusions drawn from the experimental
-evidence, revisits the research questions posed in this chapter, acknowledges the
-limitations of the current work, and identifies promising directions for future
-investigation.
+The remainder of this thesis is structured as follows.
+Chapter~\ref{chap:litreview} reviews the theoretical foundations and related work
+across five areas: legged robot morphology, Vision-Language Models, mechanistic
+interpretability and Sparse Autoencoders, large-scale dataset generation, and
+prior embodied AI systems.
+Chapter~\ref{chap:methodology} presents the proposed system in detail, covering
+the hardware design of the hybrid robot, the dataset generation pipeline, the
+fine-tuning procedure, the SAE training curriculum, and the feature-steering
+inference framework.
+Chapter~\ref{chap:experiments} describes the experimental setup and presents
+the results of the fine-tuning evaluation, the SAE feature analysis, and the
+steering sweep experiments, with qualitative and quantitative discussion.
+Chapter~\ref{chap:conclusion} synthesises the conclusions, revisits the research
+questions, acknowledges the limitations of the current work, and identifies
+directions for future research.
