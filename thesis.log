@@ -1,8 +1,7 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 18:26
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 26.2) (format=lualatex 2026.3.12)  25 MAR 2026 21:06
  restricted system commands enabled.
- file:line:error style messages enabled.
-**d:/gitrepo/LaTeX-Thesis-Template/thesis
-(d:/gitrepo/LaTeX-Thesis-Template/thesis.tex
+**thesis.tex
+(./thesis.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
 Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
@@ -1254,29 +1253,18 @@ Chapter 2.
 Chapter 3.
 [8
 
-] [9]
-Overfull \hbox (9.45879pt too wide) in paragraph at lines 137--140
-[]\TU/THSarabun.ttf(0)/m/n/12 The Vi-sion Ex-pert pro-vides task-relevant vi-sua
-l fea-tures (ob-ject cues, tar-get re-la-tions, and workspace
- []
-
-[10] [11] [12]) (./chapters/ch4_results.tex [13]
+] [9] [10] [11] [12]) (./chapters/ch4_results.tex [13]
 Chapter 4.
 [14
 
 ]
-Overfull \hbox (6.24423pt too wide) in paragraph at lines 97--99
-[]\TU/THSarabun.ttf(0)/m/n/12 These re-sults in-di-cate that the VLA pipeline is
- func-tion-ally com-plete and suit-able for manipulation-
- []
-
 <images/episode_0_task_redcubeplaceonpurple.png, id=714, 1806.75pt x 1204.5pt>
 File: images/episode_0_task_redcubeplaceonpurple.png Graphic file (type png)
 <use images/episode_0_task_redcubeplaceonpurple.png>
 Package luatex.def Info: images/episode_0_task_redcubeplaceonpurple.png  used o
 n input line 106.
 (luatex.def)             Requested size: 416.83289pt x 277.87462pt.
-[15]
+ [15]
 <images/DiT_attn_heatmap.png, id=721, 3011.25pt x 1505.625pt>
 File: images/DiT_attn_heatmap.png Graphic file (type png)
 <use images/DiT_attn_heatmap.png>
@@ -1334,23 +1322,17 @@ File: images/per_ep_joint_pos.png Graphic file (type png)
 <use images/per_ep_joint_pos.png>
 Package luatex.def Info: images/per_ep_joint_pos.png  used on input line 349.
 (luatex.def)             Requested size: 395.98996pt x 644.85786pt.
- [23<./images/joit_pos_cor_matrix_not_lerobot.png>] [24<./images/per_ep_joint_po
-s.png>]
+ [23<./images/joit_pos_cor_matrix_not_lerobot.png>]
+[24<./images/per_ep_joint_pos.png>]
 <images/end_eff_space_cover.png, id=785, 2710.125pt x 1806.75pt>
 File: images/end_eff_space_cover.png Graphic file (type png)
 <use images/end_eff_space_cover.png>
 Package luatex.def Info: images/end_eff_space_cover.png  used on input line 361
 .
 (luatex.def)             Requested size: 395.98996pt x 263.97078pt.
- [25<./images/end_eff_space_cover.png>] [26])
-(./chapters/ch5_conclusion.tex
+ [25<./images/end_eff_space_cover.png>]
+[26]) (./chapters/ch5_conclusion.tex
 Chapter 5.
-
-Overfull \hbox (10.25075pt too wide) in paragraph at lines 60--62
-[]\TU/THSarabun.ttf(0)/m/n/12 Ex-pand robot demon-stra-tion data with broader ob
--ject, scene, and in-struc-tion di-ver-sity to strengthen
- []
-
 [27
 
 
@@ -1359,9 +1341,6 @@ Overfull \hbox (10.25075pt too wide) in paragraph at lines 60--62
 
 ]
 Appendix A.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 [30
 
 
@@ -1382,14 +1361,17 @@ Here is how much of LuaTeX's memory you used:
 , 21 attribute_list, 2 write, 7 pdf_action nodes
    avail lists: 2:1243,3:479,4:320,5:263,6:161,7:6772,8:37,9:790,10:15,11:670
  42049 multiletter control sequences out of 65536+600000
- 76 fonts using 30487327 bytes
- 79i,12n,97p,421b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 76 fonts using 30487487 bytes
+ 79i,12n,97p,392b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/users/windows-11/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmo
 no12-regular.otf><C:/WINDOWS/Fonts/cambria.ttc><C:/WINDOWS/Fonts/cambria.ttc><./
 fonts/THSarabunItalic.ttf><./fonts/THSarabun.ttf><./fonts/THSarabunBold.ttf>
-Output written on thesis.pdf (42 pages, 3946092 bytes).
+Output written on thesis.pdf (42 pages, 3946100 bytes).
 
 PDF statistics: 893 PDF objects out of 1000 (max. 8388607)
  217 named destinations out of 1000 (max. 1048576)
+ 609 words of extra memory for PDF output out of 10000 (max. 100000000)
+
+ out of 1000 (max. 1048576)
  609 words of extra memory for PDF output out of 10000 (max. 100000000)
 
