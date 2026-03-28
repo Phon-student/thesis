@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.2.18)  25 MAR 2026 22:59
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.2.18)  29 MAR 2026 00:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1078,92 +1078,107 @@ particularly relevant because it provides a lightweight
 Chapter 3.
 [9
 
-] [10] [11] [12] [13] [14]
-Overfull \hbox (67.0991pt too wide) in paragraph at lines 407--412
-[] []\TU/THSarabun.ttf(0)/b/n/12 Output Format.[] \TU/THSarabun.ttf(0)/m/n/12 T
-he steered model is expected to produce structured tool-call strings of the for
-m \TU/lmtt/m/n/12 call_robot(`action')
+] [10] [11] [12] [13]
+Overfull \hbox (49.42136pt too wide) in paragraph at lines 336--344
+[] []\TU/THSarabun.ttf(0)/b/n/12 VLM Core.[] \TU/THSarabun.ttf(0)/m/n/12 Qwen3-
+VL-2B-Thinking [[]] is used as the backbone in \TU/lmtt/m/n/12 bfloat16 \TU/THS
+arabun.ttf(0)/m/n/12 precision. A \TU/lmtt/m/n/12 register_forward_hook
  []
 
 
-Overfull \hbox (5.02867pt too wide) in paragraph at lines 431--439
-[]\TU/THSarabun.ttf(0)/m/n/12 The resulting dataset contains 10000 JSONL record
-s. Each record has four fields: \TU/lmtt/m/n/12 image_path
+Overfull \hbox (7.88017pt too wide) in paragraph at lines 374--381
+[]\TU/THSarabun.ttf(0)/m/n/12 A multi-threaded pipeline (10 workers, 30 RPM rat
+e cap) submits scene frames from EO-Data1.5M [[]]
  []
 
-
-Overfull \hbox (35.5647pt too wide) in paragraph at lines 431--439
-\TU/THSarabun.ttf(0)/m/n/12 (the scene frame reference), \TU/lmtt/m/n/12 task_s
-ummary \TU/THSarabun.ttf(0)/m/n/12 (a natural-language description of the requi
-red action), \TU/lmtt/m/n/12 is_multi_turn
+[14]
+Overfull \hbox (75.86464pt too wide) in paragraph at lines 385--390
+[]\TU/THSarabun.ttf(0)/m/n/12 Qwen3-VL-2B processes 100000 samples with full in
+put–output pairs (\TU/lmtt/m/n/12 add_generation_prompt=False\TU/THSarabun.ttf(
+0)/m/n/12 ),
  []
 
-[15]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 467.
- [16]) (./chapters/ch4_results.tex [17]
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 397.
+) (./chapters/ch4_results.tex [15]
 Chapter 4.
-[18
+[16
 
 ]
 File: images//episode_0_task_redcubeplaceonpurple.png Graphic file (type bmp)
 <images//episode_0_task_redcubeplaceonpurple.png>
- [19]
+ [17]
 File: images//DiT_attn_heatmap.png Graphic file (type bmp)
 <images//DiT_attn_heatmap.png>
- [20]
+ [18]
 File: images//raw_qwen_img_token.png Graphic file (type bmp)
 <images//raw_qwen_img_token.png>
- [21]
+ [19]
 File: images//Qwen_context_embeding_cluster.png Graphic file (type bmp)
 <images//Qwen_context_embeding_cluster.png>
- [22]
+ [20]
 File: images//auto_reg_chucking_proof.png Graphic file (type bmp)
 <images//auto_reg_chucking_proof.png>
- [23]
+ [21]
 File: images//trajectory_ttrd.png Graphic file (type bmp)
 <images//trajectory_ttrd.png>
 File: images//joint_distributions.png Graphic file (type bmp)
 <images//joint_distributions.png>
- [24] [25]
+ [22] [23]
 File: images//joit_pos_cor_matrix.png Graphic file (type bmp)
 <images//joit_pos_cor_matrix.png>
 File: images//joit_pos_cor_matrix_not_lerobot.png Graphic file (type bmp)
 <images//joit_pos_cor_matrix_not_lerobot.png>
- [26]
+ [24]
 File: images//per_ep_joint_pos.png Graphic file (type bmp)
 <images//per_ep_joint_pos.png>
- [27] [28]
+ [25] [26]
 File: images//end_eff_space_cover.png Graphic file (type bmp)
 <images//end_eff_space_cover.png>
- [29]
-Overfull \hbox (3.48547pt too wide) in paragraph at lines 417--426
-[]\TU/THSarabun.ttf(0)/m/n/12 The automated multi-threaded pipeline completed s
-uccessfully, generating 10000 JSONL records
+ [27]
+Overfull \hbox (19.85588pt too wide) in paragraph at lines 410--417
+\TU/THSarabun.ttf(0)/m/n/12 SAE checkpoints (\TU/lmtt/m/n/12 sae_task_model.pt\
+TU/THSarabun.ttf(0)/m/n/12 , \TU/lmtt/m/n/12 sae_agentic_model.pt\TU/THSarabun.
+ttf(0)/m/n/12 , \TU/lmtt/m/n/12 sae_topk_production.pt\TU/THSarabun.ttf(0)/m/n/
+12 )
  []
 
 
-Overfull \hbox (32.8419pt too wide) in paragraph at lines 449--455
-[]\TU/THSarabun.ttf(0)/m/n/12 The cosine-similarity probe (Section [][]3.6.6[][
-], Phase 4a) was run against the \TU/lmtt/m/n/12 sae_agentic_model.pt
- []
-
-[30]
-Underfull \hbox (badness 10000) in paragraph at lines 496--497
-[]\TU/THSarabun.ttf(0)/m/n/12 Free-form natural language; no
+Overfull \hbox (58.69708pt too wide) in paragraph at lines 420--430
+[]\TU/THSarabun.ttf(0)/m/n/12 Cosine-similarity probing on \TU/lmtt/m/n/12 sae_
+agentic_model.pt \TU/THSarabun.ttf(0)/m/n/12 with the anchor prefix \TU/lmtt/m/
+n/12 call_robot(`pick
  []
 
 
-Underfull \hbox (badness 1577) in paragraph at lines 507--508
-[]\TU/THSarabun.ttf(0)/m/n/12 Fully overridden to robotic format; re-
+Overfull \hbox (2.16159pt too wide) in paragraph at lines 433--436
+[]\TU/THSarabun.ttf(0)/m/n/12 Feature #5086 was swept across $[] [] [][][] [][]
+ [][] [][][] [][][] [][][] [][][]$ using two parallel prompts:
  []
 
-[31] [32] [33]) (./chapters/ch5_conclusion.tex
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--449
+[]\TU/THSarabun.ttf(0)/m/n/12 Occasional \TU/lmtt/m/n/12 call_robot() \TU/THSar
+abun.ttf(0)/m/n/12 frag-
+ []
+
+
+Underfull \hbox (badness 4303) in paragraph at lines 450--451
+[]\TU/THSarabun.ttf(0)/m/n/12 Consistent \TU/lmtt/m/n/12 call_robot() \TU/THSar
+abun.ttf(0)/m/n/12 prefix;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 454--455
+[]\TU/THSarabun.ttf(0)/m/n/12 High-specificity coordinate sequence;
+ []
+
+[28] [29]) (./chapters/ch5_conclusion.tex
 Chapter 5.
-[34
+[30
 
 
-]) [35] (./thesis.bbl
+]) [31] (./thesis.bbl
 Underfull \hbox (badness 1024) in paragraph at lines 44--49
 []\TU/THSarabun.ttf(0)/m/n/12 IPEC-COMMUNITY.  EO-Data1.5M: A large-scale multi
 modal dataset for embodied object understand-
@@ -1175,25 +1190,25 @@ Underfull \hbox (badness 1596) in paragraph at lines 44--49
 $[][][][][] [] [] [] [][][][][][][][][][][] [] [][] [] [][][][][][][][] []
  []
 
-[36
+[32
 
 
-]) (./chapters/appendix.tex [37]
+]) (./chapters/appendix.tex [33]
 Appendix A.
-[38
+[34
 
 
-] [39]) (./thesis.aux)
+] [35]) (./thesis.aux)
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 26AA835490DEB4D780A61EB6655BE48D;18344.
+(rerunfilecheck)             Checksum: 521A8977F5F9124CB2622C93DAD70492;17425.
  ) 
 Here is how much of TeX's memory you used:
  18692 strings out of 478190
  349237 string characters out of 5854827
- 803200 words of memory out of 5000000
+ 802246 words of memory out of 5000000
  39006 multiletter control sequences out of 15000+600000
  473578 words of font info for 75 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  78i,12n,115p,391b,513s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on thesis.pdf (50 pages).
+Output written on thesis.pdf (46 pages).

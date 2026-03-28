@@ -99,106 +99,92 @@
 \citation{qwen3vl2025}
 \citation{cunningham2023sparse}
 \citation{gao2024scaling}
-\citation{gao2024scaling}
+\citation{eodata2024}
 \@writefile{toc}{\contentsline {section}{\numberline {3.6}VLM MECHANISTIC INTERPRETABILITY SUB-PROJECT}{14}{section.3.6}\protected@file@percent }
 \newlabel{sec:vlm_interp}{{3.6}{14}{VLM MECHANISTIC INTERPRETABILITY SUB-PROJECT}{section.3.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}Sub-Project Objectives}{14}{subsection.3.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}Sub-Project System Architecture}{14}{subsection.3.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}System Architecture}{14}{subsection.3.6.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{VLM Core.}{14}{paragraph*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{SAE Module.}{14}{paragraph*.10}\protected@file@percent }
 \newlabel{eq:sae}{{3.1}{14}{SAE Module}{equation.3.6.1}{}}
-\citation{eodata2024}
-\@writefile{toc}{\contentsline {paragraph}{Steering Hook.}{15}{paragraph*.11}\protected@file@percent }
-\newlabel{eq:steering}{{3.2}{15}{Steering Hook}{equation.3.6.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Output Format.}{15}{paragraph*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Operator Interface.}{15}{paragraph*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}Dataset Construction}{15}{subsection.3.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.4}Activation Harvesting}{16}{subsection.3.6.4}\protected@file@percent }
-\newlabel{subsec:harvest}{{3.6.4}{16}{Activation Harvesting}{subsection.3.6.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.5}SAE Training}{16}{subsection.3.6.5}\protected@file@percent }
-\newlabel{subsec:sae_training}{{3.6.5}{16}{SAE Training}{subsection.3.6.5}{}}
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {sae\_task\_model.pt}.}{16}{paragraph*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {sae\_agentic\_model.pt}.}{16}{paragraph*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Production checkpoint (\texttt  {sae\_topk\_production.pt}).}{16}{paragraph*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Steering Hook.}{14}{paragraph*.11}\protected@file@percent }
+\newlabel{eq:steering}{{3.2}{14}{Steering Hook}{equation.3.6.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Operator Interface.}{14}{paragraph*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}Dataset Construction}{14}{subsection.3.6.3}\protected@file@percent }
 \citation{bricken2023monosemanticity}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.6}Feature Identification and Steering Protocol}{17}{subsection.3.6.6}\protected@file@percent }
-\newlabel{subsec:steering_protocol}{{3.6.6}{17}{Feature Identification and Steering Protocol}{subsection.3.6.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Phase 4a -- Candidate Feature Identification via Cosine Similarity.}{17}{paragraph*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Phase 4b -- Max-Activation Interpretability.}{17}{paragraph*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Phase 4c -- Injection Strength Sweep.}{17}{paragraph*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}CHAPTER SUMMARY}{17}{section.3.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{18}{chapter.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.4}Activation Harvesting}{15}{subsection.3.6.4}\protected@file@percent }
+\newlabel{subsec:harvest}{{3.6.4}{15}{Activation Harvesting}{subsection.3.6.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.5}SAE Training}{15}{subsection.3.6.5}\protected@file@percent }
+\newlabel{subsec:sae_training}{{3.6.5}{15}{SAE Training}{subsection.3.6.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.6}Feature Identification Protocol}{15}{subsection.3.6.6}\protected@file@percent }
+\newlabel{subsec:steering_protocol}{{3.6.6}{15}{Feature Identification Protocol}{subsection.3.6.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}CHAPTER SUMMARY}{15}{section.3.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{16}{chapter.4}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:experiments}{{4}{18}{EXPERIMENTAL RESULTS AND DISCUSSION}{chapter.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{18}{section.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{18}{subsection.4.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{18}{subsection.4.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{18}{subsection.4.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.4}Metrics}{18}{subsection.4.1.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{19}{section.4.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.\relax }}{19}{table.caption.20}\protected@file@percent }
+\newlabel{chap:experiments}{{4}{16}{EXPERIMENTAL RESULTS AND DISCUSSION}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{16}{section.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{16}{subsection.4.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{16}{subsection.4.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{16}{subsection.4.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.4}Metrics}{16}{subsection.4.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{17}{section.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.\relax }}{17}{table.caption.13}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{tab:vla_system_quality}{{4.1}{19}{System-level output quality for end-to-end VLA inference.\relax }{table.caption.20}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.\relax }}{20}{figure.caption.21}\protected@file@percent }
-\newlabel{fig:episode_rollout}{{4.1}{20}{Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.\relax }{figure.caption.21}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{20}{section.4.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.\relax }}{20}{table.caption.22}\protected@file@percent }
-\newlabel{tab:integration_ablation}{{4.2}{20}{Ablation results for module integration.\relax }{table.caption.22}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.\relax }}{21}{figure.caption.23}\protected@file@percent }
-\newlabel{fig:dit_attention_heatmap}{{4.2}{21}{Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.\relax }{figure.caption.23}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.\relax }}{21}{figure.caption.24}\protected@file@percent }
-\newlabel{fig:qwen_activation_depth}{{4.3}{21}{Qwen image-token activation maps across transformer depth for task-focused scene understanding.\relax }{figure.caption.24}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{22}{section.4.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.\relax }}{22}{table.caption.25}\protected@file@percent }
-\newlabel{tab:language_following}{{4.3}{22}{Natural-language instruction-following performance.\relax }{table.caption.25}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.\relax }}{22}{figure.caption.26}\protected@file@percent }
-\newlabel{fig:qwen_embedding_clusters}{{4.4}{22}{Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.\relax }{figure.caption.26}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{23}{section.4.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.\relax }}{23}{table.caption.27}\protected@file@percent }
-\newlabel{tab:generalization_results}{{4.4}{23}{Seen vs unseen task performance.\relax }{table.caption.27}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.\relax }}{23}{figure.caption.28}\protected@file@percent }
-\newlabel{fig:autoregressive_chunking}{{4.5}{23}{Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.\relax }{figure.caption.28}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{23}{section.4.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.\relax }}{24}{table.caption.29}\protected@file@percent }
-\newlabel{tab:task_category_results}{{4.5}{24}{Performance by manipulation task category.\relax }{table.caption.29}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.\relax }}{24}{figure.caption.30}\protected@file@percent }
-\newlabel{fig:trajectory_threshold_segments}{{4.6}{24}{Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.\relax }{figure.caption.30}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.\relax }}{25}{figure.caption.31}\protected@file@percent }
-\newlabel{fig:joint_distributions}{{4.7}{25}{Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.\relax }{figure.caption.31}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.8}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.\relax }}{26}{figure.caption.32}\protected@file@percent }
-\newlabel{fig:joint_corr_lerobot}{{4.8}{26}{Joint position correlation matrix computed from the LeRobot dataset split.\relax }{figure.caption.32}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.9}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.\relax }}{27}{figure.caption.33}\protected@file@percent }
-\newlabel{fig:joint_corr_evalset}{{4.9}{27}{Joint position correlation matrix computed from the project evaluation set.\relax }{figure.caption.33}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.10}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.\relax }}{28}{figure.caption.34}\protected@file@percent }
-\newlabel{fig:per_episode_joint_range}{{4.10}{28}{Per-episode joint position range heatmap indicating variability by joint and episode.\relax }{figure.caption.34}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.11}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.\relax }}{29}{figure.caption.35}\protected@file@percent }
-\newlabel{fig:end_effector_workspace}{{4.11}{29}{End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.\relax }{figure.caption.35}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{29}{section.4.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{29}{subsection.4.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.2}Latency}{29}{subsection.4.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{30}{subsection.4.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.8}VLM INTERPRETABILITY SUB-PROJECT RESULTS}{30}{section.4.8}\protected@file@percent }
-\newlabel{sec:vlm_interp_results}{{4.8}{30}{VLM INTERPRETABILITY SUB-PROJECT RESULTS}{section.4.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.1}Dataset Construction Outcome}{30}{subsection.4.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.2}Activation Harvesting and SAE Training}{30}{subsection.4.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.3}Feature Identification: Agentic Neuron Discovery}{30}{subsection.4.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.4}Activation Steering Evaluation}{31}{subsection.4.8.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Two-Prompt Test Design.}{31}{paragraph*.36}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Steering Sweep Results.}{31}{paragraph*.37}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.6}{\ignorespaces Observed output behavior across Feature \#5086 injection strengths. The two-prompt test distinguishes task-conditioned from unconditioned steering effects.\relax }}{31}{table.caption.38}\protected@file@percent }
-\newlabel{tab:steering_sweep}{{4.6}{31}{Observed output behavior across Feature \#5086 injection strengths. The two-prompt test distinguishes task-conditioned from unconditioned steering effects.\relax }{table.caption.38}{}}
-\@writefile{toc}{\contentsline {paragraph}{Multi-Turn Coherence.}{32}{paragraph*.39}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Task-Category Coverage.}{32}{paragraph*.40}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.5}Summary of Evidence and Limitations}{32}{subsection.4.8.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.9}DISCUSSION}{32}{section.4.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{34}{chapter.5}\protected@file@percent }
+\newlabel{tab:vla_system_quality}{{4.1}{17}{System-level output quality for end-to-end VLA inference.\relax }{table.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.\relax }}{18}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:episode_rollout}{{4.1}{18}{Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.\relax }{figure.caption.14}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{18}{section.4.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.\relax }}{18}{table.caption.15}\protected@file@percent }
+\newlabel{tab:integration_ablation}{{4.2}{18}{Ablation results for module integration.\relax }{table.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.\relax }}{19}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:dit_attention_heatmap}{{4.2}{19}{Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.\relax }{figure.caption.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.\relax }}{19}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:qwen_activation_depth}{{4.3}{19}{Qwen image-token activation maps across transformer depth for task-focused scene understanding.\relax }{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{20}{section.4.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.\relax }}{20}{table.caption.18}\protected@file@percent }
+\newlabel{tab:language_following}{{4.3}{20}{Natural-language instruction-following performance.\relax }{table.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.\relax }}{20}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:qwen_embedding_clusters}{{4.4}{20}{Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.\relax }{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{21}{section.4.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.\relax }}{21}{table.caption.20}\protected@file@percent }
+\newlabel{tab:generalization_results}{{4.4}{21}{Seen vs unseen task performance.\relax }{table.caption.20}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.\relax }}{21}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:autoregressive_chunking}{{4.5}{21}{Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.\relax }{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{21}{section.4.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.\relax }}{22}{table.caption.22}\protected@file@percent }
+\newlabel{tab:task_category_results}{{4.5}{22}{Performance by manipulation task category.\relax }{table.caption.22}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.\relax }}{22}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:trajectory_threshold_segments}{{4.6}{22}{Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.\relax }{figure.caption.23}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.\relax }}{23}{figure.caption.24}\protected@file@percent }
+\newlabel{fig:joint_distributions}{{4.7}{23}{Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.\relax }{figure.caption.24}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.8}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.\relax }}{24}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:joint_corr_lerobot}{{4.8}{24}{Joint position correlation matrix computed from the LeRobot dataset split.\relax }{figure.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.9}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.\relax }}{25}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:joint_corr_evalset}{{4.9}{25}{Joint position correlation matrix computed from the project evaluation set.\relax }{figure.caption.26}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.10}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.\relax }}{26}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:per_episode_joint_range}{{4.10}{26}{Per-episode joint position range heatmap indicating variability by joint and episode.\relax }{figure.caption.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.11}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.\relax }}{27}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:end_effector_workspace}{{4.11}{27}{End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.\relax }{figure.caption.28}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{27}{section.4.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{27}{subsection.4.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.2}Latency}{27}{subsection.4.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{28}{subsection.4.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.8}VLM INTERPRETABILITY SUB-PROJECT RESULTS}{28}{section.4.8}\protected@file@percent }
+\newlabel{sec:vlm_interp_results}{{4.8}{28}{VLM INTERPRETABILITY SUB-PROJECT RESULTS}{section.4.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.1}Dataset and Corpus}{28}{subsection.4.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.2}Feature Discovery}{28}{subsection.4.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.8.3}Activation Steering}{28}{subsection.4.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.9}DISCUSSION}{28}{section.4.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.6}{\ignorespaces Output behavior of Feature \#5086 across injection strengths. Both a general-knowledge prompt and a robot-trajectory prompt were tested simultaneously.\relax }}{29}{table.caption.29}\protected@file@percent }
+\newlabel{tab:steering_sweep}{{4.6}{29}{Output behavior of Feature \#5086 across injection strengths. Both a general-knowledge prompt and a robot-trajectory prompt were tested simultaneously.\relax }{table.caption.29}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{30}{chapter.5}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:conclusion}{{5}{34}{CONCLUSION AND FUTURE WORK}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}CONCLUSION}{34}{section.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}LIMITATIONS}{34}{section.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}FUTURE WORK}{35}{section.5.3}\protected@file@percent }
+\newlabel{chap:conclusion}{{5}{30}{CONCLUSION AND FUTURE WORK}{chapter.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}CONCLUSION}{30}{section.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}LIMITATIONS}{30}{section.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}FUTURE WORK}{31}{section.5.3}\protected@file@percent }
 \bibstyle{plain}
 \bibdata{references}
 \bibcite{bricken2023monosemanticity}{1}
@@ -214,17 +200,17 @@
 \bibcite{qwen3vl2025}{11}
 \bibcite{vaswani2017attention}{12}
 \bibcite{zou2023representation}{13}
-\@writefile{toc}{\contentsline {chapter}{BIBLIOGRAPHY}{36}{Item.73}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {A}Supplementary Materials}{38}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{BIBLIOGRAPHY}{32}{Item.73}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Supplementary Materials}{34}{appendix.A}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {A.1}System Configuration Summary}{38}{section.A.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study\relax }}{38}{table.caption.42}\protected@file@percent }
-\newlabel{tab:appendix-system-config}{{A.1}{38}{System configuration used in this study\relax }{table.caption.42}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{38}{section.A.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A.3}Extended Results}{38}{section.A.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results\relax }}{39}{table.caption.43}\protected@file@percent }
-\newlabel{tab:appendix-extended-results}{{A.2}{39}{Extended performance results\relax }{table.caption.43}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {A.4}Implementation Notes}{39}{section.A.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{39}{section.A.5}\protected@file@percent }
-\gdef \@abspage@last{50}
+\@writefile{toc}{\contentsline {section}{\numberline {A.1}System Configuration Summary}{34}{section.A.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study\relax }}{34}{table.caption.31}\protected@file@percent }
+\newlabel{tab:appendix-system-config}{{A.1}{34}{System configuration used in this study\relax }{table.caption.31}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{34}{section.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A.3}Extended Results}{34}{section.A.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results\relax }}{35}{table.caption.32}\protected@file@percent }
+\newlabel{tab:appendix-extended-results}{{A.2}{35}{Extended performance results\relax }{table.caption.32}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {A.4}Implementation Notes}{35}{section.A.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{35}{section.A.5}\protected@file@percent }
+\gdef \@abspage@last{46}

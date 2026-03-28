@@ -2,13 +2,13 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.\relax }}{19}{table.caption.20}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.\relax }}{20}{table.caption.22}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.\relax }}{22}{table.caption.25}%
-\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.\relax }}{23}{table.caption.27}%
-\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.\relax }}{24}{table.caption.29}%
-\contentsline {table}{\numberline {4.6}{\ignorespaces Observed output behavior across Feature \#5086 injection strengths. The two-prompt test distinguishes task-conditioned from unconditioned steering effects.\relax }}{31}{table.caption.38}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.\relax }}{17}{table.caption.13}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.\relax }}{18}{table.caption.15}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.\relax }}{20}{table.caption.18}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.\relax }}{21}{table.caption.20}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.\relax }}{22}{table.caption.22}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Output behavior of Feature \#5086 across injection strengths. Both a general-knowledge prompt and a robot-trajectory prompt were tested simultaneously.\relax }}{29}{table.caption.29}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study\relax }}{38}{table.caption.42}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results\relax }}{39}{table.caption.43}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study\relax }}{34}{table.caption.31}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results\relax }}{35}{table.caption.32}%

@@ -312,219 +312,110 @@ For comparative reporting, unseen-task retention is additionally summarized as:
 \label{sec:vlm_interp}
 %─────────────────────────────────────────────────────────────────────────────
 
-The main VLA pipeline described in prior sections measures robot performance
-behaviorally --- through task success rate and action validity. However, this
-evaluation leaves open the question of \emph{why} the model generates a particular
-action sequence and which internal representations drive that choice. A complementary
-sub-project therefore applies mechanistic interpretability to the VLM core: using
-Sparse Autoencoders (SAEs) to decompose its hidden representations into interpretable
-feature directions and using those directions to steer model behavior at inference
-time without any gradient updates. This approach directly addresses the auditability
-and safety concerns identified in Section~\ref{chap:introduction}.
+This sub-project applies Sparse Autoencoders (SAEs) to the VLM core to discover
+which internal feature directions drive robotic action generation, and to steer
+model behavior by injecting those directions at inference time without retraining.
 
 \subsection{Sub-Project Objectives}
 
-The sub-project pursues four concrete and measurable goals:
 \begin{enumerate}[label=\arabic*)]
-    \item Construct a 10\,000-record robot conversation dataset for single-turn and
-    multi-turn task planning in \texttt{call\_robot()} format.
+    \item Construct a 10\,000-record robot conversation dataset in
+    \texttt{call\_robot()} format for single-turn and multi-turn task planning.
     \item Harvest layer-20 hidden-state activations from 100\,000 multimodal
-    robot-task samples to build the SAE training corpus.
-    \item Train a TopK Sparse Autoencoder on the harvested activations to extract
-    monosemantic, interpretable feature directions from the VLM residual stream.
-    \item Identify the feature directions that govern robotic action generation and
-    demonstrate that injecting those directions at inference time reliably elicits
-    structured \texttt{call\_robot()} outputs across diverse scene images and task
-    descriptions.
+    robot-task samples to form the SAE training corpus.
+    \item Train a TopK SAE on the corpus to extract monosemantic feature directions
+    from the VLM residual stream.
+    \item Identify which feature directions govern robotic action generation and
+    demonstrate that injecting them reliably elicits structured
+    \texttt{call\_robot()} outputs without any model retraining.
 \end{enumerate}
 
-\subsection{Sub-Project System Architecture}
-
-The sub-project pipeline has four stages: dataset construction, activation harvesting,
-SAE training, and feature steering. The components involved are described below.
+\subsection{System Architecture}
 
 \paragraph{VLM Core.}
-The backbone is Qwen3-VL-2B-Thinking~\cite{qwen3vl2025}, a 2-billion-parameter
-multimodal encoder–decoder operating in \texttt{bfloat16} precision to satisfy
-the $\leq$\,24\,GB VRAM hardware constraint. At each forward pass a
-\texttt{register\_forward\_hook} is attached to transformer layer 20, capturing the
-residual-stream hidden state $\mathbf{h}^{(20)}_t \in \mathbb{R}^{2048}$ for
-every token position $t$. Layer 20 is targeted for two reasons. First, prior
-SAE work on large language models consistently finds that mid-to-deep layers
-(${\sim}60$--$80\%$ of total depth) encode the richest mixture of semantic
-and procedural concepts~\cite{cunningham2023sparse, gao2024scaling}. For
-Qwen3-VL-2B, with 28 transformer layers, layer 20 corresponds to the $71\%$
-depth mark, placing it squarely in this range. Second, layers closer to the
-output become increasingly task-specific to next-token prediction, making their
-features less transferable as steering vectors.
+Qwen3-VL-2B-Thinking~\cite{qwen3vl2025} is used as the backbone in
+\texttt{bfloat16} precision. A \texttt{register\_forward\_hook} on transformer
+layer 20 captures the residual-stream hidden state
+$\mathbf{h}^{(20)}_t \in \mathbb{R}^{2048}$ at each forward pass. Layer 20
+(71\% depth in a 28-layer model) is chosen because mid-to-deep layers encode the
+richest mixture of semantic and procedural concepts~\cite{cunningham2023sparse,
+gao2024scaling}, while layers near the output are too task-specific to serve as
+general steering directions.
 
 \paragraph{SAE Module.}
-A TopK Sparse Autoencoder with a 16$\times$ expansion ratio is trained on the
-harvested activations, yielding a dictionary of $d_\text{sae} = 32\,768$ feature
-directions from a $d_\text{model} = 2\,048$ hidden space. The encoder–decoder pair
-implements:
+A TopK Autoencoder with 16$\times$ expansion ($d_\text{sae} = 32\,768$,
+$d_\text{model} = 2\,048$) is trained to reconstruct layer-20 activations:
 \begin{equation}
-\hat{\mathbf{h}} = W_\text{dec}\;\text{TopK}_{k}\!\left(W_\text{enc}\,\mathbf{h}
-+ \mathbf{b}_\text{enc}\right) + \mathbf{b}_\text{dec},
+\hat{\mathbf{h}} = W_\text{dec}\;\text{TopK}_{32}\!\left(
+W_\text{enc}\,\mathbf{h} + \mathbf{b}_\text{enc}\right) + \mathbf{b}_\text{dec}.
 \label{eq:sae}
 \end{equation}
-where $W_\text{enc} \in \mathbb{R}^{d_\text{sae} \times d_\text{model}}$,
-$W_\text{dec} \in \mathbb{R}^{d_\text{model} \times d_\text{sae}}$, and
-$k = 32$ active features per token is enforced by zeroing all but the 32 largest
-post-ReLU pre-activations.
-
-The choice of $k = 32$ balances two competing objectives: low enough to force
-monosemantic features (too many active features per token reintroduces
-polysemanticity), and high enough to achieve accurate reconstruction of the original
-hidden state (too few active features cause information loss). The 16$\times$
-expansion ratio follows the scaling analysis in Gao et al.~\cite{gao2024scaling},
-which shows that dictionaries at least 10$\times$ wider than the model dimension
-are needed to separate superposed concepts reliably. Decoder weights are initialized
-as the transpose of encoder weights to accelerate early convergence, and the MSE
-reconstruction loss is used as the training objective.
-
-Each column $\mathbf{d}_i \in \mathbb{R}^{2048}$ of the learned decoder matrix
-$W_\text{dec}$ defines one interpretable feature direction in the model's hidden
-space, serving as both the feature detector (via the encoder) and the steering vector
-(via direct injection).
+Only the 32 largest pre-activations are kept per token ($k=32$), enforcing sparsity
+without an $L_1$ penalty. Each decoder column $\mathbf{d}_i$ is a learned feature
+direction that doubles as a steering vector.
 
 \paragraph{Steering Hook.}
-At inference time, a target feature vector $\hat{\mathbf{d}}_i$ (L2-normalized to
-unit length to provide consistent scaling across features) is injected into every
-token position at layer 20 before the remaining decoding layers process the signal:
+The L2-normalized decoder column for a chosen feature is added to every token's
+hidden state at layer 20:
 \begin{equation}
-\tilde{\mathbf{h}}_t^{(20)} = \mathbf{h}_t^{(20)} + \alpha\,\hat{\mathbf{d}}_i,
-\qquad \hat{\mathbf{d}}_i = \frac{\mathbf{d}_i}{\|\mathbf{d}_i\|_2}.
+\tilde{\mathbf{h}}_t^{(20)} = \mathbf{h}_t^{(20)}
++ \alpha\,\frac{\mathbf{d}_i}{\|\mathbf{d}_i\|_2},
 \label{eq:steering}
 \end{equation}
-The L2 normalization in Equation~\ref{eq:steering} decouples injection strength
-$\alpha$ from the raw scale of the learned decoder column, making $\alpha$ directly
-comparable across different feature IDs and enabling a principled strength sweep.
-The hook is implemented via \texttt{register\_forward\_hook} and requires no
-modification to model weights or the inference graph.
-
-\paragraph{Output Format.}
-The steered model is expected to produce structured tool-call strings of the form
-\texttt{call\_robot(`action')} followed by a natural-language confirmation reply.
-This output format is interface-compatible with the TCP/IP command adapter used in
-the main VLA pipeline (Section~\ref{chap:methodology}), meaning that a sufficiently
-steered response can be directly consumed by the robot communication layer.
+where $\alpha$ is an operator-controlled injection strength. No weight updates are
+required.
 
 \paragraph{Operator Interface.}
-A Gradio web application exposes an image-upload widget and a real-time
-injection-strength slider (range 0--300, default 150). This allows operators to
-interactively sweep $\alpha$ against live camera frames and observe the resulting
-\texttt{call\_robot()} outputs without modifying any code, directly supporting the
-auditability requirement from the design constraints.
+A Gradio web app provides an image-upload widget and a real-time $\alpha$ slider
+(range 0--300), allowing operators to audit and adjust steering behavior live.
 
 \subsection{Dataset Construction}
 
-Scene-grounded robot conversation data does not exist in standard vision-language
-corpora, so a purpose-built dataset is constructed. A multi-threaded pipeline
-(10 workers, 30 requests-per-minute rate cap for API quota compliance) submits
-image--instruction pairs to Gemini (gemma-3-27b-it) with prompts that constrain
-responses to \texttt{call\_robot()} format. Scene frames are drawn from the
-EO-Data1.5M dataset~\cite{eodata2024}, specifically the \texttt{qa-task\_planning}
-split, which provides diverse outdoor and indoor scenes covering the manipulation
-task types targeted in this thesis.
-
-The resulting dataset contains 10\,000 JSONL records. Each record has four fields:
-\texttt{image\_path} (the scene frame reference), \texttt{task\_summary} (a
-natural-language description of the required action), \texttt{is\_multi\_turn} (a
-boolean flag), and \texttt{conversation} (an array of alternating user and assistant
-turns, where every assistant turn is a \texttt{call\_robot()} tool call). Multi-turn
-records model a three-step grasp sequence---approach, visual verification,
-place---to ensure the SAE activation corpus contains representations of context
-retention across sequential robot actions, not only isolated single-step commands.
+A multi-threaded pipeline (10 workers, 30 RPM rate cap) submits scene frames from
+EO-Data1.5M~\cite{eodata2024} (\texttt{qa-task\_planning} split) to Gemini
+(gemma-3-27b-it), producing 10\,000 JSONL records. Each record contains
+\texttt{image\_path}, \texttt{task\_summary}, \texttt{is\_multi\_turn}, and a
+\texttt{conversation} array where every assistant turn is a \texttt{call\_robot()}
+tool call. Multi-turn records follow a three-step grasp sequence (approach
+$\to$ verify $\to$ place).
 
 \subsection{Activation Harvesting}
 \label{subsec:harvest}
 
-The Qwen3-VL-2B model is run in inference mode (gradients disabled) over 100\,000
-multimodal samples drawn from the EO-Data1.5M \texttt{qa-task\_planning} split.
-For each sample, the full conversation (user image + text, assistant \texttt{call\_robot()}
-reply) is formatted with \texttt{add\_generation\_prompt=False} so the model sees
-the complete input–output pair and its layer-20 activations reflect the full task
-context rather than the prompt prefix alone. This teacher-forcing setup ensures
-that the harvested activations represent the model's internal state when it is
-\emph{producing} a robot action, not merely reading a request.
-
-At each forward pass the hook captures the complete sequence of layer-20 hidden
-states $\mathbf{H}^{(20)} \in \mathbb{R}^{T \times 2048}$, where $T$ is the
-sequence length. To prevent GPU memory overflow for long sequences, a maximum of
-128 token positions are retained per sample, selected uniformly at random from the
-full sequence. Each retained position contributes one $\mathbb{R}^{2048}$ activation
-vector to the training corpus. Across 100\,000 samples this produces up to
-12.8\,million activation vectors, saved in \texttt{float16} format as 100 shards
-of 1\,000 samples each for memory-efficient streaming during SAE training.
+Qwen3-VL-2B processes 100\,000 samples with full input–output pairs
+(\texttt{add\_generation\_prompt=False}), so harvested activations reflect the
+model's state while \emph{generating} a robot action, not just reading a prompt.
+Up to 128 token positions are sampled randomly per sequence to cap memory usage,
+yielding up to 12.8\,million \texttt{float16} vectors saved across 100 shards.
 
 \subsection{SAE Training}
 \label{subsec:sae_training}
 
-Two SAE checkpoints are trained on the harvested corpus, each targeting a different
-behavioral regime of the VLM.
+Three checkpoints are produced from the harvested corpus:
 
-\paragraph{\texttt{sae\_task\_model.pt}.}
-Trained on single-turn activations (samples where \texttt{is\_multi\_turn} is false),
-this checkpoint is optimized for discovering features that drive isolated pick-and-place
-and object-manipulation commands.
+\begin{itemize}
+    \item \textbf{\texttt{sae\_task\_model.pt}}: trained on single-turn activations
+    only; targets single-step manipulation commands.
+    \item \textbf{\texttt{sae\_agentic\_model.pt}}: trained on the full corpus
+    including multi-turn sequences; LR $5\times10^{-4}$, 30 epochs.
+    \item \textbf{\texttt{sae\_topk\_production.pt}}: full corpus, Adam,
+    LR $1\times10^{-4}$, 20 epochs, decoder weights initialized as
+    $W_\text{enc}^\top$ for faster convergence; used in all steering experiments.
+\end{itemize}
 
-\paragraph{\texttt{sae\_agentic\_model.pt}.}
-Trained on the full corpus including multi-turn sequences, this checkpoint is
-optimized for discovering features active during sequential, context-dependent
-planning, including the three-step grasp sequences in the dataset. The agentic model
-uses a higher learning rate ($5 \times 10^{-4}$) and is trained for 30 epochs to
-encourage sharper feature separation in the more complex multi-turn activation space.
-
-\paragraph{Production checkpoint (\texttt{sae\_topk\_production.pt}).}
-Trained with learning rate $1 \times 10^{-4}$ and Adam optimizer for 20 epochs on
-the full corpus, this checkpoint is optimized for stability and is used in all
-deployed steering experiments. Decoder weights are initialized to the transpose of
-the encoder weight matrix to accelerate early convergence. The MSE reconstruction
-loss is computed per batch after TopK masking:
-\begin{equation}
-\mathcal{L}_\text{SAE} = \frac{1}{|\mathcal{B}|}\sum_{\mathbf{h} \in \mathcal{B}}
-\|\mathbf{h} - \hat{\mathbf{h}}\|_2^2,
-\end{equation}
-where $\hat{\mathbf{h}}$ is the SAE reconstruction from Equation~\ref{eq:sae},
-and $\mathcal{B}$ is a mini-batch of size 4\,096 activation vectors.
-
-\subsection{Feature Identification and Steering Protocol}
+\subsection{Feature Identification Protocol}
 \label{subsec:steering_protocol}
 
-\paragraph{Phase 4a -- Candidate Feature Identification via Cosine Similarity.}
-After SAE training, candidate steering features are identified by running the model
-on a probe input with a known behavioral target. The probe is constructed by
-formatting a scene image with the tool-call prefix
-\texttt{call\_robot(`pick a} appended to the assistant turn, so that the last
-token in the sequence is the model's own representation of ``about to issue a
-pick command.'' The layer-20 hidden state of this last token is captured and
-its cosine similarity with every column of the decoder matrix $W_\text{dec}$
-is computed:
-\begin{equation}
-s_i = \cos\!\left(\mathbf{h}^{(20)}_\text{last},\; \mathbf{d}_i\right)
-= \frac{\mathbf{h}^{(20)}_\text{last} \cdot \mathbf{d}_i}
-{\|\mathbf{h}^{(20)}_\text{last}\|_2\;\|\mathbf{d}_i\|_2}.
-\end{equation}
-The top-10 features by similarity score $s_i$ are ranked as candidate steering
-directions.
-
-\paragraph{Phase 4b -- Max-Activation Interpretability.}
-For each candidate feature, 5\,000 samples from EO-Data1.5M are scanned and the
-top-5 highest-activating text inputs are collected. This \emph{max-activation}
-analysis~\cite{bricken2023monosemanticity} provides a human-readable semantic label
-for each feature: the natural-language prompts that most strongly activate it reveal
-what concept the feature direction encodes.
-
-\paragraph{Phase 4c -- Injection Strength Sweep.}
-Each candidate feature is evaluated across an injection strength sweep
-$\alpha \in \{0, 2, 5, 10, 20, 50, 80\}$. Two contrasting prompt types are used
-simultaneously: a general knowledge question with no robotic context, and a direct
-robot trajectory planning request. This two-prompt design tests whether the steering
-effect is task-conditioned (only activates robot-format output for robotics-relevant
-inputs) or unconditioned (overrides all outputs regardless of input). A repetition
-penalty of 1.1 is applied during generation at all strength levels to suppress
-degenerate looping outputs that can occur at high $\alpha$.
+After training, a probe input with the tool-call prefix
+\texttt{call\_robot(`pick a} is run through the model. The cosine similarity
+between the last-token hidden state and every decoder column is computed, and the
+top-10 features by score are ranked as candidates. Each candidate is then validated
+by scanning 5\,000 EO-Data1.5M samples for its top-5 highest-activating
+prompts~\cite{bricken2023monosemanticity}, providing a human-readable label for
+what concept the feature encodes. Confirmed candidates are swept across
+$\alpha \in \{0, 2, 5, 10, 20, 50, 80\}$ using two contrasting prompts in
+parallel: a general knowledge question and a robot trajectory planning request.
+A repetition penalty of 1.1 suppresses degenerate looping at high $\alpha$.
 
 
 %─────────────────────────────────────────────────────────────────────────────

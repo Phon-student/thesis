@@ -58,57 +58,44 @@
 \contentsline {subsection}{\numberline {3.5.4}Evaluation Metrics}{13}{subsection.3.5.4}%
 \contentsline {section}{\numberline {3.6}VLM MECHANISTIC INTERPRETABILITY SUB-PROJECT}{14}{section.3.6}%
 \contentsline {subsection}{\numberline {3.6.1}Sub-Project Objectives}{14}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}Sub-Project System Architecture}{14}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.2}System Architecture}{14}{subsection.3.6.2}%
 \contentsline {paragraph}{VLM Core.}{14}{paragraph*.9}%
 \contentsline {paragraph}{SAE Module.}{14}{paragraph*.10}%
-\contentsline {paragraph}{Steering Hook.}{15}{paragraph*.11}%
-\contentsline {paragraph}{Output Format.}{15}{paragraph*.12}%
-\contentsline {paragraph}{Operator Interface.}{15}{paragraph*.13}%
-\contentsline {subsection}{\numberline {3.6.3}Dataset Construction}{15}{subsection.3.6.3}%
-\contentsline {subsection}{\numberline {3.6.4}Activation Harvesting}{16}{subsection.3.6.4}%
-\contentsline {subsection}{\numberline {3.6.5}SAE Training}{16}{subsection.3.6.5}%
-\contentsline {paragraph}{\texttt {sae\_task\_model.pt}.}{16}{paragraph*.14}%
-\contentsline {paragraph}{\texttt {sae\_agentic\_model.pt}.}{16}{paragraph*.15}%
-\contentsline {paragraph}{Production checkpoint (\texttt {sae\_topk\_production.pt}).}{16}{paragraph*.16}%
-\contentsline {subsection}{\numberline {3.6.6}Feature Identification and Steering Protocol}{17}{subsection.3.6.6}%
-\contentsline {paragraph}{Phase 4a -- Candidate Feature Identification via Cosine Similarity.}{17}{paragraph*.17}%
-\contentsline {paragraph}{Phase 4b -- Max-Activation Interpretability.}{17}{paragraph*.18}%
-\contentsline {paragraph}{Phase 4c -- Injection Strength Sweep.}{17}{paragraph*.19}%
-\contentsline {section}{\numberline {3.7}CHAPTER SUMMARY}{17}{section.3.7}%
-\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{18}{chapter.4}%
-\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{18}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{18}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{18}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{18}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Metrics}{18}{subsection.4.1.4}%
-\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{19}{section.4.2}%
-\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{20}{section.4.3}%
-\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{22}{section.4.4}%
-\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{23}{section.4.5}%
-\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{23}{section.4.6}%
-\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{29}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{29}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4.7.2}Latency}{29}{subsection.4.7.2}%
-\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{30}{subsection.4.7.3}%
-\contentsline {section}{\numberline {4.8}VLM INTERPRETABILITY SUB-PROJECT RESULTS}{30}{section.4.8}%
-\contentsline {subsection}{\numberline {4.8.1}Dataset Construction Outcome}{30}{subsection.4.8.1}%
-\contentsline {subsection}{\numberline {4.8.2}Activation Harvesting and SAE Training}{30}{subsection.4.8.2}%
-\contentsline {subsection}{\numberline {4.8.3}Feature Identification: Agentic Neuron Discovery}{30}{subsection.4.8.3}%
-\contentsline {subsection}{\numberline {4.8.4}Activation Steering Evaluation}{31}{subsection.4.8.4}%
-\contentsline {paragraph}{Two-Prompt Test Design.}{31}{paragraph*.36}%
-\contentsline {paragraph}{Steering Sweep Results.}{31}{paragraph*.37}%
-\contentsline {paragraph}{Multi-Turn Coherence.}{32}{paragraph*.39}%
-\contentsline {paragraph}{Task-Category Coverage.}{32}{paragraph*.40}%
-\contentsline {subsection}{\numberline {4.8.5}Summary of Evidence and Limitations}{32}{subsection.4.8.5}%
-\contentsline {section}{\numberline {4.9}DISCUSSION}{32}{section.4.9}%
-\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{34}{chapter.5}%
-\contentsline {section}{\numberline {5.1}CONCLUSION}{34}{section.5.1}%
-\contentsline {section}{\numberline {5.2}LIMITATIONS}{34}{section.5.2}%
-\contentsline {section}{\numberline {5.3}FUTURE WORK}{35}{section.5.3}%
-\contentsline {chapter}{BIBLIOGRAPHY}{36}{Item.73}%
-\contentsline {chapter}{\numberline {A}Supplementary Materials}{38}{appendix.A}%
-\contentsline {section}{\numberline {A.1}System Configuration Summary}{38}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{38}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Extended Results}{38}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Implementation Notes}{39}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{39}{section.A.5}%
+\contentsline {paragraph}{Steering Hook.}{14}{paragraph*.11}%
+\contentsline {paragraph}{Operator Interface.}{14}{paragraph*.12}%
+\contentsline {subsection}{\numberline {3.6.3}Dataset Construction}{14}{subsection.3.6.3}%
+\contentsline {subsection}{\numberline {3.6.4}Activation Harvesting}{15}{subsection.3.6.4}%
+\contentsline {subsection}{\numberline {3.6.5}SAE Training}{15}{subsection.3.6.5}%
+\contentsline {subsection}{\numberline {3.6.6}Feature Identification Protocol}{15}{subsection.3.6.6}%
+\contentsline {section}{\numberline {3.7}CHAPTER SUMMARY}{15}{section.3.7}%
+\contentsline {chapter}{\numberline {4}EXPERIMENTAL RESULTS AND DISCUSSION}{16}{chapter.4}%
+\contentsline {section}{\numberline {4.1}EXPERIMENTAL SETUP}{16}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Hardware and Runtime Environment}{16}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Task Protocol}{16}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Evaluation Domains}{16}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Metrics}{16}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}END-TO-END VLA PIPELINE PERFORMANCE}{17}{section.4.2}%
+\contentsline {section}{\numberline {4.3}INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}{18}{section.4.3}%
+\contentsline {section}{\numberline {4.4}NATURAL-LANGUAGE INSTRUCTION FOLLOWING}{20}{section.4.4}%
+\contentsline {section}{\numberline {4.5}GENERALIZATION AND ZERO-SHOT PERFORMANCE}{21}{section.4.5}%
+\contentsline {section}{\numberline {4.6}TASK-WISE MANIPULATION PERFORMANCE}{21}{section.4.6}%
+\contentsline {section}{\numberline {4.7}DESIGN CONSTRAINT VALIDATION}{27}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Computation and Memory}{27}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Latency}{27}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Integration Efficiency}{28}{subsection.4.7.3}%
+\contentsline {section}{\numberline {4.8}VLM INTERPRETABILITY SUB-PROJECT RESULTS}{28}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Dataset and Corpus}{28}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Feature Discovery}{28}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.8.3}Activation Steering}{28}{subsection.4.8.3}%
+\contentsline {section}{\numberline {4.9}DISCUSSION}{28}{section.4.9}%
+\contentsline {chapter}{\numberline {5}CONCLUSION AND FUTURE WORK}{30}{chapter.5}%
+\contentsline {section}{\numberline {5.1}CONCLUSION}{30}{section.5.1}%
+\contentsline {section}{\numberline {5.2}LIMITATIONS}{30}{section.5.2}%
+\contentsline {section}{\numberline {5.3}FUTURE WORK}{31}{section.5.3}%
+\contentsline {chapter}{BIBLIOGRAPHY}{32}{Item.73}%
+\contentsline {chapter}{\numberline {A}Supplementary Materials}{34}{appendix.A}%
+\contentsline {section}{\numberline {A.1}System Configuration Summary}{34}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Additional Experimental Settings}{34}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Extended Results}{34}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Implementation Notes}{35}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Usage Instructions for Reproduction}{35}{section.A.5}%
