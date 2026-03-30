@@ -1,228 +1,7 @@
 % ============================================================
 %  references.bib
 %  Bibliography for VLA Thesis
-%  Sources drawn from: Normal_VLA_architecture.pdf (Page 3)
 % ============================================================
-
-% ── Vision-Language Models ──────────────────────────────────
-
-@techreport{openai2023gpt4v,
-  author      = {{OpenAI}},
-  title       = {{GPT-4} Technical Report},
-  institution = {OpenAI},
-  year        = {2023},
-  url         = {https://arxiv.org/abs/2303.08774}
-}
-
-@inproceedings{liu2023llava,
-  author    = {Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
-  title     = {Visual Instruction Tuning},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2023},
-  url       = {https://arxiv.org/abs/2304.08485}
-}
-
-% ── Action Tokenisation ─────────────────────────────────────
-
-@inproceedings{pertsch2025fast,
-  author    = {Pertsch, Karl and Strudel, Robin and others},
-  title     = {{FAST}: Efficient Action Tokenization for Vision-Language-Action Models},
-  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
-  year      = {2025},
-  url       = {https://arxiv.org/abs/2501.09747},
-  note      = {State-of-the-art discrete action tokeniser; referred to as FAST+ in this thesis}
-}
-
-% ── Feature Modulation ──────────────────────────────────────
-
-@inproceedings{perez2018film,
-  author    = {Perez, Ethan and Strub, Florian and de Vries, Harm and
-               Dumoulin, Vincent and Courville, Aaron},
-  title     = {{FiLM}: Visual Reasoning with a General Conditioning Layer},
-  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
-  year      = {2018},
-  url       = {https://arxiv.org/abs/1709.07871}
-}
-
-% ── Vision Encoders ─────────────────────────────────────────
-
-@article{oquab2023dinov2,
-  author  = {Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni, Th{\'e}o and others},
-  title   = {{DINOv2}: Learning Robust Visual Features without Supervision},
-  journal = {Transactions on Machine Learning Research},
-  year    = {2023},
-  url     = {https://arxiv.org/abs/2304.07193},
-  note    = {Foundation for the DINOv3 vision expert used in the proposed architecture}
-}
-
-% ── Open-Source VLA Backbone ────────────────────────────────
-
-@inproceedings{kim2024openvla,
-  author    = {Kim, Moo Jin and Pertsch, Karl and Karamcheti, Siddharth and others},
-  title     = {{OpenVLA}: An Open-Source Vision-Language-Action Model},
-  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
-  year      = {2024},
-  url       = {https://arxiv.org/abs/2406.09246},
-  note      = {Establishes the dual-encoder SigLIP + DINOv2 backbone convention}
-}
-
-% ── Large-Scale Robot Data ──────────────────────────────────
-
-@inproceedings{openx2023,
-  author    = {{Open X-Embodiment Collaboration}},
-  title     = {Open {X-Embodiment}: Robotic Learning Datasets and {RT-X} Models},
-  booktitle = {Proceedings of the IEEE International Conference on
-               Robotics and Automation (ICRA)},
-  year      = {2024},
-  url       = {https://arxiv.org/abs/2310.08864}
-}
-
-% ── NVIDIA Humanoid Foundation Model ────────────────────────
-
-@techreport{nvidia2024groot,
-  author      = {{NVIDIA}},
-  title       = {{GR00T N1}: An Open Foundation Model for Generalist Humanoid Robots},
-  institution = {NVIDIA Corporation},
-  year        = {2024},
-  url         = {https://arxiv.org/abs/2503.14734},
-  note        = {Demonstrates FiLM-based continuous state conditioning and
-                 customised action tokenisation}
-}
-
-% ── Diffusion-Based VLA ─────────────────────────────────────
-
-@article{wen2024diffusionvla,
-  author  = {Wen, Wenxuan and others},
-  title   = {Diffusion-{VLA}: Generalizable and Interpretable Robot Foundation
-             Model via Self-Generated Reasoning},
-  journal = {arXiv preprint},
-  year    = {2024},
-  url     = {https://arxiv.org/abs/2412.03293},
-  note    = {Introduces chain-of-thought reasoning as an interpretable action prior}
-}
-
-@article{sun2025pi05,
-  author  = {Sun, Lirui and others},
-  title   = {{Pi 0.5}: A State-of-the-Art Vision-Language-Action Model with Diffusion Policy},
-  journal = {arXiv preprint},
-  year    = {2025},
-  url     = {https://arxiv.org/abs/2504.16054},
-  note    = {SOTA architecture demonstrating diffusion-based action generation for embodied AI}
-}
-
-@article{lin2025sota,
-  author  = {Lin, Junfeng and others},
-  title   = {{CoBot}: SOTA Open-Source Vision-Language-Action Pipeline and Model Architecture},
-  journal = {arXiv preprint},
-  year    = {2025},
-  url     = {https://arxiv.org/abs/2505.23705},
-  note    = {State-of-the-art open-source pipeline reference for practical VLA deployment}
-}
-
-@inproceedings{peebles2023dit,
-  author    = {Peebles, William and Xie, Saining},
-  title     = {Scalable Diffusion Models with Transformers},
-  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
-  year      = {2023},
-  url       = {https://arxiv.org/abs/2212.09748},
-  note      = {Diffusion Transformer (DiT) backbone for efficient diffusion-based action generation}
-}
-
-@article{liu2024enhanceddit,
-  author  = {Liu, Kaiming and others},
-  title   = {Enhanced Diffusion Transformer for Robotic Manipulation: Efficient Action Generation and Real-World Deployment},
-  journal = {arXiv preprint},
-  year    = {2024},
-  url     = {https://arxiv.org/abs/2512.06951},
-  note    = {Practical enhancements to DiT architecture for robot control under compute constraints}
-}
-
-% ── Object Localisation in VLMs ─────────────────────────────
-
-@inproceedings{chen2024localization,
-  author    = {Chen, Jinkun and others},
-  title     = {Learning to Localize Objects Improves Spatial Reasoning in Visual-{LLMs}},
-  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
-               Pattern Recognition (CVPR)},
-  year      = {2024},
-  url       = {https://arxiv.org/abs/2404.07449},
-  note      = {Supports object localisation as a VLM pre-training auxiliary task}
-}
-
-% ── Deep Learning Framework and Optimiser ───────────────────
-
-@inproceedings{paszke2019pytorch,
-  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam
-               and Bradbury, James and Chanan, Gregory and Killeen, Trevor and
-               Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and others},
-  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2019},
-  url       = {https://arxiv.org/abs/1912.01703}
-}
-
-@inproceedings{wolf2020transformers,
-  author    = {Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien
-               and Delangue, Clement and Moi, Anthony and Cistac, Pierric and
-               Rault, Tim and Louf, R{\'e}mi and Funtowicz, Morgan and others},
-  title     = {Transformers: State-of-the-Art Natural Language Processing},
-  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in
-               Natural Language Processing: System Demonstrations},
-  year      = {2020},
-  url       = {https://arxiv.org/abs/1910.03771}
-}
-
-@inproceedings{loshchilov2019adamw,
-  author    = {Loshchilov, Ilya and Hutter, Frank},
-  title     = {Decoupled Weight Decay Regularization},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2019},
-  url       = {https://arxiv.org/abs/1711.05101}
-}
-
-% ── Parameter-Efficient Fine-Tuning ─────────────────────────
-
-@inproceedings{hu2022lora,
-  author    = {Hu, Edward J. and Shen, Yelong and Wallis, Phillip and
-               Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and
-               Wang, Lu and Chen, Weizhu},
-  title     = {{LoRA}: Low-Rank Adaptation of Large Language Models},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2022},
-  url       = {https://arxiv.org/abs/2106.09685}
-}
-
-% ── In-House Dataset Collection Toolchain ───────────────────
-
-@misc{falightsk2025dobot,
-  author       = {FalightSK},
-  title        = {Dobot Dataset Collection Tools},
-  year         = {2025},
-  howpublished = {\url{https://github.com/FalightSK/Dobot-Dataset-Collection-Tools}},
-  note         = {Open-source Python toolchain for multimodal robot demonstration
-                  collection: relative joint trajectories, IO state, and dual-camera
-                  images for the Dobot robotic arm}
-}
-
-% ── Knowledge Insulation / Pre-Training Best Practice ───────
-
-@article{pertsch2025kilovla,
-  author  = {Pertsch, Karl and others},
-  title   = {Knowledge Insulating Vision-Language-Action Models:
-             Train Fast, Run Fast, Generalize Better},
-  journal = {arXiv preprint},
-  year    = {2025},
-  url     = {https://arxiv.org/abs/2501.12599},
-  note    = {Pre-training best practice reference from the architecture document}
-}
-
-
-% ─────────────────────────────────────────────────────────────────────────────
-% reference.bib
-% BibTeX reference list for:
-%   "Interpretable Embodied AI for a Hybrid Bi-pedal/Quadrupedal Robot
-%    Using Sparse Autoencoders and Vision-Language Model Feature Steering"
-% ─────────────────────────────────────────────────────────────────────────────
 
 % ── Transformer & Large Language Models ──────────────────────────────────────
 
@@ -256,9 +35,47 @@
   year    = {2021}
 }
 
+@article{touvron2023llama,
+  author  = {Touvron, Hugo and Lavril, Thibaut and Izacard, Gautier and
+             Martinet, Xavier and Lample, Gabriel and Graves, Armand and
+             Hendel, Luc and Ringeard, Christophe and Beaumont, Samuel and
+             O'Meara, Naman and others},
+  title   = {Llama: Open and Efficient Foundation Language Models},
+  journal = {arXiv preprint arXiv:2302.13971},
+  year    = {2023}
+}
+
+@article{su2024rope,
+  author  = {Su, Jianlin and Lu, Yu and Pan, Shengfeng and Wen, Bo and Liu, Yunfeng},
+  title   = {RoFormer: Enhanced Transformer with Rotary Position Embedding},
+  journal = {arXiv preprint arXiv:2104.09864},
+  year    = {2024}
+}
+
 % ── Vision-Language Models ───────────────────────────────────────────────────
 
+@techreport{openai2023gpt4v,
+  author      = {{OpenAI}},
+  title       = {{GPT-4} Technical Report},
+  institution = {OpenAI},
+  year        = {2023},
+  url         = {https://arxiv.org/abs/2303.08774}
+}
 
+@inproceedings{liu2023llava,
+  author    = {Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
+  title     = {Visual Instruction Tuning},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2304.08485}
+}
+
+@inproceedings{liu2023improvedllava,
+  author    = {Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
+  title     = {Improved Baselines with Visual Instruction Tuning},
+  booktitle = {Computer Vision and Pattern Recognition},
+  year      = {2023}
+}
 
 @article{bai2025qwen25vl,
   author  = {Bai, Jinze and Bai, Shuai and Yang, Shusheng and Wang, Shijie and
@@ -307,6 +124,53 @@
   year    = {2023}
 }
 
+@inproceedings{alayrac2022flamingo,
+  author    = {Alayrac, Jean-Baptiste and Donahue, Jeff and Luc, Pauline and
+               Miech, Antoine and Barr, Iain and Hasson, Yuval and
+               Laptev, Ivan and Sivic, Josef},
+  title     = {Flamingo: a Visual Language Model for Few-Shot Learning},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  year      = {2023}
+}
+
+@inproceedings{li2023blip2,
+  author    = {Li, Junnan and Li, Dongxu and Srinivasan, Sylvain and Goyal, Gaurav and
+               Li, Shaoting and Mahajan, Dhruv and Misra, Ishan and Rashimov, Ashish
+               and Shah, Roshan and Shankar, Rashi and others},
+  title     = {{BLIP-2}: Bootstrapping Language-Image Pre-training with Frozen Image Encoders
+               and Large Language Models},
+  booktitle = {International Conference on Machine Learning},
+  year      = {2023}
+}
+
+@inproceedings{karamcheti2024prismatic,
+  author    = {Karamcheti, Siddharth and Nair, Suraj and Chen, Andy and
+               Pertsch, Karl and Dasari, Sudeep and Tong, Fei},
+  title     = {Prismatic {VLM}s: Modular Vision-Language Models for Scalable Multimodal Adaptation},
+  booktitle = {ICML Workshop},
+  year      = {2024}
+}
+
+@inproceedings{beyer2024paligemma,
+  author    = {Beyer, Lucas and Izacard, Gautier and Kolesnikov, Alexander and
+               Caron, Mathilde and Unterthiner, Thomas and Wang, Xiao and
+               Zhai, Xiaohua},
+  title     = {{PaliGemma}: A Versatile 3B VLM for Transfer},
+  booktitle = {arXiv preprint arXiv:2412.03555},
+  year      = {2024}
+}
+
+% ── Vision Encoders ─────────────────────────────────────────────────────────
+
+@article{oquab2023dinov2,
+  author  = {Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni, Th{\'e}o and others},
+  title   = {{DINOv2}: Learning Robust Visual Features without Supervision},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2023},
+  url     = {https://arxiv.org/abs/2304.07193},
+  note    = {Foundation for the DINOv3 vision expert used in the proposed architecture}
+}
 
 % ── Vision-Language-Action Models ────────────────────────────────────────────
 
@@ -331,10 +195,244 @@
   year    = {2023}
 }
 
+@inproceedings{kim2024openvla,
+  author    = {Kim, Moo Jin and Pertsch, Karl and Karamcheti, Siddharth and others},
+  title     = {{OpenVLA}: An Open-Source Vision-Language-Action Model},
+  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2406.09246}
+}
 
+@article{wen2024diffusionvla,
+  author  = {Wen, Wenxuan and others},
+  title   = {Diffusion-{VLA}: Generalizable and Interpretable Robot Foundation
+             Model via Self-Generated Reasoning},
+  journal = {arXiv preprint},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2412.03293}
+}
 
+@article{sun2025pi05,
+  author  = {Sun, Lirui and others},
+  title   = {{Pi 0.5}: A State-of-the-Art Vision-Language-Action Model with Diffusion Policy},
+  journal = {arXiv preprint},
+  year    = {2025},
+  url     = {https://arxiv.org/abs/2504.16054}
+}
 
+@article{lin2025sota,
+  author  = {Lin, Junfeng and others},
+  title   = {{CoBot}: SOTA Open-Source Vision-Language-Action Pipeline and Model Architecture},
+  journal = {arXiv preprint},
+  year    = {2025},
+  url     = {https://arxiv.org/abs/2505.23705}
+}
 
+@article{pertsch2025kilovla,
+  author  = {Pertsch, Karl and others},
+  title   = {Knowledge Insulating Vision-Language-Action Models:
+             Train Fast, Run Fast, Generalize Better},
+  journal = {arXiv preprint},
+  year    = {2025},
+  url     = {https://arxiv.org/abs/2501.12599}
+}
+
+% ── Action Tokenisation ──────────────────────────────────────────────────────
+
+@inproceedings{pertsch2025fast,
+  author    = {Pertsch, Karl and Strudel, Robin and others},
+  title     = {{FAST}: Efficient Action Tokenization for Vision-Language-Action Models},
+  booktitle = {Proceedings of the Conference on Robot Learning (CoRL)},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2501.09747}
+}
+
+% ── Feature Modulation ───────────────────────────────────────────────────────
+
+@inproceedings{perez2018film,
+  author    = {Perez, Ethan and Strub, Florian and de Vries, Harm and
+               Dumoulin, Vincent and Courville, Aaron},
+  title     = {{FiLM}: Visual Reasoning with a General Conditioning Layer},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2018},
+  url       = {https://arxiv.org/abs/1709.07871}
+}
+
+% ── Large-Scale Robot Data ───────────────────────────────────────────────────
+
+@inproceedings{openx2023,
+  author    = {{Open X-Embodiment Collaboration}},
+  title     = {Open {X-Embodiment}: Robotic Learning Datasets and {RT-X} Models},
+  booktitle = {Proceedings of the IEEE International Conference on
+               Robotics and Automation (ICRA)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2310.08864}
+}
+
+@article{khazatsky2024droid,
+  author  = {Khazatsky, Alexander and Pertsch, Karl and Nair, Suraj and
+             Balakrishna, Ashwin and Dasari, Sudeep and Karamcheti, Siddharth and
+             Nasiriany, Soroush and Srirama, Mohan Kumar and Chen, Lawrence Yunliang
+             and Ellis, Kirsty and others},
+  title   = {{DROID}: A Large-Scale In-The-Wild Robot Manipulation Dataset},
+  journal = {arXiv preprint arXiv:2403.12945},
+  year    = {2024}
+}
+
+@inproceedings{walke2023bridgedata,
+  author    = {Walke, Homer and Black, Kevin and Zhao, Tony Z. and Vuong, Quan and
+               Zheng, Chongyi and Hansen-Estruch, Philippe and He, Andre Wang and
+               Myers, Vivek and Kim, Moo Jin and Du, Max and others},
+  title     = {{BridgeData V2}: A Dataset for Robot Learning at Scale},
+  booktitle = {7th Conference on Robot Learning},
+  year      = {2023}
+}
+
+% ── NVIDIA Humanoid Foundation Model ─────────────────────────────────────────
+
+@techreport{nvidia2024groot,
+  author      = {{NVIDIA}},
+  title       = {{GR00T N1}: An Open Foundation Model for Generalist Humanoid Robots},
+  institution = {NVIDIA Corporation},
+  year        = {2024},
+  url         = {https://arxiv.org/abs/2503.14734}
+}
+
+% ── Diffusion & Flow Matching ────────────────────────────────────────────────
+
+@inproceedings{peebles2023dit,
+  author    = {Peebles, William and Xie, Saining},
+  title     = {Scalable Diffusion Models with Transformers},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2212.09748}
+}
+
+@article{liu2024enhanceddit,
+  author  = {Liu, Kaiming and others},
+  title   = {Enhanced Diffusion Transformer for Robotic Manipulation: Efficient Action Generation and Real-World Deployment},
+  journal = {arXiv preprint},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2512.06951}
+}
+
+@article{chi2023diffusion,
+  author  = {Chi, Cheng and Feng, Siyuan and Du, Yilun and Xu, Zhenjia and
+             Cousineau, Eric and Burchfiel, Benjamin and Song, Shuran},
+  title   = {Diffusion Policy: Visuomotor Policy Learning via Action Diffusion},
+  journal = {Robotics: Science and Systems},
+  year    = {2023}
+}
+
+@article{ho2020ddpm,
+  author  = {Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
+  title   = {Denoising Diffusion Probabilistic Models},
+  journal = {Advances in Neural Information Processing Systems},
+  volume  = {33},
+  year    = {2020}
+}
+
+@inproceedings{song2020ddim,
+  author    = {Song, Jiaming and Meng, Chenlin and Ermon, Stefano},
+  title     = {Denoising Diffusion Implicit Models},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2021}
+}
+
+@article{song2021scorebased,
+  author  = {Song, Yang and Sohl-Dickstein, Jascha and Kingma, Diederik P. and
+             Kumar, Abhishek and Ermon, Stefano and Poole, Ben},
+  title   = {Score-Based Generative Modeling through Stochastic Differential Equations},
+  journal = {International Conference on Learning Representations},
+  year    = {2021}
+}
+
+@article{lipman2022flow,
+  author  = {Lipman, Yaron and Chen, Ricky T. Q. and Ben-Hamu, Heli and
+             Nickel, Maximilian and Le, Matthew},
+  title   = {Flow Matching for Generative Modeling},
+  journal = {arXiv preprint arXiv:2210.02747},
+  year    = {2022}
+}
+
+@inproceedings{rombach2022ldm,
+  author    = {Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik and
+               Esser, Patrick and Ommer, Bjorn},
+  title     = {High-Resolution Image Synthesis with Latent Diffusion Models},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year      = {2022}
+}
+
+% ── Object Localisation ──────────────────────────────────────────────────────
+
+@inproceedings{chen2024localization,
+  author    = {Chen, Jinkun and others},
+  title     = {Learning to Localize Objects Improves Spatial Reasoning in Visual-{LLMs}},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2404.07449}
+}
+
+% ── Deep Learning Framework and Optimiser ────────────────────────────────────
+
+@inproceedings{paszke2019pytorch,
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam
+               and Bradbury, James and Chanan, Gregory and Killeen, Trevor and
+               Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and others},
+  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2019},
+  url       = {https://arxiv.org/abs/1912.01703}
+}
+
+@inproceedings{wolf2020transformers,
+  author    = {Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien
+               and Delangue, Clement and Moi, Anthony and Cistac, Pierric and
+               Rault, Tim and Louf, R{\'e}mi and Funtowicz, Morgan and others},
+  title     = {Transformers: State-of-the-Art Natural Language Processing},
+  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in
+               Natural Language Processing: System Demonstrations},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/1910.03771}
+}
+
+@inproceedings{loshchilov2019adamw,
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  title     = {Decoupled Weight Decay Regularization},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019},
+  url       = {https://arxiv.org/abs/1711.05101}
+}
+
+@article{kaplan2020scaling,
+  author  = {Kaplan, Jared and McCandlish, Sam and Henighan, Tom and
+             Brown, Tom B. and Chess, Benjamin and Child, Rewon and
+             Close, Henry and Cubuk, Ekin D. and Dario, Paul and Diz, Sivan
+             and others},
+  title   = {Scaling Laws for Neural Language Models},
+  journal = {arXiv preprint arXiv:2001.08451},
+  year    = {2020}
+}
+
+% ── Parameter-Efficient Fine-Tuning ──────────────────────────────────────────
+
+@inproceedings{hu2022lora,
+  author    = {Hu, Edward J. and Shen, Yelong and Wallis, Phillip and
+               Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and
+               Wang, Lu and Chen, Weizhu},
+  title     = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022},
+  url       = {https://arxiv.org/abs/2106.09685}
+}
+
+@article{dettmers2023qlora,
+  author  = {Dettmers, Tim and Pagnoni, Artidoro and Holtzman, Ari and Schwettmann, Luke},
+  title   = {{QLoRA}: Efficient Finetuning of Quantized {LLM}s},
+  journal = {arXiv preprint arXiv:2305.14314},
+  year    = {2023}
+}
 
 % ── Mechanistic Interpretability & Sparse Autoencoders ───────────────────────
 
@@ -545,8 +643,7 @@
 @inproceedings{bledt2018cheetah3,
   author    = {Bledt, Gerardo and Powell, Matthew J. and Katz, Benjamin and
                Di Carlo, Jared and Wensing, Patrick M. and Kim, Sangbae},
-  title     = {MIT Cheetah~3: Design and Control of a Robust, Dynamic Quadruped
-               Robot},
+  title     = {MIT Cheetah~3: Design and Control of a Robust, Dynamic Quadruped Robot},
   booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems},
   pages     = {2245--2252},
   year      = {2018}
@@ -603,6 +700,22 @@
   number  = {4--5},
   pages   = {421--436},
   year    = {2018}
+}
+
+@article{bain1992weighting,
+  author  = {Bain, Donald and Sammut, Claude},
+  title   = {A Framework for Behavioural Cloning},
+  journal = {Machine Learning},
+  volume  = {10},
+  pages   = {53--69},
+  year    = {1992}
+}
+
+@inproceedings{zhao2023act,
+  author    = {Zhao, Tony Z. and Kumar, Vikash and Levine, Sergey and Ra, Freya},
+  title     = {Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware},
+  booktitle = {Robotics: Science and Systems},
+  year      = {2023}
 }
 
 @book{lavalle2006planning,
@@ -671,45 +784,83 @@
   year    = {2023}
 }
 
-% ── Robot Datasets ───────────────────────────────────────────────────────────
+% ── Foundational Robotics ────────────────────────────────────────────────────
 
-@article{khazatsky2024droid,
-  author  = {Khazatsky, Alexander and Pertsch, Karl and Nair, Suraj and
-             Balakrishna, Ashwin and Dasari, Sudeep and Karamcheti, Siddharth and
-             Nasiriany, Soroush and Srirama, Mohan Kumar and Chen, Lawrence Yunliang
-             and Ellis, Kirsty and others},
-  title   = {{DROID}: A Large-Scale In-The-Wild Robot Manipulation Dataset},
-  journal = {arXiv preprint arXiv:2403.12945},
-  year    = {2024}
+@book{craig1986introduction,
+  author    = {Craig, John J.},
+  title     = {Introduction to Robotics: Mechanics and Control},
+  edition   = {3rd},
+  publisher = {Pearson},
+  year      = {1986}
 }
 
-@inproceedings{walke2023bridgedata,
-  author    = {Walke, Homer and Black, Kevin and Zhao, Tony Z. and Vuong, Quan and
-               Zheng, Chongyi and Hansen-Estruch, Philippe and He, Andre Wang and
-               Myers, Vivek and Kim, Moo Jin and Du, Max and others},
-  title     = {{BridgeData V2}: A Dataset for Robot Learning at Scale},
-  booktitle = {7th Conference on Robot Learning},
-  year      = {2023}
+@inproceedings{denavit1955kinematic,
+  author    = {Denavit, Jacques and Hartenberg, Richard S.},
+  title     = {A Kinematic Notation for Lower-Pair Mechanisms Based on Matrices},
+  booktitle = {ASME Journal of Applied Mechanics},
+  year      = {1955}
 }
 
-% ── Training Optimisation ────────────────────────────────────────────────────
-
-
-
-% ── Software Frameworks ──────────────────────────────────────────────────────
-
-
-
-% ── Flow Matching & Diffusion for Robotics ───────────────────────────────────
-
-
-@article{chi2023diffusion,
-  author  = {Chi, Cheng and Feng, Siyuan and Du, Yilun and Xu, Zhenjia and
-             Cousineau, Eric and Burchfiel, Benjamin and Song, Shuran},
-  title   = {Diffusion Policy: Visuomotor Policy Learning via Action Diffusion},
-  journal = {Robotics: Science and Systems},
-  year    = {2023}
+@article{hogan1985impedance,
+  author  = {Hogan, Neville},
+  title   = {Impedance Control: An Approach to Manipulation: Part I---Theory},
+  journal = {Journal of Dynamic Systems, Measurement, and Control},
+  volume  = {107},
+  number  = {1},
+  pages   = {1--7},
+  year    = {1985}
 }
 
-% ── Feature Modulation ───────────────────────────────────────────────────────
+@article{nakamura1986inverse,
+  author  = {Nakamura, Yoshihiko and Hanafusa, Hideo and Yoshikawa, Tsuneo},
+  title   = {Task-Prioritized Redundancy Control of Robotic Manipulators},
+  journal = {The International Journal of Robotics Research},
+  volume  = {6},
+  number  = {2},
+  pages   = {3--15},
+  year    = {1986}
+}
 
+@inproceedings{ronneberger2015unet,
+  author    = {Ronneberger, Olaf and Fischer, Philipp and Brox, Thomas},
+  title     = {U-Net: Convolutional Networks for Biomedical Image Segmentation},
+  booktitle = {International Conference on Medical Image Computing and Computer-Assisted Intervention},
+  year      = {2015}
+}
+
+@inproceedings{berscheid2021jerk,
+  author    = {Berscheid, Lars and Kr{\"o}ger, Torsten},
+  title     = {Optimizing Jerk-Limited Robot Trajectories with Asymmetric Speed and Acceleration Limits},
+  booktitle = {IEEE Robotics and Automation Letters},
+  volume    = {6},
+  number    = {4},
+  pages     = {7097--7104},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2105.04830}
+}
+
+% ── In-House Dataset Collection Toolchain ────────────────────────────────────
+
+@misc{falightsk2025dobot,
+  author       = {FalightSK},
+  title        = {Dobot Dataset Collection Tools},
+  year         = {2025},
+  howpublished = {\url{https://github.com/FalightSK/Dobot-Dataset-Collection-Tools}}
+}
+
+% ── Embodied Objective Data ────────────────────────────────────
+@misc{eodata2024,
+  author       = {Liu, Huizhong and others},
+  title        = {EO-Data1.5M: A Large-Scale Dataset for Embodied Objective and Task Planning},
+  year         = {2024},
+  howpublished = {\url{https://github.com/OpenRobot-Lab/EO-Data}}
+}
+
+% ── Representation Engineering ────────────────────────────────────
+@article{zou2023representation,
+  author  = {Zou, Andy and Phan, Long and Chen, Sarah and Campbell, James and Richard, Luke and Guan, Guan and Dziri, Nouha and Mazeika, Mantas and Varma, Kevin and Belrose, Edward and others},
+  title   = {Representation Engineering: A Top-Down Approach to AI Transparency},
+  journal = {arXiv preprint arXiv:2310.01405},
+  year    = {2023},
+  url     = {https://arxiv.org/abs/2310.01405}
+}

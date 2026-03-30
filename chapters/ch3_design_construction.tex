@@ -1,323 +1,215 @@
-\chapter{RESEARCH METHODOLOGY AND SYSTEM DESIGN}
-\label{chap:methodology}
+\chapter{IMPLEMENTATION}
+\label{chap:implementation}
 
-This chapter presents the methodology and system design of the proposed
-Vision-Language-Action (VLA) framework for robot manipulation under constrained
-resources. The chapter focuses on three project priorities: (1) constructing an
-end-to-end VLA pipeline that is practical for commercial setups, (2) satisfying data,
-hardware, and safety constraints for Dobot CR5 deployment, and (3) defining a clear
-evaluation protocol across simulation and real-world domains.
-
-To improve traceability between design and evidence, the chapter is structured from
-requirements to implementation and then to evaluation. Each design decision is
-explicitly linked to one or more project constraints introduced in
-Chapter~\ref{chap:introduction}.
-
+This chapter presents the methodology and system design of the proposed Vision-Language-Action (VLA) framework. The implementation is structured into primary phases: Robot to AI Communication, Dataset Preparation, Model Training, and Model Evaluation. This pipeline is designed to maximize sample efficiency while preventing hardware degradation during data collection.
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{METHODOLOGY OVERVIEW}
+\section{Phase 1: Robot to AI Communication}
+\label{sec:phase1_communication}
 %─────────────────────────────────────────────────────────────────────────────
 
-The research workflow is organized as an implementation pipeline from communication
-infrastructure to model refinement:
+The first phase establishes a robust and continuous data pipeline between the physical Dobot CR5 hardware and the AI processing backend. 
 
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{AI-to-Robot Communication Interface}: build a module that converts
-    Dobot TCP/IP command primitives into a machine-learning-friendly composable action
-    format and vice versa.
+\subsection{TCP/IP Interface and Byte Decoding}
+Data from the robot is transmitted via a TCP/IP interface as a continuous raw byte stream (e.g., \texttt{01001...}). To parse this stream, a custom \textbf{Byte Decoder} module is implemented. This decoder is responsible for unpacking the low-level data stream into distinct, usable states, specifically extracting the current 6-DOF joint poses and the binary gripper state.
 
-    \item \textbf{Dataset Collection}: construct training data from two sources:
-    (a) simulation trajectories in Isaac Lab exported to LeRobot format, and
-    (b) real-world human demonstrations on the physical robot.
+\subsection{Tensorization and Storage}
+Once the states are unpacked, they pass through a \textbf{Tensorization} layer. This step converts the raw numerical arrays directly into PyTorch tensors, ensuring the data is natively formatted for the machine learning pipeline. Finally, these tensors are grouped and written to a Hadoop Distributed File System (HDFS) in HDF5 format, ensuring fast, parallel read-access during model training.
 
-    \item \textbf{Model Development}: implement and integrate multimodal perception,
-    language grounding, and action prediction modules into one end-to-end model.
+%─────────────────────────────────────────────────────────────────────────────
+\section{Phase 2: Dataset Preparation}
+\label{sec:phase2_dataset}
+%─────────────────────────────────────────────────────────────────────────────
 
-    \item \textbf{Training Objective Design}: define losses and optimization settings
-    for stable learning under low-data and limited-memory conditions.
+To train the VLA model effectively without causing physical damage to the robot, the dataset collection strategy is split into simulation and real-world pipelines. The combined dataset is exported into the unified LeRobot schema.
 
-    \item \textbf{Inference and Model Analysis}: inspect prediction behavior,
-    latency, failure modes, and sim-to-real transfer quality.
+\subsection{Simulation Data Pipeline}
+Collecting large-scale repetitive trajectories on physical hardware often leads to mechanical wear, joint pain, and joint-lock issues during awkward or repeated poses. To circumvent this, the bulk of the dataset is generated in \textbf{IsaacLab}. Using a simulated Dobot CR5 configuration, an Inverse Kinematics (IK) and Event Generator drives the robot through randomized task configurations. An Observator module captures the rendered simulation data.
 
-    \item \textbf{Model Improvement}: apply targeted refinement based on analysis,
-    including data balancing, prompt/interface tuning, and architecture adjustments.
+To ensure high-fidelity learning, the simulation pipeline enforces strict temporal synchronization across all modalities. As demonstrated in Figure~\ref{fig:example-sim-data}, the joint trajectories, gripper actuation states, and multi-camera rendered frames (overview and end-effector) are perfectly aligned at each timestep, providing the model with a coherent multimodal timeline.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/example_sim_data.png}
+    \caption[Temporal synchronization in IsaacLab]{Temporal synchronization in the IsaacLab simulation environment. Joint trajectories (top), gripper states (middle), and multi-camera RGB frames (bottom) are precisely aligned across the episode timeline.}
+    \label{fig:example-sim-data}
+\end{figure}
+
+\subsection{Real-World Data Pipeline}
+To bridge the sim-to-real gap, a smaller subset of real-world data is collected using a two-step kinesthetic teaching method:
+\begin{enumerate}
+    \item \textbf{Record State Trajectory:} A human operator physically guides the robot arm through the task (kinesthetic teaching), and the TCP/IP interface records the precise joint state trajectory.
+    \item \textbf{Replay Trajectory:} The robot autonomously replays the recorded trajectory. During this replay, the external and wrist-mounted cameras, along with other sensors, record the scene. 
 \end{enumerate}
+This strategy ensures that the visual data is perfectly aligned with the kinematics while remaining entirely free of human hands obstructing the camera views.
 
-At a high level, the learning problem is to estimate a policy
-\(\pi_\theta\) that maps multimodal context to controller-executable actions:
-\[
-a_t = \pi_\theta(I_t, \mathcal{U}, h_t),
-\]
-where \(I_t\) is the RGB observation, \(\mathcal{U}\) is the natural-language
-instruction, and \(h_t\) is optional history/state context. The methodology seeks to
-maximize task success under three constraints: limited demonstrations, limited memory,
-and safety-constrained execution.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{PROBLEM-DRIVEN DESIGN REQUIREMENTS}
-%─────────────────────────────────────────────────────────────────────────────
-
-The system design is directly derived from the project constraints. Unlike large-scale
-VLA studies that rely on broad datasets and high-end servers, this thesis targets a
-minimal commercial setup. Therefore, design decisions are driven by three major
-constraints.
-
-\subsection{Dataset Quantity and Variety Constraint}
-
-The available dataset is intentionally limited: approximately one hour of total robot
-motion with only three task families. This is significantly smaller than many VLA
-pipelines that use more than ten hours of demonstrations and broader task diversity.
-As a result, the methodology prioritizes sample efficiency, high data quality,
-cross-domain consistency (sim and real), and curriculum-style task coverage.
-
-In practical terms, this means the pipeline avoids data-hungry assumptions and instead
-prioritizes representation reuse, careful trajectory normalization, and targeted
-coverage of failure-prone scenarios.
-
-\subsection{Hardware Constraint (Commercial GPU)}
-
-The model architecture must fit within practical hardware specifications,
-specifically around 8 GB of VRAM. This restricts parameter count, sequence length,
-and batch-size strategy, and motivates memory-aware training techniques such as mixed
-precision, gradient accumulation, compact tokenization, and lightweight heads.
-
-This constraint also affects experiment planning: ablations and evaluation schedules
-must be designed to preserve comparability without requiring large parallel runs.
-
-\subsection{Safety and Inference Standard Constraint}
-
-For safe and repeatable operation on Dobot CR5, robot joint-position standards are
-fixed before inference to define a consistent workspace and startup condition. The
-exact joint preset is recorded in the experiment configuration file and should be
-reported as
-\texttt{[Joint preset values for Dobot CR5 to be specified in final version]}.
-This standardization reduces run-to-run variance and lowers risk during autonomous
-execution.
-
-The safety layer is treated as a first-class system component rather than a post hoc
-filter. This design choice is critical when model predictions are generated from
-natural-language input, where ambiguity can propagate to unsafe control proposals.
-
-
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{VISION-LANGUAGE-ACTION SYSTEM ARCHITECTURE}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Input and Output Definition}
-
-At each control cycle, the system receives:
+\subsection{Task Variance and Dataset Statistics}
+The combined dataset encompasses three distinct task variances to teach the robot a complete pick-and-place sequence:
 \begin{itemize}
-    \item an RGB observation $I_t$, and
-    \item a natural-language instruction $\mathcal{U}$ from the user.
+    \item \textbf{Stay:} The robot learns to hold its position and maintain visual focus on the target object. This serves as a critical termination signal, teaching the robot to recognize when the "Reach" task is complete.
+    \item \textbf{Reach:} The robot moves its gripper to a designated position directly above the target object.
+    \item \textbf{Grip:} The robot executes the physical grasping mechanism to pick up the target object.
 \end{itemize}
 
-The system outputs a structured action command executable by the robot arm controller.
-The output is designed to be composable with the TCP/IP communication interface so it
-can be translated safely into Dobot command streams.
-
-Operationally, the architecture separates semantic grounding from command realization.
-This improves debuggability and allows independent validation of perception-language
-alignment and action executability.
-
-\subsection{VLM Core}
-
-The VLM module performs multimodal understanding and instruction grounding. It
-extracts intent from natural language, associates intent with current scene context,
-and generates a high-level task state for downstream action production.
-
-The VLM output is intentionally constrained to a structured intermediate task state
-instead of free-form control text. This reduces ambiguity at the interface with the
-action generator.
-
-\subsection{Vision Expert}
-
-The Vision Expert provides task-relevant visual features (object cues, target
-relations, workspace context, and target hints) for robust action planning. It is
-designed to improve perception reliability under object and scene variation.
-
-To support low-resource training, the Vision Expert emphasizes transferable features
-that remain stable across simulation and real camera conditions.
-
-\subsection{Action Expert}
-
-The Action Expert converts grounded task representations into executable robot
-manipulation commands. The module is constrained by communication safety rules,
-workspace limits, and robot kinematics, ensuring that generated actions remain valid
-for runtime execution.
-
-The Action Expert also acts as a control regularizer: it converts semantic intent into
-bounded command trajectories that are compatible with controller timing and packet
-format requirements.
-
-\subsection{Module Coordination}
-
-The three modules are connected through explicit intermediate representations:
-\begin{enumerate}[label=\alph*)]
-    \item \textbf{Language-grounded task state} from VLM,
-    \item \textbf{Task-conditioned visual features} from Vision Expert,
-    \item \textbf{Executable action sequence} from Action Expert.
-\end{enumerate}
-
-This separation improves maintainability and enables targeted optimization of each
-module while keeping end-to-end behavior coherent.
-
-In addition, the architecture introduces a protocol adapter between the Action Expert
-and Dobot controller. This adapter maps model-level action semantics to TCP/IP command
-payloads with explicit validation rules (range checks, rate checks, and command
-structure checks) before dispatch.
-
-The protocol adapter provides deterministic verification before hardware dispatch,
-which is essential for reproducibility and for safe execution in real-robot tests.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{IMPLEMENTATION STRATEGY}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Dataset Collection Strategy}
-
-The data pipeline combines simulation and real-world trajectories:
-\begin{enumerate}[label=\arabic*)]
-    \item Generate simulation trajectories in Isaac Lab.
-    \item Export trajectories to LeRobot-compatible format.
-    \item Collect human demonstrations on the physical Dobot CR5.
-    \item Normalize both sources into a unified schema of observation,
-    instruction, and action tuples.
-\end{enumerate}
-
-This two-source design improves sample efficiency: simulation contributes scalable
-coverage of trajectory patterns, while real demonstrations provide embodiment-specific
-corrections for dynamics and sensing mismatch.
-
-\subsection{Model Development and Training Strategy}
-
-The system is trained and tuned in stages:
-\begin{enumerate}[label=\arabic*)]
-    \item Initialize the VLA backbone with pretrained multimodal knowledge.
-    \item Adapt perception and action heads to robot-manipulation dynamics.
-    \item Train with low-resource-aware objectives for stability and action validity.
-    \item Perform end-to-end tuning to reduce module mismatch and command noise.
-\end{enumerate}
-
-The training objective combines command prediction and execution validity terms:
-\[
-\mathcal{L}_{\text{total}} = \lambda_1 \mathcal{L}_{\text{action}}
-+ \lambda_2 \mathcal{L}_{\text{validity}}
-+ \lambda_3 \mathcal{L}_{\text{alignment}},
-\]
-where \(\mathcal{L}_{\text{action}}\) supervises target actions,
-\(\mathcal{L}_{\text{validity}}\) penalizes unsafe or non-executable outputs, and
-\(\mathcal{L}_{\text{alignment}}\) preserves language-vision-task consistency.
-
-\subsection{Inference and Model Analysis}
-
-After training, inference behavior is analyzed in both simulation and physical setups,
-including latency profile, command validity, failure taxonomy, and transfer behavior.
-This analysis identifies whether errors are caused by perception ambiguity, language
-misgrounding, or action decoding instability.
-
-Failure analysis is organized by stage so corrective interventions can be applied with
-minimal retraining overhead.
-
-\subsection{Model Improvement Loop}
-
-Based on analysis findings, iterative improvements are applied through data balancing,
-task reweighting, communication-level safeguards, and architectural tuning.
-
-This closed-loop process is central to low-resource development because each
-improvement cycle must produce measurable gains without expensive data re-collection.
-
-\subsection{Latency and Memory Optimization}
-
-To satisfy real-time robot-control requirements, the implementation applies practical
-optimization techniques, including mixed precision inference, efficient token/image
-preprocessing, and lightweight module interfaces that remain feasible on 8 GB VRAM.
-
-Together, these optimizations convert the architecture from a proof-of-concept model
-into an executable pipeline for interactive robot operation.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{EVALUATION PROTOCOL FOR MANIPULATION TASKS}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Evaluation Objectives}
-
-Evaluation is designed to measure whether the system satisfies the project goals:
+After merging the simulation and real-world pipelines, the final unified LeRobot dataset yields the following statistics:
 \begin{itemize}
-    \item follows natural-language instructions,
-    \item generalizes to unseen tasks,
-    \item maintains stable manipulation output,
-    \item satisfies real-time execution constraints.
+    \item \textbf{Simulation Dataset:} 530 episodes, totaling 1 hour of continuous motion data.
+    \item \textbf{Real-World Dataset:} 90 episodes, totaling 10 minutes of targeted, human-demonstrated data.
+    \item \textbf{Total Task Variance:} 3 distinct tasks (Stay, Reach, and Grip) distributed across both domains.
 \end{itemize}
 
-The protocol deliberately separates robustness assessment (success-rate domain) from
-transfer assessment (zero-shot domain), because these dimensions often improve at
-different rates in constrained-data training.
+\subsection{Kinematic Analysis and Precomputed Motion Masking}
+\label{sec:kinematic_analysis}
+To optimize the training objective based on the physical realities of the manipulation tasks, an empirical kinematic analysis is performed on the collected dataset. Rather than treating all joints equally, the system identifies which joints are actively driving a specific trajectory chunk and which are merely idling.
 
-\subsection{Evaluation Domains}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/joint_analysis.png}
+    \caption[Joints change distribution]{Empirical kinematic analysis of the dataset. A threshold of 0.001 normalized units/frame is used to independently classify each joint as moving or stationary.}
+    \label{fig:joint-analysis}
+\end{figure}
 
-The protocol consists of two main domains:
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Success-Rate Evaluation}:
-    assess task completion under standard conditions.
-    \item \textbf{Zero-Shot Evaluation}:
-    assess transfer to unseen combinations without additional fine-tuning.
-\end{enumerate}
+As illustrated in Figure~\ref{fig:joint-analysis}, the per-joint moving proportion is analyzed across the dataset. A strict motion threshold of \textbf{0.001} (normalized units/frame) is established. Any joint velocity falling below this floating-point minimum is mathematically classified as stationary machine noise. Velocities exceeding this threshold are classified as intentional movement.
 
-Each domain is evaluated in both environments:
-\begin{itemize}
-    \item On simulation,
-    \item On real robot.
-\end{itemize}
+This binary classification (Moving vs. Stationary) is applied independently to each joint across all trajectory chunks, creating a dynamic motion mask (Figure~\ref{fig:joint-weighting}). To prevent computational bottlenecks during the live GPU training loop, these motion flags are precomputed offline during the data preparation phase and saved directly into the dataset tensors. This allows the loss function to apply targeted weights during training without any runtime overhead.
 
-This matrix of \{success-rate, zero-shot\} \(\times\) \{sim, real\} is used to
-distinguish pure policy quality from embodiment transfer effects.
-
-\subsection{Task Categories}
-
-The benchmark includes representative robot manipulation tasks such as:
-\begin{enumerate}[label=\arabic*)]
-    \item pick-and-place,
-    \item stacking,
-    \item drawer or container interaction,
-    \item multi-step object sequencing.
-\end{enumerate}
-
-\subsection{Evaluation Metrics}
-
-The following metrics are used:
-\begin{itemize}
-    \item \textbf{Task success rate}: whether generated actions satisfy the command
-    objective in each task.
-    \item \textbf{Zero-shot success rate}: performance on unseen combinations relative
-    to standard seen conditions.
-    \item \textbf{Action validity}: percentage of outputs that are executable by the
-    robot controller.
-    \item \textbf{Latency}: end-to-end action generation time per command cycle.
-\end{itemize}
-
-For comparative reporting, unseen-task retention is additionally summarized as:
-\[
-\text{Generalization Ratio} =
-\frac{\text{Unseen Task Success}}{\text{Seen Task Success}} \times 100.
-\]
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/joint_weighting.png}
+    \caption[Precomputed motion mask application]{Application of the precomputed motion mask across trajectory chunks. Each joint is independently flagged as MOVING (orange) or STATIONARY (blue) to inform the weighted Position Loss.}
+    \label{fig:joint-weighting}
+\end{figure}
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{CHAPTER SUMMARY}
+\section{Phase 3: Model Architecture}
+\label{sec:phase3_architecture}
 %─────────────────────────────────────────────────────────────────────────────
 
-This chapter defined a practical VLA methodology aligned with low-resource
-implementation goals. The proposed system integrates multimodal reasoning and robot
-action generation through a standardized AI-to-robot interface. The design explicitly
-addresses limited dataset scale, 8 GB VRAM hardware constraints, and Dobot CR5 safety
-standards, and establishes an evaluation protocol across simulation and real-world
-domains for both standard success-rate and zero-shot tests.
+The core system architecture processes multimodal inputs to generate fluid, safe robotic trajectories. As illustrated in Figure~\ref{fig:system-architecture}, the pipeline is divided into three primary stages: Perception, Action Generation, and the Safety Layer. At each control cycle, the system ingests a synthesized input tuple consisting of an RGB image, a natural-language instruction, and the current joint state. These inputs are processed by the cognitive backbone and passed to the diffusion expert, before final validation against hardware constraints.
 
-With this methodology in place, Chapter~\ref{chap:experiments} evaluates whether the
-designed pipeline delivers measurable gains in action validity, instruction following,
-and transfer performance under the targeted resource constraints.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/system_architecture.png}
+    \caption[Overall Vision-Language-Action pipeline]{Overall Vision-Language-Action pipeline. Multimodal inputs flow through the QwenVL 3.5 2B perception backbone and DiT Action Expert, generating safe, validated trajectories for the Dobot CR5.}
+    \label{fig:system-architecture}
+\end{figure}
+
+\subsection{Vision-Language Backbone}
+\label{sec:vlm_backbone}
+
+The VLM Core utilizes the lightweight Qwen-VL architecture. While larger models (e.g., 4-billion parameters) are standard in large-scale VLA research, empirical benchmarking of spatial intelligence reveals that the smaller parameter models (2B) retain highly comparable spatial awareness. 
+
+As detailed in Table~\ref{tab:spatial_intelligence}, the performance delta between the 4B and smaller variants across core spatial benchmarks such as RefCOCO (avg) and EmbSpatialBench is marginal. Consequently, downsizing to the smaller Qwen-VL backbone yields significant computational performance and memory footprint gains while sacrificing almost zero actionable accuracy for robotic manipulation. This backbone is responsible for extracting dense latent representations from the multi-camera visual inputs.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Benchmark} & \textbf{Qwen3-VL-4B} & \textbf{Qwen3-VL-2B} & \textbf{Qwen3.5-VL-2B} & \textbf{Qwen3.5-VL-0.8B} \\
+        \midrule
+        RefCOCO (avg)   & 88.2 & 84.8 & 84.8 / 84.3 & 79.3 / 77.8 \\
+        CountBench      & 89.4 & 84.1 & 91.4 / 86.8 & 77.0 / 68.6 \\
+        ODInW13         & 39.4 & 36.0 & 35.9 / 40.5 & 31.6 / 33.2 \\
+        ERQA            & 47.3 & 41.8 & 43.8 / 33.0 & 34.5 / 23.8 \\
+        EmbSpatialBench & 80.7 & 75.9 & 77.9 / 66.4 & 68.6 / 54.6 \\
+        RefSpatialBench & 45.3 & 28.9 & 32.9 / 30.0 & 23.5 / 21.7 \\
+        Hypersim        & 11.9 & 11.2 & 12.4 / 12.4 & 11.9 / 11.0 \\
+        SUNRGBD         & 28.0 & 28.6 & 28.7 / 25.6 & 26.1 / 23.3 \\
+        Nuscene         & 4.9  & 4.0  & 6.9 / 8.5   & 5.7 / 7.0   \\
+        \bottomrule
+    \end{tabular}
+    \caption{Spatial Intelligence Benchmark Comparison across Qwen-VL Model Variants.}
+    \label{tab:spatial_intelligence}
+\end{table}
+
+\subsection{Overview-Aware Strategy}
+A critical challenge in end-to-end robotics is the tendency of models to "cheat" by over-relying on the end-effector (wrist) camera to align with an object, effectively ignoring the global scene context. To combat this, the architecture employs an \textbf{Overview-Aware Strategy}. During training, an \texttt{ee\_image\_dropout\_prob} of 20\% is applied, randomly blanking the end-effector view. This forces the model to extract spatial features from the overview camera, ensuring it understands the robot's coordinates relative to the entire workspace.
+
+\subsection{Structured Latent Conditioning via Masked Cross-Attention}
+\label{sec:latent_conditioning}
+
+To bridge the high-dimensional semantic output of the QwenVL backbone and the continuous action-space requirements of the DiT, the architecture introduces a Perceiver-style cross-attention bottleneck. Rather than passing the entire sequence of VLM tokens directly to the diffusion expert---which would incur massive computational overhead and risk modality entanglement---the system compresses this knowledge into a fixed sequence of 64 trainable latent tokens. The data flow of this mechanism is illustrated in Figure~\ref{fig:model-flowing}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/model_flowing.png}
+    \caption[Structured latent conditioning flow]{Detailed flow of the structured latent conditioning. A fixed set of trainable Latent tokens cross-attends to the QwenVL output. The refined tokens (Latent*) are combined with an orthogonally projected Robot State to form the final Context for the Diffusion Transformer.}
+    \label{fig:model-flowing}
+\end{figure}
+
+A critical architectural innovation in this pipeline is the forced disentanglement of multimodal features. If the 64 latent queries ($Q$) are allowed to attend globally to all VLM keys and values ($K, V$), the model often collapses into a state where it primarily attends to a single dominant modality. To prevent this, the 64-token sequence is partitioned into four distinct chunks, and a custom boolean attention mask (Figure~\ref{fig:token-crossattention}) enforces strict routing rules during the cross-attention operation:
+\begin{itemize}
+    \item \textbf{Chunk 1 (15 tokens):} Constrained to attend \textit{only} to spatial tokens originating from the overview camera.
+    \item \textbf{Chunk 2 (15 tokens):} Constrained to attend \textit{only} to spatial tokens from the end-effector (wrist) camera.
+    \item \textbf{Chunk 3 (10 tokens):} Constrained to attend \textit{only} to the natural-language instruction text tokens.
+    \item \textbf{Chunk 4 (24 tokens):} Granted global attention to synthesize cross-modal contextual relationships.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/token_crossattention.png}
+    \caption[Boolean cross-attention mask mapping]{Boolean cross-attention mask mapping. Shaded cells indicate permitted attention connections between the latent token chunks and the specific modality source tokens. Unshaded cells are masked.}
+    \label{fig:token-crossattention}
+\end{figure}
+
+Before the DiT can utilize these visual and semantic features, the current 6-DOF joint and gripper state must be integrated. To map the physical state vector into the high-dimensional latent space without destabilizing the network, it is passed through a linear projection layer. Crucially, the weights of this linear layer are initialized using an \textbf{orthogonal projection strategy} relative to the mean of the physical state distribution across the training dataset. This technique prevents raw state features from dominating visual features early in training and ensures strict gradient stability. The projected state is then concatenated with the Latent* sequence to form the ultimate context tensor.
+
+\subsection{Diffusion Transformer (DiT)}
+The final context tensor is fed into the \textbf{Diffusion Transformer (DiT)} Action Expert. The DiT integrates these disentangled latent features with a noisy action input to iteratively generate the final predicted robot trajectory.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Phase 4: Training Objectives and Flow Matching}
+\label{sec:phase4_training}
+%─────────────────────────────────────────────────────────────────────────────
+
+Unlike traditional behavior cloning that predicts a single discrete action, this methodology utilizes \textbf{Flow Matching} for trajectory generation. The model learns to predict the "velocity" vector field that transforms a distribution of pure noise ($x_0$) into a distribution of expert trajectories ($x_1$).
+
+\subsection{The Multi-Component Loss Function}
+To ensure the generated trajectory is accurate, physically grounded, and smooth, the model optimizes a weighted combination of five distinct loss terms:
+
+$$L_{total} = L_{flow} + \lambda_{pos}L_{pos} + \lambda_{smooth}L_{smooth} + \lambda_{div}L_{div} + \lambda_{state}L_{state}$$
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{p{0.25\linewidth} p{0.3\linewidth} p{0.4\linewidth}}
+        \toprule
+        \textbf{Loss Term} & \textbf{Calculation} & \textbf{Objective} \\
+        \midrule
+        Flow Loss ($L_{flow}$) & MSE($v_{pred}$, target\_velocity) & The core objective. Trains the DiT to predict the correct direction to "push" noise toward the expert action. \\
+        \addlinespace
+        Position Loss ($L_{pos}$) & MSE($x1_{hat}$, $x1_{target}$) & Acts as a safety net. Ensures the final coordinates reached by the flow prediction match the target. \\
+        \addlinespace
+        Smoothness Loss ($L_{smooth}$) & L2(acceleration) & Penalizes high-frequency "jitter" via the second derivative to ensure fluid motion. \\
+        \addlinespace
+        Diversity Loss ($L_{div}$) & CosineSimilarity(latents) & Prevents mode collapse by forcing internal latent tokens to represent different scene features. \\
+        \addlinespace
+        State Prediction ($L_{state}$) & MSE($pred\_state$, $real\_state$) & Forces visual features to be physically grounded by reconstructing joint angles directly from images. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Breakdown of the Multi-Component Loss Function}
+    \label{tab:loss_functions}
+\end{table}
+
+\subsubsection*{Weighted Position Loss via Precomputed Masks}
+To leverage the kinematic analysis conducted during data preparation (Section~\ref{sec:kinematic_analysis}), the Position Loss ($L_{pos}$) is not applied uniformly across all joints. Instead, it utilizes the precomputed motion masks to dynamically scale the loss gradients. 
+
+The weighted Position Loss is formulated as a weighted Mean Squared Error (MSE) across all joints $j$:
+$$L_{pos} = \frac{1}{J} \sum_{j=1}^{J} w_j \| \hat{x}_{1,j} - x_{1,j} \|_2^2$$
+where $\hat{x}_{1,j}$ is the predicted final coordinate, $x_{1,j}$ is the target coordinate, and the dynamic weight multiplier $w_j$ is defined by the motion flag:
+\begin{itemize}
+    \item $w_j = 2.0$ if Joint $j$ is classified as \textbf{MOVING}.
+    \item $w_j = 0.8$ if Joint $j$ is classified as \textbf{STATIONARY}.
+\end{itemize}
+This academic rationale forces the network's gradient updates to focus heavily on correcting the joints actively driving the motion, rather than over-optimizing or hallucinating movements in idle joints.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Phase 5: Model Evaluation and Improvement}
+\label{sec:phase5_evaluation}
+%─────────────────────────────────────────────────────────────────────────────
+
+The final trained model undergoes a rigorous two-pronged evaluation protocol:
+\begin{itemize}
+    \item \textbf{Simulation Evaluation (Generalization):} The model is tested against unseen objects and novel environmental settings in IsaacLab to measure its zero-shot generalization capabilities.
+    \item \textbf{Real-World Evaluation (Completion):} The model is deployed on the physical Dobot CR5 to measure the absolute object success rate across 10 trials per task. 
+\end{itemize}
+Insights gathered from these evaluations (specifically divergences in expected positioning and motion jitter) are fed back into the tuning weights for the Divergence, Smoothness, and Position losses to iteratively refine system performance.

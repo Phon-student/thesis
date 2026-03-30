@@ -1,50 +1,29 @@
 \noindent
 \begin{tabular}{ll}
-\textbf{Thesis}          & Action Omni Multi-modal model that interacts with physical world \\
-                         & with Improved Generalization to Unseen Manipulation Tasks \\
-\textbf{Students}        & Mr.~Sittipon Kumda \\
-                         & Mr.~Rachata Pratheep Na Thalang \\
-                         & Mr.~Sippaphat Pitiwan \\
-                         & Mr.~Tanakorn Youngmeesuk \\
-                         & Ms.~Thanchanok Nuengcham Nong \\
+\textbf{Thesis}          & ACTION OMNI MULTI-MODAL MODEL THAT INTERACTS WITH PHYSICAL WORLD \\
+\textbf{Students}        & Sittipon Kumda \\
+                         & Rachata Pratheep Na Thalang \\
+                         & Sippaphat Pitiwan \\
+                         & Tanakorn Youngmeesuk \\
+                         & Thanchanok Nuengchamnong \\
 \textbf{Student IDs}     & 65011539, 65011499, 65011525, 65011563, 65011586 \\
 \textbf{Degree}          & Bachelor of Engineering \\
 \textbf{Program}         & Robotics and AI Engineering \\
 \textbf{Year}            & 2026 \\
-\textbf{Thesis Advisor}  & Prof.~Dr.~Poom Konghuayrob \\
+\textbf{Thesis Advisor}  & Asst.~Prof~Dr.~Poom Konghuayrob \\
 \end{tabular}
 
 \vspace{1cm}
+
 
 \begin{center}
 \textbf{\Large ABSTRACT IN ENGLISH}
 \end{center}
 
-\vspace{0.5cm}
+This thesis presents Action Omni, an end-to-end Vision-Language-Action (VLA) framework for robot manipulation on the Dobot CR5 that enables execution of tasks directly from natural-language instructions, eliminating the need for task-specific programming. Unlike conventional robot control which requires manual code for each new task, VLA enables a single model to interpret free-form natural-language instructions, perceive the scene through RGB cameras, and generate continuous joint trajectories removing the need for hand-crafted state machines, predefined motion primitives, or task-specific re-programming when the task or environment changes. Developed under strict constraints including a 1-hour dataset, 8~GB VRAM training limit, and safety-restricted joint configurations, the system integrates a QwenVL3.5 2B perception backbone, a Diffusion Transformer (DiT) Action Expert, and a deterministic safety layer, trained on 530 simulation and 90 real-world episodes across Stay, Reach, and Grip tasks. Compared to SmolVLA, Action Omni achieves \textbf{55\%} success in simulation and \textbf{30\%} on the real-world Reach task, while requiring only 4~GB VRAM during inference.
+ 
 
-This thesis presents a Vision-Language-Action (VLA) framework for robot arm
-manipulation in which visual perception, language understanding, and action generation
-are integrated into a single control pipeline. The work addresses key limitations of
-current VLA practice in low-resource settings: high data collection cost, limited
-access to high-memory hardware, and fragmented integration between multimodal AI and
-robot-controller execution.
 
-The proposed architecture combines three coordinated components: a Vision-Language
-Model (VLM) core for instruction grounding, a Vision Expert for task-relevant visual
-feature extraction, and an Action Expert for executable robot action generation.
-The system receives an RGB scene observation and a free-form natural-language command,
-then produces structured manipulation actions suitable for safe robot-controller
-execution through a TCP/IP communication adapter. The design specifically targets a
-commercial setup with limited dataset volume and an 8 GB VRAM class training budget.
-
-Experiments on representative robot manipulation tasks show that explicit VLM + Vision
-Expert + Action Expert integration improves action validity and task success compared
-with partial baselines. Evaluation across simulation and real-robot domains,
-including zero-shot settings, shows that the system follows natural-language
-instructions reliably, maintains practical real-time latency, and retains competitive
-performance under constrained training resources. The results support the feasibility
-of practical low-resource VLA-based robot control under realistic computation,
-data, and integration constraints.
 
 \vspace{0.4cm}
 \noindent\textbf{Keywords:} Vision-Language-Action, Robot Manipulation,

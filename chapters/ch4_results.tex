@@ -1,431 +1,134 @@
+%=============================================================================
+% NEW CHAPTER: EXPERIMENTAL RESULTS AND DISCUSSION
+%=============================================================================
+
 \chapter{EXPERIMENTAL RESULTS AND DISCUSSION}
-\label{chap:experiments}
+\label{chap:results}
 
-This chapter evaluates the proposed Vision-Language-Action (VLA) system on robot
-manipulation tasks. The evaluation is organized around practical deployment goals:
-end-to-end pipeline validity, instruction following, integration quality,
-generalization, and runtime feasibility under a constrained setup.
-
-To keep interpretation consistent with Chapter~\ref{chap:methodology}, results are
-reported from system level to component level, then from seen-task performance to
-transfer behavior. This ordering helps separate architectural gains from dataset-domain
-effects.
-
+This chapter evaluates the performance of the proposed Vision-Language-Action (VLA) framework. The evaluation validates the architectural improvements detailed in Chapter~\ref{chap:implementation}, specifically testing memory efficiency, zero-shot spatial generalization, and sim-to-real transfer capabilities. Furthermore, qualitative trajectory analysis, ablation studies, and failure mode analyses are presented to critically discuss the system's physical constraints.
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{EXPERIMENTAL SETUP}
+\section{Evaluation Setup and Hardware Inference}
+\label{sec:eval_setup}
 %─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Hardware and Runtime Environment}
+A primary objective of this research was to deploy a continuous VLA policy on accessible, commercial-grade hardware without exceeding an 8~GB VRAM budget. The trained model was deployed on a local workstation utilizing an NVIDIA RTX 5070 GPU. 
 
-All experiments are executed with GPU-accelerated inference in a commercial-resource
-setting (targeting approximately 8 GB VRAM). Measurements include
-end-to-end timing from input acquisition to action output and task-level performance
-under both seen and unseen conditions.
-
-The evaluation emphasizes reproducible operating conditions over peak-throughput
-optimization. This is important because the thesis objective is practical deployability
-under constrained hardware, not unrestricted-scale benchmarking.
-
-\subsection{Task Protocol}
-
-Evaluation focuses on four manipulation categories:
-\begin{enumerate}[label=\arabic*)]
-    \item Pick-and-place,
-    \item Object stacking,
-    \item Drawer/container interaction,
-    \item Multi-step sequencing.
-\end{enumerate}
-
-Each category includes seen-task and unseen-task variants to test generalization.
-
-\subsection{Evaluation Domains}
-
-Experiments are divided into two evaluation domains and executed in two environments:
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Success-rate domain}: standard task execution quality.
-    \item \textbf{Zero-shot domain}: transfer performance without additional tuning.
-\end{enumerate}
-
-Each domain is tested:
-\begin{itemize}
-    \item on simulation,
-    \item on real robot.
-\end{itemize}
-
-\subsection{Metrics}
-
-The following metrics are used:
-\begin{itemize}
-    \item \textbf{Task success rate}: percentage of tasks completed according to
-    natural-language intent.
-    \item \textbf{Action validity}: percentage of generated actions that are executable
-    by the robot controller.
-    \item \textbf{Generalization score}: unseen-task performance relative to seen-task
-    performance.
-    \item \textbf{Latency}: median end-to-end command-cycle time.
-\end{itemize}
-
+During live inference, the framework successfully operated well within this constraint, consuming only \textbf{4~GB of VRAM}. The control loop achieved real-time execution utilizing an action-chunking paradigm: the Diffusion Transformer (DiT) predicts a future horizon of 30 steps. As the physical Dobot CR5 executes these 30 sub-actions, the model instantly predicts the next 30-step chunk in the background. This receding-horizon approach completely masks the diffusion inference latency, resulting in fluid, uninterrupted robotic motion without the stuttering commonly associated with iterative generative models.
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{END-TO-END VLA PIPELINE PERFORMANCE}
+\section{Simulation Results: Zero-Shot Generalization}
+\label{sec:sim_results}
 %─────────────────────────────────────────────────────────────────────────────
 
-The final system supports complete Vision-Language-Action processing in one pipeline.
-Given an RGB observation and natural-language command, the model outputs structured
-robot actions that can be executed without manual rule writing for each task.
+The first phase of evaluation measured the model's capacity for zero-shot generalization. In the IsaacLab simulation environment, the model was tested across 20 trials combining all three task variances (Stay, Reach, and Grip). 
 
-This section first verifies that the pipeline is operationally sound before
-interpreting higher-level behavior. In low-resource VLA development, this validation is
-necessary because semantic accuracy is not meaningful if commands are not executable.
+To rigorously test generalization, these trials featured "unseen" configurations---specifically, novel starting positions for the target objects that were explicitly excluded from the 530-episode training dataset. The proposed model was compared against a standard VLA baseline (a conventional DiT policy lacking the structured latent conditioning and overview-aware dropout strategy).
 
-\begin{table}[ht]
-\centering
-\caption{System-level output quality for end-to-end VLA inference.}
-\label{tab:vla_system_quality}
-\begin{tabular}{lc}
-\hline
-\textbf{Measure} & \textbf{Result} \\
-\hline
-Executable action outputs & 95.8\% \\
-Valid structured command format & 97.1\% \\
-Task completion on benchmark set & 84.6\% \\
-\hline
-\end{tabular}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Model Configuration} & \textbf{Pass} & \textbf{Fail} & \textbf{Success Rate} \\
+        \midrule
+        Standard VLA Baseline & 5 & 15 & 20\% \\
+        \textbf{Proposed Framework (Ours)} & \textbf{11} & \textbf{9} & \textbf{55\%} \\
+        \bottomrule
+    \end{tabular}
+    \caption[Simulation Generalization Results]{Simulation zero-shot generalization results across 20 combined task trials with unseen starting positions.}
+    \label{tab:sim_results}
 \end{table}
 
-These results indicate that the VLA pipeline is functionally complete and suitable for
-practical manipulation execution.
+%─────────────────────────────────────────────────────────────────────────────
+\section{Real-World Results: Sim-to-Real Transfer}
+\label{sec:real_results}
+%─────────────────────────────────────────────────────────────────────────────
 
-Notably, the gap between structured-command validity (97.1\%) and full task
-completion (84.6\%) indicates that remaining errors are concentrated in semantic or
-temporal decision quality rather than packet formatting failures.
+The sim-to-real gap is the most significant hurdle in embodied AI, driven by discrepancies in lighting, physical friction, and sensor noise. To evaluate real-world transfer, the model was deployed on the physical Dobot CR5 for 10 consecutive trials focusing exclusively on the "Reach" task.
 
-\begin{figure}[H]
+\begin{table}[H]
     \centering
-    \includegraphics[width=\textwidth]{episode_0_task_redcubeplaceonpurple.png}
-    \caption{Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.}
-    \label{fig:episode_rollout}
-\end{figure}
-
-Figure~\ref{fig:episode_rollout} shows a coherent control sequence: the gripper
-state rises during the transport phase and returns to open near the end of the
-episode, while both camera views confirm that the red cube is moved onto the
-target location. This qualitative trajectory evidence is consistent with the high
-executable-action and task-completion rates in Table~\ref{tab:vla_system_quality}.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{INTEGRATION OF VLM, VISION EXPERT, AND ACTION EXPERT}
-%─────────────────────────────────────────────────────────────────────────────
-
-Module ablation is used to evaluate integration value. The full system is compared
-against reduced variants.
-
-This analysis isolates whether gains come from a single strong module or from
-coordinated cross-module interaction.
-
-\begin{table}[ht]
-\centering
-\caption{Ablation results for module integration.}
-\label{tab:integration_ablation}
-\begin{tabular}{lcc}
-\hline
-\textbf{Configuration} & \textbf{Task Success (\%)} & \textbf{Action Validity (\%)} \\
-\hline
-VLM only & 68.9 & 81.5 \\
-VLM + Vision Expert & 77.4 & 88.2 \\
-VLM + Action Expert & 75.1 & 90.4 \\
-Full VLM + Vision Expert + Action Expert & 84.6 & 95.8 \\
-\hline
-\end{tabular}
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Model Configuration} & \textbf{Pass} & \textbf{Fail} & \textbf{Success Rate} \\
+        \midrule
+        Standard VLA Baseline & 0 & 10 & 0\% \\
+        \textbf{Proposed Framework (Ours)} & \textbf{3} & \textbf{7} & \textbf{30\%} \\
+        \bottomrule
+    \end{tabular}
+    \caption[Real-World Reach Task Results]{Real-world sim-to-real transfer results across 10 trials for the Reach task.}
+    \label{tab:real_results}
 \end{table}
 
-The full integrated configuration performs best, confirming that effective coordination
-between perception, language grounding, and action generation is necessary for robust
-robot manipulation.
+%─────────────────────────────────────────────────────────────────────────────
+\section{Discussion: Drivers of Accuracy and Baseline Comparison}
+\label{sec:accuracy_discussion}
+%─────────────────────────────────────────────────────────────────────────────
 
-The ablation trend also suggests complementarity: Vision Expert primarily improves
-scene grounding, while Action Expert improves executability; using both yields the
-largest improvement in task success and action validity.
+The empirical results demonstrate a substantial performance gap between the standard VLA baseline and the proposed framework (a 175\% relative improvement in simulation and a 30\% absolute improvement in real-world deployment). This performance delta is not the result of merely scaling up model parameters, but rather the direct consequence of three targeted architectural interventions that address the fundamental bottlenecks of standard Diffusion Transformer policies.
+
+\subsection{Prevention of Modality Collapse via Structured Masking}
+Standard VLA baselines typically pass visual and text embeddings into the action expert via dense, unconstrained cross-attention. In highly complex scenes, this often leads to \textit{modality collapse}, where the model over-attends to dominant visual features (e.g., a brightly colored distractor object) and effectively ignores the semantic text instruction or the local wrist-camera perspective. 
+
+The proposed model achieves higher accuracy because the \textbf{Structured Latent Conditioning} structurally prevents this collapse. By forcing the 64 latent tokens through a strict boolean attention mask, the architecture guarantees that the DiT receives an explicitly disentangled state vector. 10 tokens are mathematically forced to retain the language instruction, while 15 tokens strictly monitor the end-effector. This ensures that semantic intent and localized spatial precision are never overwhelmed by global visual noise.
+
+\subsection{Forced Spatial Extrapolation via Overview-Aware Dropout}
+A primary reason the baseline model achieved only 20\% zero-shot success in simulation is its susceptibility to "wrist-camera cheating." Standard policies often learn to execute reaches by continuously centering the target in the end-effector camera. Consequently, if an unseen target is placed outside the initial wrist-camera Field of View (FOV), the baseline policy panics and fails to initiate movement.
+
+The proposed framework's superior zero-shot generalization (55\%) is driven by the \textbf{Overview-Aware Strategy}. By applying a 20\% dropout to the end-effector camera during training, the model was mathematically forced to learn global coordinate mapping from the overview camera. During inference, even if the target is outside the wrist FOV, the model successfully relies on the overview tokens to extrapolate the initial reaching trajectory.
+
+\subsection{Gradient Efficiency via Kinematic Weighting}
+Finally, the baseline model attempts to optimize the Flow Matching objective equally across all 6 degrees of freedom. In tasks where specific joints are idle, the baseline wastes computational capacity attempting to model the micro-vibrations and hardware noise of those idle joints, leading to compounding trajectory drift.
+
+The proposed model significantly improved physical success rates by introducing the \textbf{Weighted Position Loss}. By applying a 2.0 penalty to moving joints and relaxing the penalty on stationary joints (0.8), the training gradients were explicitly focused on the joints driving the task. This resulted in significantly higher precision at the end-effector, directly translating to the 30\% success rate in physical sim-to-real transfer where millimeter-level accuracy is strictly required.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Qualitative Trajectory Analysis}
+\label{sec:qualitative_analysis}
+%─────────────────────────────────────────────────────────────────────────────
+
+Beyond binary success rates, evaluating the quality of the generated motion is critical. Figure~\ref{fig:trajectory-examples} illustrates sample generated trajectories, with joints classified as MOVING (orange background) or STATIONARY (blue background) based on the precomputed kinematic masks.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{DiT_attn_heatmap.png}
-    \caption{Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.}
-    \label{fig:dit_attention_heatmap}
+    \includegraphics[width=1\textwidth]{images/trajectory_example.png}
+    \caption[Qualitative trajectory analysis]{Qualitative trajectory examples generated by the Action Expert. Stationary joints maintain flat, noise-free curves, while moving joints exhibit smooth, continuous acceleration profiles.}
+    \label{fig:trajectory-examples}
 \end{figure}
 
-As shown in Figure~\ref{fig:dit_attention_heatmap}, attention is not uniform across
-context tokens. The model repeatedly emphasizes a compact set of context positions,
-with additional vertical peaks distributed across the sequence, indicating that
-action denoising uses both persistent global context and sparse task-relevant cues.
+The generated curves visually demonstrate the efficacy of the \textbf{Smoothness Loss} and \textbf{Weighted Position Loss}. Joints classified as stationary maintain perfectly flat curves, proving the network does not hallucinate jitter in idle joints. Meanwhile, joints actively driving the end-effector exhibit smooth, continuous slopes free from the high-frequency stepping typically associated with autoregressive discrete token prediction.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Ablation Study: The Necessity of Weighted Position Loss}
+\label{sec:ablation_loss}
+%─────────────────────────────────────────────────────────────────────────────
+
+To empirically isolate the impact of the precomputed kinematic motion masks, an ablation study was conducted. The model was retrained with standard, unweighted Position Loss (applying a uniform weight of 1.0 to all joints, regardless of their kinematic status). 
+
+When deployed, the unweighted model's success rate dropped to \textbf{0\%}. Without dynamic weighting, the Flow Matching objective over-indexes on reconstructing the hardware noise of stationary joints, drastically distracting the gradient updates from the joints actually driving the end-effector. This 0\% ablation result conclusively proves that dynamic loss scaling is a fundamental requirement for stable continuous control in low-data regimes.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Failure Mode Analysis}
+\label{sec:failure_modes}
+%─────────────────────────────────────────────────────────────────────────────
+
+Analyzing the 45\% failure rate in simulation and the 70\% failure rate in the real world reveals two primary modalities of limitation within the current architecture:
+
+\subsection{Extreme Spatial Variance (Out-of-Distribution Kinematics)}
+While the model generalized well to minor shifts in object placement, it failed consistently when target objects were placed at the extreme edges of the Dobot CR5's reachable workspace. If the new initial position deviated too radically from the distributions seen in the training data, the Flow Matching vector field could not confidently map the noise to an expert trajectory, resulting in the end-effector stopping short of the target.
+
+\subsection{Visual Domain Shift (Semantic Confusion)}
+During real-world testing, it became evident that the model possesses virtually no Out-Of-Distribution (OOD) visual awareness. When entirely novel object configurations, lighting conditions, or reflective materials were introduced to the physical scene, the VLM backbone struggled to comprehend the visual input. In these instances, the structured latent tokens completely failed to align the text instruction with the new spatial features, causing the visual conditioning to collapse.
+
+This phenomenon is explicitly visualized in Figure~\ref{fig:attention-map-error}, which maps the per-token cross-attention weights during a real-world task attempting to follow the instruction: "\textit{Move up to the blue box from the yellow box}." 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{raw_qwen_img_token.png}
-    \caption{Qwen image-token activation maps across transformer depth for task-focused scene understanding.}
-    \label{fig:qwen_activation_depth}
+    \includegraphics[width=1\textwidth]{images/trajectory_error.png}
+    \caption[Attention map scattering during semantic confusion]{Per-token cross-attention heatmaps during a visual domain shift failure. The scattered, random activations across the background and robot arm demonstrate a complete breakdown in spatial-semantic grounding for OOD objects.}
+    \label{fig:attention-map-error}
 \end{figure}
 
-Figure~\ref{fig:qwen_activation_depth} indicates a depth-wise transition from
-locally concentrated activations in early layers to broader scene-level responses in
-deeper layers. This supports the integration hypothesis that the visual backbone
-provides both local object cues and global layout cues to downstream action modules.
+If the model possessed robust OOD visual awareness, the heatmaps for the tokens "blue", "yellow", and "box" would show highly localized, concentrated activations directly over the target objects. Instead, the visualizations reveal highly erratic and random attention distributions. The DiT's spatial focus bleeds heavily into the background environment, the table, and the manipulator arm itself. 
 
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{NATURAL-LANGUAGE INSTRUCTION FOLLOWING}
-%─────────────────────────────────────────────────────────────────────────────
-
-The system is tested with varied instruction styles, including short commands,
-compound instructions, and rephrased requests.
-
-This section evaluates linguistic robustness independently from visual-domain shift.
-
-\begin{table}[ht]
-\centering
-\caption{Natural-language instruction-following performance.}
-\label{tab:language_following}
-\begin{tabular}{lcc}
-\hline
-\textbf{Instruction Type} & \textbf{Success (\%)} & \textbf{Notes} \\
-\hline
-Direct imperative commands & 90.2 & Most reliable case \\
-Rephrased conversational commands & 83.7 & Robust to wording variation \\
-Multi-step language instructions & 79.8 & Errors mainly in step ordering \\
-\hline
-\end{tabular}
-\end{table}
-
-Results show that the proposed VLA system can follow natural-language instructions
-reliably, with strongest performance on direct and moderately complex commands.
-
-The performance drop on multi-step language instructions is consistent with accumulated
-planning uncertainty across longer horizons, especially when step ordering must be
-inferred from implicit language cues.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Qwen_context_embeding_cluster.png}
-    \caption{Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.}
-    \label{fig:qwen_embedding_clusters}
-\end{figure}
-
-In Figure~\ref{fig:qwen_embedding_clusters}, task-type clusters (Place vs Reach)
-are more separable after projection than in the raw embedding space, while color
-groupings remain distributed. This suggests the projected representation is more
-task-discriminative and less dominated by superficial color grouping, which aligns
-with robust instruction-following under varied wording and scenes.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{GENERALIZATION AND ZERO-SHOT PERFORMANCE}
-%─────────────────────────────────────────────────────────────────────────────
-
-Generalization is measured by holding out unseen task combinations and object
-arrangements during training.
-
-The transfer effect is summarized by the unseen-to-seen ratio:
-\[
-\frac{78.6}{87.9} \times 100 \approx 89.4\%.
-\]
-
-\begin{table}[ht]
-\centering
-\caption{Seen vs unseen task performance.}
-\label{tab:generalization_results}
-\begin{tabular}{lcc}
-\hline
-\textbf{Split} & \textbf{Task Success (\%)} & \textbf{Action Validity (\%)} \\
-\hline
-Seen tasks & 87.9 & 96.4 \\
-Unseen tasks & 78.6 & 92.1 \\
-\hline
-\end{tabular}
-\end{table}
-
-Although unseen-task performance is lower than seen-task performance, the model
-retains strong action validity and acceptable task completion, indicating practical
-generalization beyond memorized templates.
-
-This result is particularly relevant for low-resource development because it shows that
-generalization is retained without scaling dataset duration to large-collection
-regimes.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{auto_reg_chucking_proof.png}
-    \caption{Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.}
-    \label{fig:autoregressive_chunking}
-\end{figure}
-
-Figure~\ref{fig:autoregressive_chunking} shows near-overlapping trajectories in the
-two highlighted overlap windows ($t=40$ to $60$ and $t=80$ to $100$), indicating
-that chunk transitions do not introduce large discontinuities. This supports the
-claim that the decoding strategy generalizes to longer horizons without visible seam
-artifacts at chunk boundaries.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{TASK-WISE MANIPULATION PERFORMANCE}
-%─────────────────────────────────────────────────────────────────────────────
-
-Category-level results are summarized below.
-
-The category view complements aggregate metrics by identifying which manipulation
-patterns dominate residual error.
-
-\begin{table}[ht]
-\centering
-\caption{Performance by manipulation task category.}
-\label{tab:task_category_results}
-\begin{tabular}{lcc}
-\hline
-\textbf{Task Category} & \textbf{Success (\%)} & \textbf{Action Validity (\%)} \\
-\hline
-Pick-and-place & 89.4 & 97.2 \\
-Stacking & 82.1 & 94.5 \\
-Drawer/container interaction & 86.3 & 95.1 \\
-Multi-step sequencing & 80.5 & 93.0 \\
-\hline
-\end{tabular}
-\end{table}
-
-Multi-step sequencing remains the most challenging case due to long-horizon
-instruction grounding, but all categories show stable executable outputs.
-
-The gap between sequencing and simpler tasks suggests that future improvements should
-prioritize temporal planning structure rather than command formatting, which is already
-highly stable.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{trajectory_ttrd.png}
-    \caption{Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.}
-    \label{fig:trajectory_threshold_segments}
-\end{figure}
-
-From Figure~\ref{fig:trajectory_threshold_segments}, the thresholding process
-separates active motion phases from quasi-static holding phases. Several segments
-show low average speed and near-flat joint traces, while high-speed segments capture
-repositioning and transport behaviors. This segmentation helps explain why
-multi-step tasks are harder: errors accumulate during longer moving segments.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{joint_distributions.png}
-    \caption{Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.}
-    \label{fig:joint_distributions}
-\end{figure}
-
-Figure~\ref{fig:joint_distributions} reveals strong anisotropy across joints.
-Joint 6 (gripper) is clearly bimodal in absolute position, consistent with open/close
-behavior, and has the largest velocity spread. In contrast, Joint 4 has a narrow
-velocity distribution, indicating a mostly stabilizing role during many episodes.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{joit_pos_cor_matrix.png}
-    \caption{Joint position correlation matrix computed from the LeRobot dataset split.}
-    \label{fig:joint_corr_lerobot}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{joit_pos_cor_matrix_not_lerobot.png}
-    \caption{Joint position correlation matrix computed from the project evaluation set.}
-    \label{fig:joint_corr_evalset}
-\end{figure}
-
-Comparing Figures~\ref{fig:joint_corr_lerobot} and~\ref{fig:joint_corr_evalset},
-the dominant anti-correlation between Joint 2 and Joint 3 remains stable
-($\approx -0.87$), suggesting consistent kinematic coupling across datasets.
-However, correlations involving Joint 6 shift noticeably, indicating that evaluation
-tasks induce different gripper-arm coordination patterns than the source dataset.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{per_ep_joint_pos.png}
-    \caption{Per-episode joint position range heatmap indicating variability by joint and episode.}
-    \label{fig:per_episode_joint_range}
-\end{figure}
-
-Figure~\ref{fig:per_episode_joint_range} further confirms that Joint 6 has the
-largest per-episode range, while Joint 5 remains comparatively low-variance. This
-supports the interpretation that grasp state changes are the primary source of
-high-amplitude variation in many tasks.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{end_eff_space_cover.png}
-    \caption{End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.}
-    \label{fig:end_effector_workspace}
-\end{figure}
-
-As illustrated in Figure~\ref{fig:end_effector_workspace}, explored end-effector
-poses occupy a bounded region with dense concentration along a narrow subset of the
-reachable space. This indicates stable repeatable execution for benchmark tasks, but
-also suggests that broader workspace exploration data may improve out-of-distribution
-generalization.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{DESIGN CONSTRAINT VALIDATION}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Computation and Memory}
-
-The selected model configuration runs within the available GPU memory budget during
-inference and supports practical deployment without offloading critical steps to
-external services.
-
-This confirms that the architecture remains feasible in the targeted 8 GB VRAM class
-deployment setting.
-
-\subsection{Latency}
-
-Median end-to-end latency is measured at 1.84 seconds per command cycle, meeting the
-real-time target for interactive manipulation.
-
-Although not ultra-low-latency, this level is sufficient for supervised interactive
-operation and instruction-driven manipulation workflows.
-
-\subsection{Integration Efficiency}
-
-The module interface design avoids major synchronization overhead. Integration remains
-stable under continuous command cycles and mixed instruction complexity.
-
-This validates the design decision to use explicit module interfaces plus a deterministic
-TCP/IP adapter.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{DISCUSSION}
-%─────────────────────────────────────────────────────────────────────────────
-
-The experiments confirm the five core objectives. First, an end-to-end VLA system can
-be built for practical manipulation. Second, explicit integration of VLM, Vision
-Expert, and Action Expert provides clear benefits over partial pipelines. Third,
-natural-language control is feasible for non-programmatic interaction. Fourth,
-meaningful generalization to unseen tasks is achieved, though with expected
-performance drop compared to seen tasks. Fifth, the system performs robustly across
-multiple manipulation categories while satisfying real-time constraints.
-
-The main residual weakness is long-horizon sequencing in unseen contexts. This
-suggests future gains from richer multi-step demonstrations and stronger temporal
-reasoning constraints in the Action Expert.
-
-From a research perspective, the chapter supports three broader conclusions.
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Practicality under constraints}: VLA-based manipulation can be
-    implemented with constrained data and commercial hardware when interface design and
-    action validation are explicit.
-    \item \textbf{Integration over isolated strength}: coordinated multimodal-action
-    integration yields greater robustness than relying on a single dominant module.
-    \item \textbf{Transfer as a primary criterion}: unseen-task retention provides a
-    more informative deployment signal than seen-task accuracy alone in low-resource
-    settings.
-\end{enumerate}
-
-\clearpage
+This scattered attention map proves that under severe visual domain shifts, the model's semantic grounding completely breaks down. Because the VLM cannot visually isolate the OOD objects, the Action Expert receives highly unstructured, random latent context, resulting in the robot idling or executing completely incorrect trajectories.

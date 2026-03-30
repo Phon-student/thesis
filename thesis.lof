@@ -1,17 +1,32 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A diagram of Dobot Cr5}}{5}{figure.caption.5}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Comparison between U-Net and DiT}}{9}{figure.caption.6}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces OpenVLA architecture}}{11}{figure.caption.7}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces SmolVLA architecture}}{12}{figure.caption.8}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Pi0.5 architecture}}{13}{figure.caption.9}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Overall Vision-Language-Action pipeline. Multimodal inputs flow through the QwenVL 3.5 2B perception backbone and DiT Action Expert, generating safe, validated trajectories for the Dobot CR5.}}{17}{figure.caption.10}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Detailed flow of the structured latent conditioning. A fixed set of trainable Latent tokens cross-attends to the QwenVL output. The refined tokens (Latent*) are combined with an orthogonally projected Robot State to form the final Context for the Diffusion Transformer.}}{19}{figure.caption.12}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Boolean cross-attention mask mapping. Shaded cells indicate permitted attention connections between the latent token chunks and the specific modality source tokens. Unshaded cells are masked.}}{20}{figure.caption.13}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.}}{17}{figure.caption.10}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.}}{18}{figure.caption.12}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.}}{18}{figure.caption.13}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.}}{19}{figure.caption.15}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.}}{20}{figure.caption.17}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.}}{21}{figure.caption.19}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.}}{22}{figure.caption.20}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.}}{23}{figure.caption.21}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.}}{24}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.}}{25}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.}}{26}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Reference dataset metadata summary (episodes, recording duration, frame rate, and episode-length distribution) used for comparison context.}}{24}{figure.caption.16}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Action autocorrelation of the new dataset. Suggested chunk length is 10 steps ($\approx 0.33$ s), indicating short-horizon temporal dependence.}}{25}{figure.caption.17}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces State-action temporal alignment of the new dataset. Mean control delay is 1 step ($\approx 0.033$ s), indicating near-synchronous action-state coupling.}}{25}{figure.caption.18}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Demonstrator speed variance in the new dataset. Coefficient of variation is 0.289, indicating moderate speed dispersion across episodes.}}{25}{figure.caption.19}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Cross-episode action variance in the new dataset. Variance concentration in specific temporal regions indicates phase-structured manipulation behavior.}}{26}{figure.caption.20}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Reference-set temporal diagnostics (autocorrelation, state-action delay, and speed variance) for side-by-side interpretation against the new data.}}{27}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Reference-set cross-episode action variance map across bilateral joints.}}{27}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Representative episode rollout for a pick-and-place instruction, showing joint trajectories and synchronized camera observations over time.}}{29}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Action-token to context-token attention map in the final diffusion transformer block. Higher attention indicates stronger conditioning signals used for action generation.}}{30}{figure.caption.27}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Qwen image-token activation maps across transformer depth for task-focused scene understanding.}}{30}{figure.caption.28}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Context-embedding clustering before and after projection, showing improved separation by task type while preserving object-color structure.}}{31}{figure.caption.30}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Autoregressive chunking consistency in overlap regions, demonstrating stable joint prediction across chunk boundaries.}}{32}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Trajectory segmentation under a motion threshold, illustrating moving and stationary phases used for temporal behavior analysis.}}{33}{figure.caption.34}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Per-joint position and anchor-velocity distributions used to inspect action-space coverage and motion statistics.}}{34}{figure.caption.35}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Joint position correlation matrix computed from the LeRobot dataset split.}}{35}{figure.caption.36}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Joint position correlation matrix computed from the project evaluation set.}}{36}{figure.caption.37}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Per-episode joint position range heatmap indicating variability by joint and episode.}}{37}{figure.caption.38}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces End-effector workspace coverage in 3D and projected density views, indicating explored reachable regions.}}{38}{figure.caption.39}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

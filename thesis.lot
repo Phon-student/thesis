@@ -1,13 +1,18 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Spatial Intelligence Benchmark Comparison across Qwen-VL Model Variants.}}{18}{table.caption.11}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Breakdown of the Multi-Component Loss Function}}{21}{table.caption.14}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces System-level output quality for end-to-end VLA inference.}}{16}{table.caption.9}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Ablation results for module integration.}}{17}{table.caption.11}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Natural-language instruction-following performance.}}{19}{table.caption.14}%
-\contentsline {table}{\numberline {4.4}{\ignorespaces Seen vs unseen task performance.}}{20}{table.caption.16}%
-\contentsline {table}{\numberline {4.5}{\ignorespaces Performance by manipulation task category.}}{21}{table.caption.18}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Dataset collection setting in this thesis compare to common SOTA-style practice.}}{23}{table.caption.15}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Summary of additional diagnostics for new data and reference data.}}{28}{table.caption.23}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces System-level output quality for end-to-end VLA inference.}}{28}{table.caption.24}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Ablation results for module integration.}}{29}{table.caption.26}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Natural-language instruction-following performance.}}{31}{table.caption.29}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Seen vs unseen task performance.}}{32}{table.caption.31}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Performance by manipulation task category.}}{33}{table.caption.33}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Qualitative effect of activation steering at varying injection strength $\mitalpha $.}}{39}{table.caption.40}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{31}{table.caption.26}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{32}{table.caption.27}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces System configuration used in this study}}{45}{table.caption.42}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Extended performance results}}{46}{table.caption.43}%

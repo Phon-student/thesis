@@ -1,73 +1,34 @@
+%=============================================================================
+% NEW CHAPTER: CONCLUSION
+%=============================================================================
+
 \chapter{CONCLUSION AND FUTURE WORK}
 \label{chap:conclusion}
 
+This thesis successfully bridged the gap between high-level semantic language instructions and low-level continuous robotic control for the collaborative Dobot CR5 platform. By uniting parameter-efficient Vision-Language Models with advanced Diffusion Transformer Action Experts, this project demonstrates a viable path forward for affordable, intelligent robotics.
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{CONCLUSION}
-%─────────────────────────────────────────────────────────────────────────────
-
-This thesis addressed the limitations of classical robot systems that are often
-task-specific, inflexible, and weak in natural-language interaction and unseen-task
-generalization. To solve these issues, the work proposed a Vision-Language-Action
-(VLA) framework that integrates three modules: a VLM core, a Vision Expert, and an
-Action Expert.
-
-The project achieved the current-stage objectives:
-\begin{enumerate}[label=\arabic*)]
-    \item Developed an end-to-end VLA system for robot manipulation.
-    \item Integrated VLM + Vision Expert + Action Expert into one coherent pipeline.
-    \item Enabled robots to follow natural-language instructions.
-    \item Improved generalization performance on unseen tasks.
-    \item Evaluated the system on representative manipulation benchmarks.
-\end{enumerate}
-
-Experimental results showed that explicit module integration improved action validity
-and task completion compared with partial baselines. The system maintained practical
-latency for interactive robot control and demonstrated stable performance across
-pick-and-place, stacking, container interaction, and multi-step sequencing tasks.
-
-Overall, the results support the central claim of this thesis: a carefully integrated
-VLA architecture can provide a practical path toward general-purpose intelligent robot
-manipulation under real-world compute and data constraints.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{LIMITATIONS}
-%─────────────────────────────────────────────────────────────────────────────
-
-Despite strong overall performance, several limitations remain.
-
+\section{Summary of Contributions}
+The core deliverables and contributions of this research are defined as follows:
 \begin{itemize}
-    \item Generalization to highly novel long-horizon tasks still degrades compared
-    with seen-task performance.
-    \item Data scale and diversity remain limited relative to real-world task
-    complexity.
-    \item Action sequencing errors can appear when instructions are ambiguous or
-    underspecified.
+    \item \textbf{Hardware Accessibility:} Developed a highly resource-optimized VLA framework capable of achieving continuous real-time inference on a commercial GPU utilizing only 4~GB of VRAM.
+    \item \textbf{Performance Gain:} Demonstrated a 55\% success rate in zero-shot multi-task simulations, more than doubling the 20\% baseline performance of standard, unweighted VLA architectures.
+    \item \textbf{End-to-End Pipeline Delivery:} Successfully delivered a complete VLA development framework and a multimodal robotics dataset specifically tailored for the Dobot CR5 embodiment.
 \end{itemize}
 
-These limitations indicate that stronger temporal reasoning and broader data coverage
-are necessary for robust deployment in unconstrained environments.
+\section{Research Limitations}
+While the proposed framework demonstrates significant improvements over standard baselines, several limitations constrain the current system:
+\begin{itemize}
+    \item \textbf{Dataset Scale and Task Scope:} The system was trained on a highly focused, low-volume dataset ($\approx$1 hour of simulation and 10 minutes of real-world demonstration). Consequently, the learned behaviors are currently restricted to three primitive skills (Stay, Reach, Grip). The model lacks the data diversity required for complex, multi-stage manipulation or highly dexterous bimanual tasks.
+    \item \textbf{VLM Parameter Ceiling:} Achieving the 4~GB VRAM operational footprint necessitated downsizing the perception backbone to the 2B-parameter QwenVL model. While its spatial awareness is excellent, its core semantic reasoning capacity is inherently lower than 7B or 70B parameter models, limiting its ability to process highly complex or ambiguous natural language instructions.
+    \item \textbf{Domain Shift Vulnerability:} As identified in the failure mode analysis, the model remains susceptible to out-of-distribution (OOD) scenarios. Unseen object colors, reflective textures, or extreme spatial coordinates that deviate significantly from the training distribution can cause the flow-matching vector field to collapse, leading to task failure.
+\end{itemize}
 
+\section{Global and Social Impact}
+The development of lightweight, highly capable VLA models democratizes access to advanced robotics research. By publishing the framework and dataset to the open-source community (via Hugging Face), this project lowers the barrier to entry for institutions lacking massive compute clusters. Furthermore, transitioning from brittle geometric path-planning to cognitively aware VLA policies acts as a catalyst for a new era of industrial automation, enabling robots to safely and robustly perform complex, unstructured tasks alongside human operators.
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{FUTURE WORK}
-%─────────────────────────────────────────────────────────────────────────────
-
-Future development will focus on the following directions:
-
-\begin{enumerate}[label=\arabic*)]
-    \item Expand robot demonstration data with broader object, scene, and instruction
-    diversity to improve generalization on unseen tasks.
-    \item Improve long-horizon planning in the Action Expert for more reliable
-    multi-step task execution.
-    \item Optimize model efficiency further for lower-latency operation on embedded
-    hardware.
-    \item Extend evaluation to more complex real-world manipulation scenarios with
-    stricter robustness requirements.
-    \item Introduce stronger safety checks and action-validation layers before physical
-    execution.
-\end{enumerate}
-
-These directions will support the transition from a research prototype to a more
-widely deployable general-purpose robotic assistant.
+\section{Future Work}
+To transition this proof-of-concept into a production-ready system, future work must address the identified limitations and failure modes. Key areas for development include:
+\begin{itemize}
+    \item \textbf{Scaling Data and Task Complexity:} Expanding the IsaacLab simulation pipeline to introduce aggressive domain randomization (lighting, textures, colors) and vastly wider spatial parameters to harden the model against out-of-distribution spatial failures.
+    \item \textbf{Enhancing Robustness and Failure Recovery:} Implementing closed-loop visual feedback mechanisms where the VLM actively monitors the execution of the trajectory, allowing the system to autonomously re-plan and recover if an object slips or the initial grasp fails.
+\end{itemize}

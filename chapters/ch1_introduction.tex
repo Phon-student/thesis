@@ -2,151 +2,255 @@
 \label{chap:introduction}
 
 %─────────────────────────────────────────────────────────────────────────────
-\section{Background and Motivation}
+\section{Statement and Significance of the Problems}
 %─────────────────────────────────────────────────────────────────────────────
 
-Vision-Language Models (VLMs) have recently shown strong capability in multimodal
-reasoning, instruction following, and human-computer interaction. Free-form language
-and visual observations can now be interpreted within a unified representation, so the
-gap between human intent and machine response can be reduced.
+The past decade has witnessed a profound transformation in artificial intelligence,
+driven by the emergence of Vision-Language Models (VLMs). These neural networks jointly process
+visual and textual inputs to produce semantically grounded outputs. By training on
+hundreds of millions of image-text pairs, these models have acquired broad and
+transferable understanding: they can recognise objects, infer spatial relationships,
+follow complex instructions, and reason about scenes they have never explicitly been
+trained on~\cite{openai2023gpt4v, liu2023llava, qwen3vl2025}. This generalized
+understanding has successfully unlocked a new tier of software automation,
+streamlining complex digital tasks such as zero-shot optical character recognition
+(OCR) and automated document summarization~\cite{bai2025qwen25vl}.
 
-The next research direction is the migration of this capability from digital tasks to
-physical execution. In this context, practical world impact is expected in domains where
-natural-language instructions must be converted into reliable actions, such as warehouse
-pick-and-place assistance, small-batch manufacturing support, laboratory sample handling,
-and assistive service operations in constrained indoor environments.
+The natural progression of this capability is its extension from the digital domain
+into the physical world. If a VLM can interpret an image and respond to questions
+about it, it should be able to direct a robot to physically interact with the objects
+it perceives. This transition forms the foundation of Vision-Language-Action (VLA)
+models  systems that couple the semantic reasoning of a VLM with a physical action
+generation module, enabling a robot to receive a natural-language instruction,
+interpret the visual state of its environment, and produce motor commands to
+accomplish the specified goal~\cite{brohan2023rt2, driess2023palme}. The potential
+for industrial automation is substantial: a robot that understands language and
+vision could be deployed flexibly across diverse tasks with minimal reprogramming,
+adapting to new objects and instructions without the task-specific engineering that
+classical robotic systems require~\cite{lavalle2006planning}.
 
-However, practical Vision-Language-Action (VLA) development is still constrained by
-resource requirements. In many published settings, more than 10 hours of robot motion,
-specialized data-collection infrastructure, and high-memory GPU hardware are required.
-Such requirements are difficult to satisfy for students, independent researchers, and
-small university laboratories. Real-robot data collection is costly and time-intensive,
-while access to large GPU memory is often limited.
+However, while VLM research has flourished globally, the study and development of
+VLA systems remains remarkably narrow. This disparity is primarily driven by severe
+hardware and computational constraints. Although advanced VLA models such as
+RT-2~\cite{brohan2023rt2}, OpenVLA~\cite{kim2024openvla}, and GR00T N1~\cite{nvidia2024groot} have demonstrated impressive results, their
+development relies on resources that are inaccessible to most research groups:
+multi-GPU server clusters, purpose-built robot fleets costing tens of thousands of
+dollars, and datasets comprising hundreds of thousands of demonstration
+episodes~\cite{openx2023, khazatsky2024droid}. As a consequence, VLA research
+remains far narrower in participation and diversity than VLM research, and its
+findings are difficult to reproduce or extend in resource-constrained settings.
 
-Accordingly, this thesis is motivated by the following question: can an end-to-end VLA
-pipeline be developed under a minimal commercial setup, using low-volume data and
-moderate compute resources, while retaining usable manipulation performance? To address
-this question, a practical framework is developed and evaluated to integrate multimodal
-understanding and robot control in a single trainable pipeline for constrained settings.
+This concentration of capability matters because it slows educational adoption,
+weakens scientific reproducibility, and delays the transfer of embodied AI from
+research laboratories to practical applications. If practical design principles for
+VLA development under constrained conditions are not established, access to this
+technology will remain limited to well-funded institutions. To address this, the
+study proposes an end-to-end framework to develop a VLA model strictly on
+consumer-grade setups. By bridging the gap between high-end capability and
+low-resource accessibility, this framework aims to make VLA research reachable and
+reproducible worldwide.
+
+\newpage
+
+\noindent The problem can be summarised in four concrete dimensions:
+
+\begin{enumerate}
+    \item \textbf{High entry cost}: existing VLA pipelines require long-duration data
+    collection, large task diversity, and multi-GPU infrastructure that is beyond the
+    reach of most academic groups and small research teams.
+
+    \item \textbf{Insufficient low-resource methodology}: limited published guidance
+    exists for training robust VLA models under narrow data and compute budgets, and
+    no open end-to-end framework currently targets consumer-grade hardware.
+
+    \item \textbf{AI-to-robot integration challenges}: practical deployment fails when
+    model outputs cannot be reliably translated into safe, standardised, and
+    executable robot commands at real-time control frequencies.
+
+    \item \textbf{Incomplete validation}: many studies emphasise simulation
+    performance while real-robot behaviour, zero-shot transfer, and deployment
+    constraints remain under-reported, limiting the practical relevance of their
+    findings.
+\end{enumerate}
+
+Addressing these issues is significant because it enables broader participation in
+embodied AI research, improves scientific reproducibility, and increases the
+practicality of language-conditioned robot systems for real operational environments
+beyond large research institutions.
 
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{Problem Identification}
-%─────────────────────────────────────────────────────────────────────────────
 
-Based on the motivation above, the core problem is not only model quality but
-development accessibility. Existing VLA practices are often constrained by high data
-requirements and expensive compute, which slows down experimentation and limits
-reproducibility across institutions.
+\section{Goal and Objectives of the Study}
 
-\paragraph{Gap 1: High Entry Cost for VLA Development.}
-Many published VLA pipelines depend on long-duration robot data collection
-(frequently more than 10 hours per setup), large and diverse task sets, and powerful
-multi-GPU infrastructure. This is misaligned with low-cost academic or commercial
-prototyping environments.
+The primary goal of this study is to develop a practical, end-to-end
+Vision-Language-Action framework that operates effectively on consumer-grade
+hardware, thereby democratizing access to embodied AI research worldwide. This is
+achieved by designing a system that is explicitly bounded by consumer-grade
+hardware constraints from the outset, rather than treating resource efficiency as a
+secondary concern.
 
-\paragraph{Gap 2: Insufficient Low-Resource Design Principles.}
-There is limited guidance on how to design a VLA pipeline that still works when data
-volume is low, task diversity is narrow, and hardware is constrained (e.g., 8 GB VRAM).
+\noindent The specific objectives are:
 
-\paragraph{Gap 3: Fragmented AI-to-Robot Integration.}
-Even when multimodal models perform well, practical deployment fails if communication
-between AI outputs and robot controller commands is not standardized, safe, and
-composable.
+\begin{enumerate}
+    \item To train a VLA model using the proposed end-to-end framework within an
+    8~GB VRAM budget, and to demonstrate practical manipulation capability by
+    achieving a task success rate above 50\%, improving clearly over the
+    approximately 30\% baseline.
 
-\paragraph{Gap 4: Incomplete Sim-to-Real Validation.}
-Evaluation is often focused on simulation only, while real-robot performance,
-zero-shot transfer, and deployment safety constraints are underreported.
-
-Building on these identified gaps, this thesis poses the following primary research
-question:
-
-\begin{quote}
-\textit{How can a practical end-to-end Vision-Language-Action pipeline be designed to
-train and deploy natural-language robot manipulation under low-data and limited-GPU
-conditions while preserving usable performance in both simulation and real-world
-settings?}
-\end{quote}
-
-The following secondary questions are also addressed:
-\begin{enumerate}[label=\arabic*)]
-    \item How should an end-to-end VLA pipeline be structured so that model outputs are
-    directly usable for robot execution through a stable AI-to-robot interface?
-    \item Which design choices are most effective when dataset duration is around
-    one hour and training must fit within an 8 GB VRAM budget?
-    \item To what extent can the resulting system follow natural-language commands and
-    generalize under zero-shot conditions in simulation and real-world tests?
+    \item To establish a robust VLA development framework that enables effective
+    alignment between simulation data and real-world robot datasets, so that
+    cross-domain learning, transfer reliability, and real-world deployment
+    stability are improved under consumer-grade resource constraints.
 \end{enumerate}
 
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{Objectives}
-%─────────────────────────────────────────────────────────────────────────────
 
-The overarching objective of this research is to make VLA development feasible under
-commercially accessible resources. The specific objectives are as follows:
+\section{Scope of the Study}
 
-\begin{enumerate}[label=\arabic*)]
-    \item To develop an end-to-end Vision-Language-Action pipeline that can be trained
-    and deployed with low dataset volume and limited GPU resources.
-    \item To build a VLA model that can steer a robot arm according to natural-language
-    commands with reliable executable outputs.
+
+The study focuses on language-guided tabletop manipulation using a Dobot CR5 six-
+degree-of-freedom robot arm. RGB visual observations from two fixed cameras and
+natural-language instructions are the primary system inputs. The task domain covers
+four manipulation categories: pick-and-place, stacking, drawer and container
+interaction, and multi-step sequencing.
+
+The demonstration dataset is intentionally constrained to a low-resource regime,
+comprising approximately one hour of robot motion distributed across simulation and
+real-world sources. Simulation trajectories are generated in Isaac Lab with domain
+randomisation; real-world demonstrations are collected using the open-source Dobot
+Dataset Collection Tools~\cite{falightsk2025dobot} via human teleoperation.
+
+Model development and training are designed to fit commercially accessible compute
+resources, with a target peak training budget of approximately 8~GB VRAM achieved
+through bfloat16 mixed precision, gradient checkpointing, and QLoRA~\cite{dettmers2023qlora}.
+Evaluation is conducted in both simulation and real-robot settings and includes
+success-rate assessment on seen tasks, zero-shot generalisation analysis on unseen
+object-instruction combinations, action validity measurement, and end-to-end latency
+profiling.
+
+
+
+\section{Process of the Study}
+
+
+\noindent The study is conducted through a structured end-to-end process:
+
+\begin{enumerate}
+    \item \textbf{System design}: a modular VLA architecture is specified by
+    integrating three core stages  a QwenVL3.5 2B perception
+    backbone~\cite{qwen3vl2025} for multimodal understanding, a trainable Diffusion
+    Transformer Action Expert~\cite{peebles2023dit} for continuous trajectory
+    generation, and a safety layer (constraint check plus protocol adapter) for
+    verified robot dispatch. The architecture is designed to satisfy the 8~GB VRAM
+    constraint from the outset.
+
+    \item \textbf{Data construction}: simulation trajectories from Isaac Lab and
+    real-world teleoperation recordings are collected, synchronised, and converted
+    into LeRobot-compatible corpora with per-joint normalisation and outlier
+    filtering. The simulation corpus is used for training, while real-world data is
+    reserved for evaluation and deployment validation.
+
+    \item \textbf{Model training}: the pipeline is trained in two stages. Stage~1
+    trains only the lightweight connector and action modules with frozen backbones,
+    establishing stable action generation before backbone adaptation. Stage~2 applies
+    LoRA fine-tuning~\cite{hu2022lora} to the VLM backbone with reduced learning
+    rate to adapt language-visual grounding to the manipulation domain without
+    catastrophic forgetting.
+
+    \item \textbf{Robot integration}: model outputs are translated into executable
+    robot commands through a safety-aware protocol adapter that performs
+    de-normalisation, constraint validation, and TCP/IP dispatch to the Dobot CR5
+    controller. A three-tier failure-handling protocol (rescale, abort, episode
+    reset) ensures safe operation under constraint violations.
+
+    \item \textbf{Evaluation and analysis}: performance is measured across simulation
+    and real-robot settings using four metrics  task success rate, action validity,
+    generalisation ratio, and end-to-end latency. Ablation experiments isolate the
+    contribution of each architectural module. Failure cases are categorised by stage
+    (perception, language grounding, action decoding) to guide targeted improvements.
+
+    \item \textbf{Iterative refinement}: error patterns identified from evaluation
+    inform targeted improvements including data reweighting, LoRA rank adjustment,
+    prompt engineering, and action-chunk horizon tuning, applied to improve
+    reliability and deployment feasibility within the resource constraints.
 \end{enumerate}
 
 
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{Scope and Limitations}
-%─────────────────────────────────────────────────────────────────────────────
-
-The scope of this research is delimited as follows. The target platform is a Dobot CR5
-robot arm for tabletop manipulation with RGB observations and natural-language
-instructions. The dataset scope is intentionally constrained to a low-resource regime
-(approximately one hour of robot motion and three task types), and training/deployment
-is designed to fit commercial GPU hardware around 8 GB VRAM. The study covers both
-simulation and real-world evaluation, including zero-shot setups. Full autonomous
-navigation, large-scale multi-robot coordination, and formal safety certification are
-outside this scope.
+\section{Limitations of the Study}
 
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{Contributions}
-%─────────────────────────────────────────────────────────────────────────────
+Several limitations are acknowledged in this work. First, task diversity is
+restricted to four tabletop manipulation categories using a small set of object
+types; conclusions regarding task generalisation should not be interpreted as
+evidence of broad universality across the full range of manipulation scenarios.
 
-The principal contributions of this thesis are as follows:
+Second, the demonstration dataset is intentionally small approximately one hour
+of motion data, with simulation-only training and real-robot deployment evaluation 
+which may constrain robustness when facing highly diverse object configurations or
+unconventional instruction phrasings not represented in the training distribution.
 
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{A low-resource end-to-end VLA pipeline} for training and deployment
-    under limited dataset and GPU conditions.
+Third, the evaluation platform is restricted to a single robot type (Dobot CR5);
+cross-platform transfer to robots with different kinematics, actuation mechanisms,
+or control interfaces is not validated in the present study. Fourth, all experiments
+are conducted under controlled laboratory conditions with consistent lighting and
+known object categories. Large-scale industrial deployment, human-safety
+certification, and long-horizon autonomous operation are outside the scope of this
+thesis.
 
-    \item \textbf{A practical AI-to-robot communication interface} that converts
-    model outputs into composable machine commands over TCP/IP for Dobot control.
+Finally, the VLM backbone is adapted through LoRA rather than full parameter
+fine-tuning, which limits the degree of task-specific adaptation achievable within
+the compute budget and may result in residual misgrounding on instruction phrasings
+that differ substantially from the backbone's pre-training distribution.
 
-    \item \textbf{A natural-language control capability} that enables robot steering
-    from user commands without manual per-task scripting.
 
-    \item \textbf{A sim-and-real evaluation framework} covering success rate and
-    zero-shot transfer in two domains.
 
-    \item \textbf{An implementation playbook} spanning dataset collection,
-    model development, training objective design, inference analysis, and model
-    improvement.
+\section{Definitions}
+
+
+\noindent The following definitions are used consistently throughout this thesis:
+
+\begin{enumerate}
+    \item \textbf{Vision-Language Model (VLM)}: a multimodal neural network
+    that jointly processes visual observations and textual inputs within a shared
+    representational framework, enabling instruction interpretation, visual
+    reasoning, and natural-language response generation~\cite{liu2023llava,
+    openai2023gpt4v}.
+
+    \item \textbf{Vision-Language-Action (VLA) model}: an extension of the VLM
+    paradigm that additionally produces executable physical control actions from
+    multimodal inputs, enabling an embodied agent to follow language instructions
+    by directly manipulating objects in its environment~\cite{brohan2023rt2,
+    kim2024openvla}.
+
+    \item \textbf{End-to-end pipeline}: an integrated learning and deployment
+    system in which perception, instruction understanding, and action generation
+    are trained and executed as a single continuous process, without relying on
+    manually engineered intermediate representations between stages.
+
+    \item \textbf{Low-resource setting}: an operational condition characterised
+    by constrained data volume and limited compute resources. In this study,
+    the low-resource setting is defined as approximately one hour of robot
+    motion data and a peak training and inference budget of approximately 8~GB
+    VRAM on a single consumer GPU.
+
+    \item \textbf{Zero-shot generalisation}: the capability of a trained model to
+    perform correctly on tasks or instruction variants that were not explicitly
+    observed during training, relying on the generalisation capacity of its
+    pre-trained backbone rather than task-specific memorisation.
+
+    \item \textbf{AI-to-robot interface}: the communication and safety layer that
+    converts the continuous action vectors produced by the model into hardware-
+    compatible robot commands, applying constraint validation and protocol
+    formatting before dispatch to the physical controller.
+
+    \item \textbf{Action validity}: the proportion of model-generated action vectors
+    that pass all safety-layer constraint checks  joint limits, workspace bounds,
+    speed limits, and format requirements  and are successfully dispatched to the
+    robot controller without rejection.
+
+    \item \textbf{Generalisation ratio}: the ratio of zero-shot task success rate
+    to seen-task success rate, expressed as a percentage, used to quantify how much
+    performance is retained when the model encounters object-instruction combinations
+    not present in the training distribution.
 \end{enumerate}
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{Thesis Organisation}
-%─────────────────────────────────────────────────────────────────────────────
-
-The remainder of this thesis is structured as follows.
-Chapter~\ref{chap:litreview} reviews related theories and prior work on multimodal
-robot learning, natural-language instruction following, and action modeling for
-manipulation.
-Chapter~\ref{chap:methodology} presents the proposed VLA system design, including
-module integration (VLM + Vision Expert + Action Expert), design constraints, and
-implementation strategy.
-Chapter~\ref{chap:experiments} reports experimental results on manipulation tasks,
-including instruction-following performance, generalization to unseen tasks, and
-real-time latency analysis.
-Chapter~\ref{chap:conclusion} summarizes key findings, limitations, and future
-directions for general-purpose intelligent robot systems.

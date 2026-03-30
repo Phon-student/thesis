@@ -1,285 +1,185 @@
-
 \chapter{RELATED THEORIES AND LITERATURE REVIEW}
 \label{chap:litreview}
 
 This chapter synthesizes the theoretical and empirical foundations that motivate the
 proposed Vision-Language-Action (VLA) framework. Rather than surveying prior work in
-isolation, the chapter connects core theories to the concrete problem addressed in
-this thesis: building practical natural-language robot manipulation under limited data
-and constrained compute.
+isolation, the chapter constructs a chronological and structural argument for the 
+design choices made in this thesis. 
 
-The discussion is organized into five themes: (1) limitations of classical robot
-pipelines, (2) foundations of Vision-Language Models (VLMs), (3) action modeling for
-manipulation, (4) integrated VLA system design in recent literature, and (5)
-generalization and transfer challenges. These themes form the conceptual bridge from
-problem statement (Chapter~\ref{chap:introduction}) to methodology
-(Chapter~\ref{chap:methodology}).
+The discussion is organized into five targeted themes: (1) classical robotic kinematics and the limitations of traditional path planning, (2) the shift toward Fusion-based Vision-Language Models as cognitive engines, (3) the historical evolution of VLA architectures from discrete tokenization to continuous policy experts, (4) the mathematics of continuous Diffusion and Flow Matching, and (5) the current state-of-the-art in VLA integration, including OpenVLA, SmolVLA, and Pi0.5. These themes form the conceptual bridge from problem statement to methodology.
 
+\section{ROBOT KINEMATICS AND CLASSICAL PIPELINES}
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{LIMITATIONS OF CLASSICAL ROBOT SYSTEMS}
-%─────────────────────────────────────────────────────────────────────────────
+Industrial manipulators execute motion in two interconnected mathematical spaces: joint space and Cartesian space. Forward Kinematics (FK) and Inverse Kinematics (IK) form the essential bridge between these spaces. For a 6-Degree-of-Freedom (DOF) collaborative arm such as The Dobot Cr5 (\cref{fig:dobotcr5}), high-level task targets are typically specified in Cartesian coordinates $(x, y, z, \mathrm{roll}, \mathrm{pitch}, \mathrm{yaw})$, while physical actuators execute solely joint-level rotational commands $(q_1, \dots, q_6)$.
 
-Classical robot systems are typically composed of hand-engineered perception,
-planning, and control modules. This design provides predictable behavior in fixed
-conditions, but it is often task-specific and difficult to scale to open-world
-settings. Changes in objects, layouts, or command style can require redesign of
-features, rules, and control logic.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/cr5.png}
+    \caption{A diagram of Dobot Cr5}
+    \label{fig:dobotcr5}
+\end{figure}
 
-A major weakness is limited generalization. Policies tuned for narrow task templates
-frequently fail in unseen scenarios, especially when visual context and language
-instructions vary simultaneously. In practical terms, this leads to high maintenance
-cost, brittle behavior outside curated test distributions, and poor accessibility for
-non-expert users.
+\subsection{Rigid Body Kinematics and FK/IK}
 
-Another structural limitation is interface rigidity. Classical systems commonly depend
-on deterministic command schemas or finite-state interfaces that assume predefined task
-structure. Such assumptions conflict with natural-language interaction, where intent is
-often underspecified, rephrased, or context dependent. This gap motivates multimodal
-approaches that can jointly interpret language and visual context before action
-generation.
-
-
-%─────────────────────────────────────────────────────────────────────────────
-\section{VISION-LANGUAGE MODEL FOUNDATIONS}
-%─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Transformer Backbone}
-
-Modern VLMs are built on the Transformer architecture~\cite{vaswani2017attention},
-which models long-range dependencies using multi-head self-attention. Given query,
-key, and value matrices, the core attention operation is:
-
+The configuration of a robot end-effector in three-dimensional space is described by an element of the Special Euclidean group $SE(3) = SO(3) \ltimes \mathbb{R}^3$, where $SO(3)$ is the Lie group of rotation matrices satisfying $R^\top R = I$ and $\det(R) = +1$, and $\mathbb{R}^3$ captures translation. A homogeneous transformation matrix $T \in SE(3)$ takes the block form:
 \begin{equation}
-\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+    T = \begin{bmatrix} R & p \\ 0^\top & 1 \end{bmatrix} \in \mathbb{R}^{4 \times 4}
 \end{equation}
 
-where \(d_k\) is the dimension of the key vectors. Multi-head attention computes
-attention in parallel across multiple representation subspaces, allowing the model to
-attend to different semantic aspects simultaneously. Each attention head specializes in
-different feature relationships, and outputs are concatenated and projected to form
-the final multi-head attention output.
+\textbf{Forward Kinematics} computes the unique end-effector pose from a known joint configuration $\mathbf{q}$. By mapping the manipulator as a kinematic chain using the Denavit-Hartenberg (DH) parameterization, the end-effector transform in the base frame is simply the sequential product of local coordinate frame transforms.
 
-This mechanism supports flexible context integration across image and language tokens.
-For embodied decision-making, this property is particularly relevant because robot
-policies must condition on long contextual chains: instruction text, scene structure,
-task history, and safety constraints. Attention-based architectures provide a practical
-mechanism for such cross-token dependency modeling, especially when perception and
-language are encoded in a shared sequence space.
+Conversely, \textbf{Inverse Kinematics} solves the highly non-linear reverse problem: given a desired end-effector pose $T^* \in SE(3)$, compute the required joint configuration $\mathbf{q}^*$. To prevent massive, unstable joint accelerations near kinematic singularities during execution, numerical IK methods utilizing Damped Least-Squares (DLS) on the manipulator Jacobian matrix $J(\mathbf{q})$ are heavily employed.
 
-Transformer layers further employ feed-forward networks, layer normalization, and
-residual connections to stabilize training and enable deep networks. In the context
-of VLMs for robotics, these architectural properties enable encoder-decoder VLA
-structures where image and text inputs are jointly encoded into a shared embedding
-space before being decoded into action predictions.
+\subsection{Traditional Path Planning vs. VLA Cognitive Control}
 
-\subsection{Vision-Language Instruction Following}
+Historically, once an IK solver identifies a target, moving the arm relies on traditional path planning algorithms such as Rapidly-exploring Random Trees (RRT$^*$) or A$^*$ search. These algorithms operate entirely on geometry: they search for collision-free trajectories through a known mathematical manifold. 
 
-Recent VLMs demonstrate strong multimodal instruction-following behavior through
-large-scale pretraining and instruction tuning~\cite{openai2023gpt4v,liu2023llava}.
-Typical encoders use dual-stream architectures: a vision encoder (e.g., DINOv2 or
-CLIP-based models) processes RGB images into spatial feature maps, while a language
-encoder (often a pretrained LLM) encodes natural-language instructions into token
-embeddings. These streams are fused through projection layers or cross-attention
-mechanisms to create a unified multimodal representation.
+However, traditional path planning suffers from a fundamental ``cognitive bottleneck'': it possesses zero semantic understanding of the world. It requires perfectly mapped 3D collision meshes and static environments. If instructed to "pick up the red apple," a classical planner fails catastrophically because it only understands numeric coordinate vectors, not the concepts of "red" or "apple." Vision-Language-Action models completely bypass this brittle geometric planning. By mapping raw pixels and semantic text directly to motor commands, VLAs eliminate the need for hard-coded collision meshes and explicit state estimation, allowing the robot to interact fluidly with unmapped, unstructured human environments.
 
-For robotic systems, this capability enables grounding free-form user requests in
-scene context, reducing the need for rigid command interfaces. The alignment between
-visual and linguistic semantics learned during pretraining carries over to robotics
-domains through transfer learning.
+\subsection{Practical Hardware Deployment: Dobot CR5 via Python}
 
-However, VLM output must still be translated into robot-executable actions with low
-latency and high reliability, which motivates explicit action modeling beyond
-language generation alone. From a systems perspective, two critical observations are:
-First, language-level correctness does not imply control-level correctness; syntactically
-coherent language may still ground to infeasible or unsafe motions. Second, VLM
-confidence scores or softmax probabilities over language tokens are not calibrated to
-robot execution safety. Therefore, practical robotic deployment requires an intermediate
-control layer with explicit validation rules, workspace checking, and kinematic
-compatibility verification before hardware dispatch.
+To bypass proprietary, inflexible geometric controllers and stream high-frequency AI-generated actions directly to the physical hardware, external compute nodes utilize standard TCP/IP socket programming. The Dobot CR5 provides decoupled ports for motion dispatch and real-time state feedback. Modern VLA pipelines control the arm using Python paradigms similar to the following:
 
+\begin{lstlisting}[language=Python, caption={Python TCP/IP control loop for Dobot CR5}]
+import time
+import struct
+import socket
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{ACTION MODELING FOR ROBOT MANIPULATION}
-%─────────────────────────────────────────────────────────────────────────────
+ROBOT_IP = "192.168.1.6"
+DASH_PORT, MOV_PORT, FB_PORT = 29999, 30003, 30004
+dash = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+dash.connect((ROBOT_IP, DASH_PORT))
+move = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+move.connect((ROBOT_IP, MOV_PORT))
+feed = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+feed.connect((ROBOT_IP, FB_PORT))
 
-Action generation for manipulation usually requires a design choice between discrete
-and continuous representations.
+#--- initialise------------------------------------------------------
+dash.send(b"EnableRobot()\n"); time.sleep(2)
+dash.send(b"ClearError()\n"); time.sleep(0.5)
 
-\begin{itemize}
-    \item \textbf{Discrete actions} are easier to validate and parse but may reduce
-    motion fidelity.
-    \item \textbf{Continuous actions} allow fine-grained control but are more
-    sensitive to model errors and deployment noise.
-\end{itemize}
+#--- Cartesian linear move (mm, degrees)-----------------------------
+move.send(b"MovL(-300,400,200,-180,0,90,SpeedL=50,AccL=30)\n")
 
-In practice, many systems use structured or mixed forms to balance robustness and
-expressiveness. For real-time control, action validity and execution safety are as
-important as semantic correctness.
+#--- read telemetry--------------------------------------------------
+raw = feed.recv(1440)
+# one 1440-byte feedback packet
+q_actual = struct.unpack_from("6d", raw, offset=24) # joint angles
 
-In low-resource settings, this representation choice becomes more critical. With
-limited demonstration diversity, purely continuous policies may overfit trajectory
-statistics and degrade sharply in unseen configurations. Hybrid action schemas, where
-high-level decisions are discretized (e.g., grasp, place, release) and low-level
-motion remains continuous, can improve controllability while preserving enough
-dexterity for manipulation tasks.
+#--- joint-space move------------------------------------------------
+move.send(b"MovJ(0,-30,90,0,60,0,SpeedJ=30,AccJ=20)\n")
+time.sleep(3)
+dash.send(b"DisableRobot()\n")
+for s in (dash, move, feed): s.close()
+\end{lstlisting}
 
-\subsubsection{Autoregressive Action Generation}
+By continuously looping {\scriptsize\texttt{ServoP}} or {\scriptsize\texttt{ServoJ}} commands at 10--30 Hz, a VLA policy can dynamically adjust its trajectory in real time based on incoming visual observations.
 
-Autoregressive models (exemplified by OpenVLA~\cite{kim2024openvla}) generate action
-sequences token-by-token, conditioned on previously generated actions and multimodal
-context. This approach enables direct attention to grounded linguistic intent at each
-decoding step. The advantage is computational simplicity and straightforward likelihood
-maximization during training. A limitation is that errors in early time-steps can
-propagate, potentially producing incoherent long-horizon trajectories.
+\section{VISION-LANGUAGE MODELS (VLMs) IN EMBODIED AI}
 
-\subsubsection{Diffusion-Based Action Generation}
+To interpret raw pixels and free-form human intent, robotic systems embed massive Vision-Language Models. However, the architectural design of these VLMs dictates their feasibility for robotics research.
 
-Diffusion models (as in Pi 0.5~\cite{sun2025pi05} and enhanced DiT
-architectures~\cite{peebles2023dit,liu2024enhanceddit}) operate by learning to
-iteratively refine action trajectories from random noise via a learned reverse diffusion
-process. The forward diffusion process gradually adds noise to clean trajectories, and
-the model learns to predict and remove noise conditioned on multimodal inputs. Key
-advantages include:
-\begin{itemize}
-    \item \textbf{Trajectory smoothness}: iterative refinement naturally encourages
-    spatiotemporal coherence, reducing jerky or discontinuous joint motion.
-    \item \textbf{Uncertainty modeling}: the diffusion process naturally captures
-    multimodal action distributions, important when multiple valid action sequences
-    satisfy the same instruction.
-    \item \textbf{Long-horizon stability}: refinement steps reduce accumulation of
-    single-step prediction errors over long horizons.
-\end{itemize}
+\subsection{Native vs. Fusion Architectures}
 
-For low-resource robotics, diffusion-based approaches have shown particular promise
-because they can be implemented efficiently with compact DiT (Diffusion Transformer)
-backbones that fit within 8 GB VRAM constraints while maintaining strong performance.
+Modern VLMs fall into two primary categories: \textit{Native} and \textit{Fusion} models. Native VLMs (e.g., GPT-4V, Qwen-VL) are trained entirely from scratch on interleaved text-image datasets. While highly capable, training and fine-tuning Native models requires staggering computational resources that are prohibitive for specialized, iterative robotics research.
 
-Action modeling in this thesis therefore emphasizes three properties:
-\begin{enumerate}[label=\arabic*)]
-    \item \textbf{Executability}: model outputs must map directly to controller-valid
-    commands.
-    \item \textbf{Safety compatibility}: outputs must satisfy workspace and joint-range
-    constraints before execution.
-    \item \textbf{Latency feasibility}: decoding and validation must remain practical
-    for interactive command cycles (a critical constraint for 8 GB VRAM deployment).
-\end{enumerate}
+Conversely, Fusion models (e.g., LLaVA, Prismatic) leverage already-trained unimodal giants. They freeze a powerful Vision Transformer (ViT) and a Large Language Model (LLM), training only a highly lightweight projection layer (such as a multi-layer perceptron or Q-Former) to map visual embeddings into the LLM's input space. 
 
+For robotics, \textbf{Fusion is overwhelmingly the superior paradigm}. Fusion models achieve semantic reasoning and instruction grounding that heavily rival Native models, but at a fraction of the computational cost. Through Parameter-Efficient Fine-Tuning techniques like LoRA (Low-Rank Adaptation), a 7-Billion parameter Fusion model can be fine-tuned on a single consumer GPU in under 24 hours. Furthermore, Fusion is modular; researchers can seamlessly swap out the visual encoder for one better suited to robotics without retraining the entire language engine.
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{VISION-LANGUAGE-ACTION INTEGRATION}
-%─────────────────────────────────────────────────────────────────────────────
+\subsection{Contrastive Encoders and the Semantic-Spatial Gap}
 
-\subsection{VLA Systems in Prior Work}
+Fusion VLMs typically utilize visual encoders trained via contrastive alignment, such as CLIP or SigLIP. SigLIP replaces large-batch softmax normalization with a highly efficient sigmoid binary classification loss:
+\begin{equation}
+    \mathcal{L}_{\mathrm{SigLIP}} = -\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{N} \log\sigma\!\left(z_{ij}\left(t\, v_i^\top l_j - b\right)\right)
+\end{equation}
+While excellent at semantic grounding ("this is a handle"), contrastive encoders inherently discard fine-grained spatial and geometric geometry ("the handle is exactly 4.2cm away"). Standard VLMs suffer from this semantic-spatial gap: they know \textit{what} to do, but lack the millimeter precision of \textit{how} to do it physically.
 
-Research on Vision-Language-Action integration has shown that combining multimodal
-reasoning with action prediction can improve robotic adaptability. Foundational work
-included RT-2~\cite{brohan2023rt2} for language-conditioned action generation and
-PaLM-E~\cite{driess2023palme} for embodied multimodal context integration.
+\section{THE EVOLUTION OF VLA: FROM TOKENS TO EXPERTS}
 
-\subsubsection{Architectural Landscape and SOTA Approaches}
+The integration of VLMs into robotics did not immediately yield smooth, continuous motion. The methodology underwent a rapid evolution from text-prediction to dedicated action policies.
 
-More recent open-source efforts have accelerated the field. OpenVLA~\cite{kim2024openvla}
-provided an accessible framework for scalable VLA training via an autoregressive
-architecture, establishing a dual-encoder convention (SigLIP for vision, CLIP for
-language) that has become widely adopted. The architectural landscape has since
-expanded to include diffusion-based approaches: Pi 0.5~\cite{sun2025pi05} demonstrates
-state-of-the-art performance using diffusion policy methodology with careful action
-space design for dexterity-task transfer, while CoBot~\cite{lin2025sota} establishes
-a practical open-source pipeline for real-world deployment with modular action
-validation layers.
+\subsection{The Genesis: Next-Token Prediction}
 
-These systems indicate that end-to-end multimodal-action learning can outperform
-strictly task-specific pipelines, particularly when data diversity is sufficiently
-high. At the same time, practical deployment still faces significant constraints:
-in compute and memory (especially for 8 GB VRAM class hardware), latency requirements
-for interactive control, data scale limitations in low-resource settings, and module
-coordination complexity. The choice between autoregressive and diffusion-based action
-generation remains architecture-dependent, with diffusion models increasingly preferred
-for trajectory smoothness, multimodal action handling, and uncertainty quantification
-under deployment constraints.
+The concept of a unified Vision-Language-Action model was born with Google DeepMind's RT-1 and RT-2 architectures. Because LLMs operate via autoregressive sequence modeling (predicting the next discrete text word), early researchers framed robot control as a translation task. They discretized the physical joint limits of the robot into text tokens (e.g., {\scriptsize\texttt{<joint\_1\_pos\_15>}}) and simply appended them to the LLM's vocabulary. 
 
-An important methodological implication is that integration quality is not solely a
-model-size problem. Even strong backbones can fail if perception features, language
-intent representations, and action outputs are weakly coupled. Consequently,
-architectural clarity and interface design are central to robust VLA behavior.
+To move the robot, the model would autoregressively generate text strings representing joint coordinates. While revolutionary because it proved large-scale robotic generalization was possible, this paradigm had severe flaws:
+1. \textbf{Resolution Floor:} Discretizing continuous 3D space into 256 or 512 text bins mathematically forces a permanent margin of error (typically 2-5mm), making fine dexterous tasks like threading a needle impossible.
+2. \textbf{Latency and Error Cascading:} Predicting one joint token at a time is computationally slow. If the model hallucinates or makes a slight error on token 2, the error permanently cascades into the predictions for tokens 3 through 6.
 
-\subsection{Need for Modular Integration}
+\subsection{The Modern Era: Decoupled Action Policy Experts}
 
-A practical VLA system must synchronize three capabilities:
-\begin{enumerate}[label=\arabic*)]
-    \item language grounding and task understanding,
-    \item visual feature extraction under scene variation,
-    \item robust generation of executable manipulation actions.
-\end{enumerate}
+To solve the dexterity and latency issues, the field shifted drastically from next-token prediction to \textbf{Action Policy Experts}. Instead of forcing the LLM to output discrete robot coordinates, the VLM is used purely as a cognitive backbone. It processes the image and text, then outputs a dense, highly semantic continuous embedding (a "thought vector"). 
 
-This motivates the modular design used in this thesis: VLM core, Vision Expert, and
-Action Expert connected by explicit intermediate representations.
+This embedding is passed into a separate, lightweight Action Expert network (such as a Diffusion model). The Action Expert operates entirely in continuous space, bypassing discrete tokenization. This hybrid approach flawlessly merges the internet-scale semantic reasoning of the VLM with the high-frequency, continuous precision of classical control.
 
-The modular strategy is adopted not as a rejection of end-to-end learning, but as a
-practical compromise between trainability, interpretability, and computational
-efficiency. It enables targeted diagnosis of failure sources (language grounding versus
-visual ambiguity versus action decoding) while supporting end-to-end optimization during
-later refinement stages. Explicit intermediate representations also improve debugging and
-allow module-specific optimization: the VLM can be tuned for instruction grounding
-accuracy, the Vision Expert for task-relevant perception, and the Action Expert for
-target smoothness and executability independently, before final integration testing.
+\section{DIFFUSION MODELS IN ROBOTICS CONTROL}
 
-This approach is particularly valuable in low-resource settings where full end-to-end
-retraining is expensive. Modular interfaces also facilitate sim-to-real transfer by
-allowing targeted domain adaptation of individual modules (e.g., retraining the Vision
-Expert on real camera data while keeping other modules frozen).
+To serve as the continuous Action Expert, Diffusion Models have become the gold standard, replacing traditional Behavioral Cloning (BC). Standard BC simply averages expert demonstrations, failing catastrophically when presented with multimodal human data (e.g., reaching an object from the left vs. the right).
 
+\subsection{DDPM and Action Chunking}
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{GENERALIZATION IN ROBOT LEARNING}
-%─────────────────────────────────────────────────────────────────────────────
+Denoising Diffusion Probabilistic Models (DDPM) gradually corrupt a target action chunk (a sequence of future actions) with Gaussian noise, and train a neural network $\epsilon_\theta$ to predict the added noise, conditioned on the VLM's observation embeddings $c$:
+\begin{equation}
+    \mathcal{L}_{\mathrm{DDPM}} = \mathbb{E}_{\mathbf{x}_0,\,\epsilon \sim \mathcal{N}(0,I),\,t} \!\left[\|\epsilon - \epsilon_\theta(\mathbf{x}_t, t, c)\|_2^2\right]
+\end{equation}
+This iterative denoising mirrors physical trajectory refinement: starting from random noise and progressively carving out a specific, safe physical trajectory. Predicting an entire "Action Chunk" (e.g., 50 future steps at once) rather than a single step provides immense temporal smoothness and mitigates inference latency.
 
-Generalization remains a central challenge in embodied AI. Training performance on
-seen tasks does not guarantee transfer to unseen objects, compositions, and
-instruction phrasings. Dataset limitations amplify this gap because robot
-demonstrations are expensive to collect at scale.
+\subsection{U-Net vs. DiT Backbones}
 
-Current literature suggests several factors that improve transfer:
-\begin{itemize}
-    \item \textbf{Task diversity}: broader coverage of manipulation primitives
-    (grasping, placing, pushing, stacking) and object categories during training.
-    \item \textbf{Language variation}: diverse phrasings and natural-language
-    descriptions of the same task reduce linguistic overfitting.
-    \item \textbf{Visual robustness}: vision encoders pretrained on large-scale
-    datasets (e.g., ImageNet, LAION) or trained with self-supervised objectives
-    (e.g., DINOv2) tend to generalize better across lighting, camera angles, and
-    object appearance.
-    \item \textbf{Interface stability}: stable, hardware-compatible action spaces
-    reduce execution noise and enable smoother generalization to novel configurations.
-    \item \textbf{Sim-to-real transfer}: training on simulation with domain randomization
-    and then fine-tuning on limited real-world data often outperforms
-    simulation-only approaches.
-\end{itemize}
+Early diffusion policies utilized 1D temporal convolutional \textbf{U-Net} architectures. While exceptionally sample-efficient on small robotic datasets, U-Nets struggle to process the massive, high-dimensional context tokens generated by modern VLMs. 
 
-These findings directly inform the design constraints and evaluation protocol of this
-thesis, where unseen-task performance is treated as a primary metric rather than a
-secondary result. Specifically, the thesis maintains separate evaluation of seen and
-unseen tasks to measure generalization quality explicitly.
+Consequently, the field adopted Diffusion Transformers (DiT). DiT treats the noisy physical action chunks and the VLM's semantic tokens as a single, unified sequence, relying entirely on scalable self-attention mechanisms. This drastically improves the model's ability to execute complex, multi-stage reasoning tasks over long horizons (\cref{fig:unet-dit}).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/unet-dit.png}
+    \caption{Comparison between U-Net and DiT}
+    \label{fig:unet-dit}
+\end{figure}
 
-For low-resource VLA development, generalization capability should be interpreted as
-a transfer ratio (unseen performance divided by seen performance), not only as an
-absolute competence score. The key question is: how much capability is retained when
-moving from seen to unseen conditions under fixed resource budgets? This contextual
-view aligns with the thesis objective of practical deployment rather than leaderboard
-optimization. A system that achieves 80\% success on seen tasks and 70\% on unseen
-tasks (87.5\% retention ratio) may be more practically useful than one achieving 95\%
-on seen but only 50\% on unseen (52.6\% retention ratio), because the former is more
-reliable for new user requests.
+\subsection{Flow Matching for Fast Inference}
 
+Despite advancements like DDIM sampling, the iterative nature of diffusion incurs latency. Flow Matching has recently emerged to solve this. Instead of iterative step-by-step denoising, Flow Matching learns a continuous vector field that transports pure noise directly to the expert action distribution along straight-line paths:
+\begin{equation}
+    \mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, \mathbf{x}_0, \mathbf{x}_1} \!\left[\|v_\theta(\mathbf{x}_t, t) - (\mathbf{x}_1 - \mathbf{x}_0)\|_2^2\right]
+\end{equation}
+Because straight lines possess zero curvature, Flow Matching requires vastly fewer integration steps (often $\leq 10$), perfectly satisfying the strict sub-100ms latency constraints of real-world robotic deployment.
 
-%─────────────────────────────────────────────────────────────────────────────
-\section{CHAPTER SUMMARY}
-%─────────────────────────────────────────────────────────────────────────────
+\newpage
 
-This chapter established the theoretical and empirical basis for the proposed
-Vision-Language-Action approach. Prior work confirms the potential of multimodal
-robot learning but also highlights unresolved issues in flexibility, natural-language
-interaction, and generalization. These gaps motivate the VLA architecture developed in
-Chapter~\ref{chap:methodology}, where a VLM, Vision Expert, and Action Expert are
-integrated for practical robot manipulation under real-world constraints.
+\section{STATE-OF-THE-ART IN VLA INTEGRATION}
+
+Modern SOTA models synthesize these concepts into highly capable foundation models for robotics.
+
+\subsection{OpenVLA}
+OpenVLA is the open-source pioneer of large-scale VLA control. Built on a 7B-parameter Llama-2 fusion backbone, it combines semantic SigLIP features with spatially dense DINOv2 features (\cref{fig:openvla}). Fine-tuned efficiently via LoRA on massive cross-embodiment datasets (nearly 1 million trajectories), OpenVLA provides unmatched out-of-the-box generalization. However, because it relies on the older paradigm of autoregressive discrete token prediction (256 quantization bins), it remains structurally bottlenecked in tasks requiring sub-millimeter precision or rapid 30Hz continuous adjustments.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/openvla.png}
+    \caption{OpenVLA architecture}
+    \label{fig:openvla}
+\end{figure}
+
+\subsection{SmolVLA}
+Addressing the massive computational overhead of 7B+ parameter models like OpenVLA, \textbf{SmolVLA} (\cref{fig:smolvla}) represents the cutting-edge shift toward highly compressed, edge-efficient architectures. By leveraging aggressively distilled LLM backbones (typically $\leq$ 2B parameters) and heavily optimized multimodal connectors, SmolVLA significantly reduces VRAM footprint and inference latency. It proves that with targeted, high-quality demonstration data and optimized parameter footprints, VLAs can be deployed directly onto edge compute (e.g., localized robot processing units) without losing core semantic reasoning capabilities, making it ideal for cost-constrained academic and industrial applications.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/smolvla.png}
+    \caption{SmolVLA architecture}
+    \label{fig:smolvla}
+\end{figure}
+
+\subsection{Pi-Zero (\texorpdfstring{$\pi_0$}{pi0}) and Pi0.5}
+Developed by Physical Intelligence, $\pi_0$ and the refined Pi0.5 (\cref{fig:pi05}) represent the pinnacle of continuous VLA control. Breaking away from discrete tokens completely, Pi0.5 employs the decoupled Action Policy Expert paradigm. It utilizes a powerful Fusion VLM (PaliGemma) to process multimodal context, piping those rich embeddings directly into a DiT-based continuous Flow Matching expert. This perfectly merges the internet-scale cognitive reasoning of a VLM with the smooth, high-frequency, millimeter-precision capabilities of modern diffusion models, resulting in unprecedented success rates on highly dexterous bimanual manipulation tasks.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/pi05.png}
+    \caption{Pi0.5  architecture}
+    \label{fig:pi05}
+\end{figure}
+
+\section{GENERALIZATION AND CHAPTER SUMMARY}
+
+Generalization remains the ultimate challenge in embodied AI. Physical robot demonstrations are profoundly expensive to harvest, requiring algorithms to infer broad, robust behaviors from limited data. The literature dictates that generalizable transfer requires robust decoupling of semantic and spatial architectures, cross-embodiment pretraining, and highly stable continuous action interfaces.
+
+In summary, classical geometric pipelines fail due to extreme brittleness, lacking the cognitive capacity to understand human intent. The field evolved to adopt Fusion VLMs, which provide unparalleled semantic reasoning at low computational costs. While early systems like RT-1 and OpenVLA framed control as discrete next-token prediction, the field rapidly advanced to continuous DiT and Flow Matching Action Experts, as seen in Pi0.5. To address the need for robust, precise manipulation on accessible hardware budgets, the methodology proposed in this thesis heavily leverages these findings: uniting a parameter-efficient Fusion VLM backbone with a continuous, latency-optimized Diffusion expert for real-world control of the Dobot CR5.

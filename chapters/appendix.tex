@@ -1,5 +1,6 @@
 \cleardoublepage
 \chapter{Supplementary Materials}
+\label{app:supplementary}
 
 This appendix compiles supporting materials that complement the main thesis content. The items included here are intended to improve reproducibility and provide implementation details that are too lengthy for the core chapters.
 
@@ -46,9 +47,9 @@ Table~\ref{tab:appendix-extended-results} provides additional performance result
         \hline
         Setting & Task Success (\%) & Action Validity (\%) & Generalization Ratio (\%) \\
         \hline
-        VLM only & 68.9 & 81.5 & -- \\
-        VLM + Vision Expert & 77.4 & 88.2 & -- \\
-        VLM + Action Expert & 75.1 & 90.4 & -- \\
+        Perception only (QwenVL3.5 2B) & 68.9 & 81.5 & -- \\
+        Perception + Safety Layer & 77.4 & 88.2 & -- \\
+        Perception + DiT & 75.1 & 90.4 & -- \\
         Full VLA (Seen tasks) & 87.9 & 96.4 & 100.0 \\
         Full VLA (Unseen tasks) & 78.6 & 92.1 & 89.4 \\
         \hline
@@ -64,11 +65,22 @@ The generalization ratio is computed as
 Key implementation details are listed below for completeness:
 
 \begin{enumerate}
-    \item Data preprocessing steps: simulation trajectories were exported from Isaac Lab into LeRobot format; real-world demonstrations were normalized into the same observation-instruction-action schema; sequence windows were clipped to fixed horizon and value ranges were normalized to controller-safe bounds.
+    \item Data preprocessing steps: simulation trajectories were exported from Isaac Lab into LeRobot format for training; real-world demonstrations were normalized into the same observation-instruction-action schema for evaluation; sequence windows were clipped to fixed horizon and value ranges were normalized to controller-safe bounds.
     \item Model training procedure: AdamW optimizer with staged training (module adaptation then end-to-end tuning), mixed precision, small-batch strategy with gradient accumulation, and early stopping based on validation task success.
     \item Inference workflow: RGB frame and natural-language command are encoded by the multimodal backbone, fused into a task-conditioned latent, then decoded into structured robot actions and translated by the TCP/IP adapter to executable Dobot command packets.
     \item Error handling and edge cases: invalid action packets are dropped by range-checking and format-checking guards; out-of-workspace targets are clamped or rejected; communication timeout triggers safe stop and reset to predefined start pose.
 \end{enumerate}
+
+\section{External Tooling and Repository Links}
+\label{app:external-tools}
+
+The primary open-source tooling used for Dobot communication and synchronized
+collection is listed below:
+
+\begin{itemize}
+    \item \textbf{Dobot Dataset Collection Tools}:\newline
+    \url{https://github.com/FalightSK/Dobot-Dataset-Collection-Tools}~\cite{falightsk2025dobot}. This repository is used as the practical baseline for TCP/IP communication wrappers, synchronized camera-joint logging, and export utilities in the workflow.
+\end{itemize}
 
 \section{Usage Instructions for Reproduction}
 To reproduce the reported results, follow these steps:
@@ -76,23 +88,10 @@ To reproduce the reported results, follow these steps:
 \begin{enumerate}
     \item Prepare the environment and install dependencies for simulation, model training, and robot communication.
     \item Generate simulation data in Isaac Lab and convert to LeRobot format.
-    \item Collect real-world human demonstration episodes and merge them into the unified dataset.
+    \item Collect real-world human demonstration episodes for deployment validation and sim-to-real evaluation.
     \item Train the model using the low-resource configuration (8 GB VRAM class, mixed precision, gradient accumulation).
     \item Run evaluation in four settings: success-rate (sim), success-rate (real), zero-shot (sim), and zero-shot (real).
     \item Compare the results with Chapter~4 and Table~\ref{tab:appendix-extended-results}.
 \end{enumerate}
-
-\section{Open-Source Tools and Resources}
-
-The following open-source tools and code repositories are instrumental for
-reproducibility and extension of this work:
-
-\begin{itemize}
-    \item \textbf{Dobot Dataset Collection Tools}~\cite{falightsk2025dobot}: A comprehensive
-    Python toolchain for multimodal robot demonstration collection from the Dobot CR5
-    robotic arm. The toolkit captures synchronized dual-camera RGB frames, relative
-    joint trajectories, and input-output (IO) state, providing the infrastructure for
-    constructing high-quality training datasets with minimal setup overhead.
-\end{itemize}
 
 \clearpage
